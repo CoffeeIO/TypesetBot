@@ -1,0 +1,29 @@
+{
+  "name": "TypeBot",
+  "version": "0.1.0",
+  "description": "",
+  "author": "Mathias Grundtvig Andreasen (MGApcDev)",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "gulp": "*",
+    "gulp-watch": "*",
+    "gulp-uglify": "*",
+    "gulp-rename": "*",
+    "gulp-concat": "*",
+    "pump": "~1.0.1",
+    "jasmine-core": "^2.4.1",
+    "karma": "^1.1.1",
+    "karma-chrome-launcher": "^1.0.1",
+    "karma-jasmine": "^1.0.2"
+  },
+  "devDependencies": {
+    "karma-html2js-preprocessor": "~1.1.0"
+  },
+  "scripts": {
+    "test": "karma start karma.conf.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MGApcDev/TypeBot"
+  }
+}
