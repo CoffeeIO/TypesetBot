@@ -1,4 +1,4 @@
-var TypeBot = (function(obj, $) {
+var TypesetBot = (function(obj, $) {
 
     /**
      * Typeset selected elements.
