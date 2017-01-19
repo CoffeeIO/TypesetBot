@@ -3,7 +3,7 @@ var TypesetBot = (function(obj, $) {
     /**
      * Typeset selected elements.
      */
-    obj.typeset = function(selector) {
+    obj.run = function(selector) {
         throw "Not implemented";
     };
 
