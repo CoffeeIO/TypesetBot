@@ -1,10 +1,11 @@
-var TypesetBot = (function(obj, $) {
+TypesetBot = (function(obj, $) {
 
+    obj.global = 420;
     /**
      * Typeset selected elements.
      */
     obj.run = function(selector) {
-        throw "Not implemented";
+        console.log(obj.lineUtils.func() + ' world');
     };
 
     /**
@@ -22,4 +23,4 @@ var TypesetBot = (function(obj, $) {
     };
 
     return obj;
-}(TypeBot || {}, jQuery));
+}(TypesetBot || {}, jQuery));

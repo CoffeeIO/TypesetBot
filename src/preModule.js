@@ -1,0 +1,2 @@
+// Define module.
+var TypesetBot = {};
