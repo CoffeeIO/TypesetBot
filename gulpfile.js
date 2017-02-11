@@ -13,6 +13,7 @@ gulp.task('uglify', function() {
         'src/preModule.js',
         'src/typesetbot.lineUtils.js',
         'src/typesetbot.wordUtils.js',
+        'src/typesetbot.paraUtils.js',
         'src/typesetbot.js',
         'src/postModule.js'
     ])
