@@ -10,7 +10,11 @@ gulp.task('default', ['uglify'], function () {
 gulp.task('uglify', function() {
     return gulp.src([
         'node_modules/jquery/dist/jquery.min.js',
-        'src/main.js'
+        'src/preModule.js',
+        'src/typesetbot.lineUtils.js',
+        'src/typesetbot.wordUtils.js',
+        'src/typesetbot.js',
+        'src/postModule.js'
     ])
     .pipe(concat('main.min.js'))
     .pipe(uglify())

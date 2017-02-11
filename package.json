@@ -1,5 +1,5 @@
 {
-  "name": "TypesetBot",
+  "name": "typsetbot",
   "version": "0.1.0",
   "description": "",
   "author": "Mathias Grundtvig Andreasen (MGApcDev)",
@@ -8,19 +8,21 @@
     "jquery": "~3.1.1"
   },
   "devDependencies": {
-    "gulp": "*",
-    "gulp-watch": "*",
-    "gulp-uglify": "*",
-    "gulp-rename": "*",
-    "gulp-concat": "*",
-    "pump": "~1.0.1",
-    "jasmine-core": "^2.4.1",
-    "karma": "^1.1.1",
-    "karma-chrome-launcher": "^1.0.1",
-    "karma-jasmine": "^1.0.2",
+    "gulp": "~3.9.1",
+    "gulp-watch": "~4.3.11",
+    "gulp-uglify": "~2.0.1",
+    "gulp-rename": "~1.2.2",
+    "gulp-concat": "~2.6.1",
+    "pump": "~1.0.2",
+    "jasmine-core": "~2.5.2",
+    "karma": "~1.4.1",
+    "karma-chrome-launcher": "~2.0.0",
+    "karma-jasmine": "~1.1.0",
     "karma-html2js-preprocessor": "~1.1.0"
   },
   "scripts": {
+    "start": "python -m SimpleHTTPServer",
+    "pretest": "gulp",
     "test": "karma start karma.conf.js"
   },
   "repository": {

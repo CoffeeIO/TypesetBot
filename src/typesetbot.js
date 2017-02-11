@@ -1,4 +1,4 @@
-var TypesetBot = (function(obj, $) {
+TypesetBot = (function(obj, $) {
 
     /**
      * Typeset selected elements.
@@ -15,11 +15,11 @@ var TypesetBot = (function(obj, $) {
     };
 
     /**
-     * Detach selected elements not to be watched by TypeBot.
+     * Unwatch selected elements.
      */
     obj.detach = function(selector) {
         throw "Not implemented";
     };
 
     return obj;
-}(TypeBot || {}, jQuery));
+}(TypesetBot || {}, jQuery));
