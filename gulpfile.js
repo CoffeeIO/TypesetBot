@@ -12,6 +12,7 @@ gulp.task('uglify', function() {
         'node_modules/jquery/dist/jquery.min.js',
         'src/preModule.js',
         'src/typesetbot.lineUtils.js',
+        'src/typesetbot.wordUtils.js',
         'src/typesetbot.js',
         'src/postModule.js'
     ])
