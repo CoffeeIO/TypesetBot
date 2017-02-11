@@ -11,10 +11,10 @@ TypesetBot.paraUtils = (function(obj){
         var regMarkup = /^[\s\b]*<[\w]+/;
 
         if (elem.html() === undefined) {
-            return elem; // ignore special elements without markup: style, script..
+            return elem; // Ignore special elements without markup: style, script..
         }
 
-        var html = '', // returning markup
+        var html = '', // Returning markup
             clone = elem.clone();
 
         // Elements to skip
@@ -24,7 +24,7 @@ TypesetBot.paraUtils = (function(obj){
             return elem;
         }
 
-        //Check empty elements
+        // Check empty elements
         if (clone.html().trim() === '') {
             return elem;
         }
