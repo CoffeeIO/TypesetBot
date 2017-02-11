@@ -1,11 +1,10 @@
 TypesetBot = (function(obj, $) {
 
-    obj.global = 420;
     /**
      * Typeset selected elements.
      */
     obj.run = function(selector) {
-        console.log(obj.lineUtils.func() + ' world');
+        throw "Not implemented";
     };
 
     /**
@@ -16,7 +15,7 @@ TypesetBot = (function(obj, $) {
     };
 
     /**
-     * Detach selected elements not to be watched by TypeBot.
+     * Unwatch selected elements.
      */
     obj.detach = function(selector) {
         throw "Not implemented";
