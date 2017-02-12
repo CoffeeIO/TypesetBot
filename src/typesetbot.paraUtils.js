@@ -1,7 +1,7 @@
 TypesetBot.paraUtils = (function(obj){
 
     obj.getWords  = function (html) {
-        return html.trim().replace(/ (?![^<]*>)/g, '&nbsp;').split('&nbsp;');
+        return html.trim().replace( /\n/g, " " ).replace( /\s+/g, " " ).replace(/ (?![^<]*>)/g, '&nbsp;').split('&nbsp;');
     };
 
     /**

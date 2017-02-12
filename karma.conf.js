@@ -18,6 +18,8 @@ module.exports = function(config) {
             // Source files.
             {pattern: 'dist/main.min.js', watched: true, included: true, served: true},
 
+            {pattern: 'fixtures/**/*.html'},
+
             // Test files.
             {pattern: 'test/paraUtils.test.js', watched: true, included: true, served: true},
 
