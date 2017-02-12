@@ -17,4 +17,21 @@ describe('Paragraph utilities:', function () {
             expect(TypesetBot.paraUtils.getWords($('.space').html()).length).toEqual(TypesetBot.paraUtils.getWords($('.plain').html()).length);
         });
     });
+
+    describe('Get default space width:', function () {
+        it('Normal font-size', function () {
+            expect(TypesetBot.paraUtils.getDefaultSpaceWidth($('.plain'))).toBeLessThan(5);
+            expect(TypesetBot.paraUtils.getDefaultSpaceWidth($('.plain'))).not.toBeLessThan(4);
+        });
+        it('Big font-size', function () {
+            expect(TypesetBot.paraUtils.getDefaultSpaceWidth($('.big-font'))).toBeLessThan(9);
+            expect(TypesetBot.paraUtils.getDefaultSpaceWidth($('.big-font'))).not.toBeLessThan(8);
+            // Bigger font-size, bigger default space.
+            expect(TypesetBot.paraUtils.getDefaultSpaceWidth($('.big-font'))).not.toBeLessThan(TypesetBot.paraUtils.getDefaultSpaceWidth($('.plain')));
+        });
+    });
+
+    // describe('Set space width:', function () {
+    //
+    // });
 });
