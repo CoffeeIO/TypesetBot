@@ -33,7 +33,28 @@ describe('Paragraph utilities:', function () {
         });
     });
 
-    // describe('Set space width:', function () {
-    //
-    // });
+    describe('Set space width:', function () {
+        it('Correct spacing with em relative to font-size', function () {
+            var defaultSpaceWidth = Number(TypesetBot.paraUtils.getDefaultSpaceWidth($('.plain'))),
+                fontSize = Number($('.plain').css('font-size').replace('px', ''));
+            TypesetBot.paraUtils.setSpaceWidth($('.plain'), '1/3', 'em');
+
+            var expectedSpaceWidth = fontSize / 3,
+                trueSpaceWidth = Number($('.plain').css('word-spacing').replace('px', ''));
+
+            expect((defaultSpaceWidth + trueSpaceWidth) - 0.1).toBeLessThan(expectedSpaceWidth);
+            expect((defaultSpaceWidth + trueSpaceWidth) + 0.1).not.toBeLessThan(expectedSpaceWidth);
+        });
+        it('Correct spacing with em relative to font-size - big font', function () {
+            var defaultSpaceWidth = Number(TypesetBot.paraUtils.getDefaultSpaceWidth($('.big-font'))),
+                fontSize = Number($('.big-font').css('font-size').replace('px', ''));
+            TypesetBot.paraUtils.setSpaceWidth($('.big-font'), '1/6', 'em');
+
+            var expectedSpaceWidth = fontSize / 6,
+                trueSpaceWidth = Number($('.big-font').css('word-spacing').replace('px', ''));
+
+            expect((defaultSpaceWidth + trueSpaceWidth) - 0.1).toBeLessThan(expectedSpaceWidth);
+            expect((defaultSpaceWidth + trueSpaceWidth) + 0.1).not.toBeLessThan(expectedSpaceWidth);
+        });
+    });
 });
