@@ -45,6 +45,7 @@ describe('Paragraph utilities:', function () {
             expect((defaultSpaceWidth + trueSpaceWidth) - 0.1).toBeLessThan(expectedSpaceWidth);
             expect((defaultSpaceWidth + trueSpaceWidth) + 0.1).not.toBeLessThan(expectedSpaceWidth);
         });
+
         it('Correct spacing with em relative to font-size - big font', function () {
             var defaultSpaceWidth = Number(TypesetBot.paraUtils.getDefaultSpaceWidth($('.big-font'))),
                 fontSize = Number($('.big-font').css('font-size').replace('px', ''));
