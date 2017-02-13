@@ -2,15 +2,25 @@ TypesetBot.lineUtils = (function(obj){
 
     obj.lastLineWidth = 0;
     obj.searchWidth = function (dom, idealW, search, p) {
-        // Check search width, 1px accuracy.
+        // Check search width, 0.2% accuracy.
+        var accuracy = 0.002 * idealW,
+            lowT = false,
+            highT = false;
         p.elem.css('margin-left', (search - p.baseW) + 'px');
         if (p.elem.position().top === p.yPos && p.elem.height() === p.baseH) {
-
+            lowT = true;
+        } else {
+            // Search lower width.
+            return 'lower';
+        }
+        p.elem.css('margin-left', (search - p.baseW + accuracy) + 'px');
+        if (p.elem.position().top === p.yPos && p.elem.height() === p.baseH) {
+            // Search higher width.
+            return 'higher';
         }
 
-        // Search higher width.
+        return search;
 
-        // Search lower width.
     };
 
     /**
