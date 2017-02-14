@@ -25,25 +25,13 @@ TypesetBot.lineUtils = (function(obj){
      * Assume we are on a newline.
      */
     obj.nextLineWidth  = function (dom, idealW) {
-        dom.append('<span class="typeset-linewidth">1 1</span>'); // Assuming any line is longer than '1 1'
+        dom.append('<span class="typeset-linewidth">1 1</span>'); // Assuming all lines are longer than '1 1'
 
         var pointer = dom.find('.typeset-linewidth'),
             yPos = pointer.position().top,
             baseW = pointer.width(),
-            baseH = pointer.height();
-
-        pointer.css('margin-left', (idealW - baseW) + 'px');
-
-        // Check if ideal width is the actual line width.
-        // If the y postiion and height of the span is unaffected, we can assume line width = ideal width.
-        if (pointer.position().top === yPos && pointer.height() === baseH) {
-            pointer.remove();
-            obj.lastLineWidth = 0; // Reset last binary search
-            return idealW;
-        }
-
-        // Check search width, 0.2% accuracy.
-        var accuracy = 0.002 * idealW;
+            baseH = pointer.height(),
+            accuracy = 0.002 * idealW; // Search width, 0.2% accuracy
 
         // Check if ideal width is the same as the last line.
         if (obj.lastLineWidth !== 0) {
@@ -64,6 +52,15 @@ TypesetBot.lineUtils = (function(obj){
                 pointer.remove();
                 return obj.lastLineWidth;
             }
+        }
+
+        // Check if ideal width is the actual line width.
+        // If the y postiion and height of the span is unaffected, we can assume line width = ideal width.
+        pointer.css('margin-left', (idealW - baseW) + 'px');
+        if (pointer.position().top === yPos && pointer.height() === baseH) {
+            pointer.remove();
+            obj.lastLineWidth = 0; // Reset last binary search
+            return idealW;
         }
 
         return obj.searchWidth(dom, accuracy, idealW / 2, {
