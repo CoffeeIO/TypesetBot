@@ -21,7 +21,7 @@ module.exports = function(config) {
             {pattern: 'fixtures/**/*.html'},
 
             // Test files.
-            {pattern: 'test/paraUtils.test.js', watched: true, included: true, served: true},
+            {pattern: 'test/*.test.js', watched: true, included: true, served: true},
 
         ],
 
