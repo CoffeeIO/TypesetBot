@@ -1,17 +1,17 @@
 TypesetBot.lineUtils = (function(obj){
 
     obj.lastLineWidth = 0;
-    obj.searchWidth = function (dom, accuracy, search, p) {
+    obj.searchWidth = function (dom, accuracy, search, offset, p) {
         p.elem.css('margin-left', (search - p.baseW) + 'px');
         if (!(p.elem.position().top === p.yPos && p.elem.height() === p.baseH)) {
             // Search lower width.
-            return obj.searchWidth(dom, accuracy, search * 0.5, p);
+            return obj.searchWidth(dom, accuracy, search - offset, offset / 2, p);
         }
 
         p.elem.css('margin-left', (search - p.baseW + accuracy) + 'px');
         if (p.elem.position().top === p.yPos && p.elem.height() === p.baseH) {
             // Search higher width.
-            return obj.searchWidth(dom, accuracy, search * 1.5, p);
+            return obj.searchWidth(dom, accuracy, search + offset, offset / 2, p);
         }
 
         // Found width.
@@ -31,7 +31,7 @@ TypesetBot.lineUtils = (function(obj){
             yPos = pointer.position().top,
             baseW = pointer.width(),
             baseH = pointer.height(),
-            accuracy = 0.002 * idealW; // Search width, 0.2% accuracy
+            accuracy = 0.001 * idealW; // Search width, 0.1% accuracy
 
         // Check if ideal width is the same as the last line.
         if (obj.lastLineWidth !== 0) {
@@ -63,7 +63,7 @@ TypesetBot.lineUtils = (function(obj){
             return idealW;
         }
 
-        return obj.searchWidth(dom, accuracy, idealW / 2, {
+        return obj.searchWidth(dom, accuracy, idealW / 2, idealW / 4, {
             'elem': pointer,
             'baseW': baseW,
             'baseH': baseH,
