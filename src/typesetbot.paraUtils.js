@@ -25,7 +25,8 @@ TypesetBot.paraUtils = (function(obj){
      * Return an array of words from some html text.
      */
     obj.getWords  = function (html) {
-        return html.trim().replace( /\n/g, " " ).replace( /\s+/g, " " ).replace(/ (?![^<]*>)/g, '&nbsp;').split('&nbsp;');
+        return html.trim().replace( /\n/g, " " ).replace( /\s+/g, " " ).replace(/ (?![^<]*>)/g, '&nbsp;')
+            .split('&nbsp;');
     };
 
     /**

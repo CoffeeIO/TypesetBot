@@ -64,14 +64,14 @@ TypesetBot.lineUtils = (function(obj){
         }
 
         return obj.searchWidth(dom, accuracy, idealW / 2, idealW / 4, {
-            'elem': pointer,
-            'baseW': baseW,
-            'baseH': baseH,
-            'yPos': yPos
+            elem: pointer,
+            baseW: baseW,
+            baseH: baseH,
+            yPos: yPos
         });
     };
 
-    obj.getAdjustmentRatio  = function () {
+    obj.getAdjustmentRatio  = function (idealW, actualW, wordCount, shrink, stretch) {
         throw "Not implemented";
     };
 
