@@ -5,9 +5,9 @@ describe('Line utilities:', function () {
     beforeEach(function(done) {
         $('.unittest').remove(); // Remove existing tex documents
         $('body').append(__html__['fixtures/test2']);
-        $(function () {
+        setTimeout(function () {
             done();
-        });
+        }, 500);
     });
 
     describe('Get line width:', function () {
