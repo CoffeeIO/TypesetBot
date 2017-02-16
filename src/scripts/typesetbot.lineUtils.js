@@ -1,6 +1,7 @@
 TypesetBot.lineUtils = (function(obj){
 
     obj.lastLineWidth = 0;
+
     /**
      * Binary search for ideal line width.
      */
@@ -21,7 +22,7 @@ TypesetBot.lineUtils = (function(obj){
         p.elem.remove();
         obj.lastLineWidth = search;
         return search;
-    };
+    }
 
     /**
      * Get the ideal line with of the following line, assuming we're on a newline.
@@ -71,9 +72,9 @@ TypesetBot.lineUtils = (function(obj){
 
         return searchWidth(dom, accuracy, idealW / 2, idealW / 4, {
             elem: pointer,
-            baseW: baseW,
-            baseH: baseH,
-            yPos: yPos
+            baseW,
+            baseH,
+            yPos
         });
     };
 

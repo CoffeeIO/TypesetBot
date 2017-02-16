@@ -92,25 +92,25 @@ TypesetBot.paraUtils = (function(obj){
      * Modified for custom element and generalizing spaces and newlines.
      * Full credit to 'miketeix' - http://jsfiddle.net/miketeix/2q8ac/
      */
-    obj.breakParaInLines = function (dom) {
-        dom.html(dom.html().replace( /\n/g, " " ).replace( /\s+/g, " " ));
-        var spanInserted = dom.html().split(" ").join(" </span><span>");
-        var wrapped = ("<span>").concat(spanInserted, "</span>");
-        dom.html(wrapped);
-        var refPos = dom.find('span:first-child').position().top;
-        var newPos;
-        dom.find('span').each(function(index) {
-            newPos = $(this).position().top
-            if (index == 0){
-               return;
-            }
-            if (newPos == refPos){
-                $(this).prepend($(this).prev().text() + " ");
-                $(this).prev().remove();
-            }
-            refPos = newPos;
-        });
-    };
+     obj.breakParaInLines = function (dom) {
+         dom.html(dom.html().replace( /\n/g, " " ).replace( /\s+/g, " " ));
+         var spanInserted = dom.html().split(" ").join(" </span><span>");
+         var wrapped = ("<span>").concat(spanInserted, "</span>");
+         dom.html(wrapped);
+         var refPos = dom.find('span:first-child').position().top;
+         var newPos;
+         dom.find('span').each(function(index) {
+             newPos = $(this).position().top;
+             if (index === 0){
+                 return;
+             }
+             if (newPos === refPos){
+                 $(this).prepend($(this).prev().text() + " ");
+                 $(this).prev().remove();
+             }
+             refPos = newPos;
+         });
+     };
 
     /**
      * Show adjustment ratios on plain text paragraph.
@@ -129,7 +129,10 @@ TypesetBot.paraUtils = (function(obj){
                 shrink = 16 / 9,
                 stretch = 16 / 6;
 
-            var ratio = TypesetBot.lineUtils.calcAdjustmentRatio(idealW, actualW, wordCount, shrink, stretch).toFixed(3);
+            var ratio = TypesetBot.lineUtils.calcAdjustmentRatio(
+                idealW, actualW, wordCount, shrink, stretch
+            ).toFixed(3);
+
             if (elem.attr('lastline') !== undefined) { // Set last line to 0 as it's not a fair evaluation.
                 ratio = 0.001;
             }
