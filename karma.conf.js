@@ -15,6 +15,14 @@ module.exports = function(config) {
 
         // list of files / patterns to load in the browser.
         files: [
+            // Source files.
+            {pattern: 'dist/main.min.js', watched: true, included: true, served: true},
+
+            {pattern: 'fixtures/**/*.html'},
+
+            // Test files.
+            {pattern: 'test/paraUtils.test.js', watched: true, included: true, served: true},
+            {pattern: 'test/lineUtils.test.js', watched: true, included: true, served: true},
 
         ],
 
@@ -93,7 +101,6 @@ module.exports = function(config) {
         configuration.browsers = ['Chrome_travis_ci'];
         configuration.singleRun = true;
     }
-
 
     config.set(configuration);
 };

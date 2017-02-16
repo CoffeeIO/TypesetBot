@@ -1,0 +1,1 @@
+* [adjustment-ratio]:not([adjustment-ratio=""]){position:relative}* [adjustment-ratio]:not([adjustment-ratio=""]):after{position:absolute;top:0;right:calc(100% + 7px);content:attr(adjustment-ratio)}
