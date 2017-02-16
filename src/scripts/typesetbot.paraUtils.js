@@ -87,5 +87,61 @@ TypesetBot.paraUtils = (function(obj){
         recWrap(dom.html(html));
     };
 
+    /**
+     * Break up of paragraph into span lines.
+     * Modified for custom element and generalizing spaces and newlines.
+     * Full credit to 'miketeix' - http://jsfiddle.net/miketeix/2q8ac/
+     */
+    obj.breakParaInLines = function (dom) {
+        dom.html(dom.html().replace( /\n/g, " " ).replace( /\s+/g, " " ));
+        var spanInserted = dom.html().split(" ").join(" </span><span>");
+        var wrapped = ("<span>").concat(spanInserted, "</span>");
+        dom.html(wrapped);
+        var refPos = dom.find('span:first-child').position().top;
+        var newPos;
+        dom.find('span').each(function(index) {
+            newPos = $(this).position().top
+            if (index == 0){
+               return;
+            }
+            if (newPos == refPos){
+                $(this).prepend($(this).prev().text() + " ");
+                $(this).prev().remove();
+            }
+            refPos = newPos;
+        });
+    };
+
+    /**
+     * Show adjustment ratios on plain text paragraph.
+     * Return array of adjustment ratios.
+     */
+    obj.showAdjustmentRatios = function (dom, showRatio = false) {
+        var arr = [];
+
+        obj.breakParaInLines(dom);
+        var idealW = dom.width();
+        dom.find('span:last').attr('lastline', '');
+        dom.find('span').each(function () {
+            var elem = $(this),
+                actualW = elem.width(),
+                wordCount = obj.getWords(elem.html()).length,
+                shrink = 16 / 9,
+                stretch = 16 / 6;
+
+            var ratio = TypesetBot.lineUtils.getAdjustmentRatio(idealW, actualW, wordCount, shrink, stretch).toFixed(3);
+            if (elem.attr('lastline') !== undefined) { // Set last line to 0 as it's not a fair evaluation.
+                ratio = 0.001;
+            }
+
+            arr.push(Number(ratio));
+            if (showRatio) {
+                elem.attr('adjustment-ratio', ratio);
+            }
+        });
+
+        return arr;
+    };
+
     return obj;
 })(TypesetBot.paraUtils || {});

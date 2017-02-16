@@ -72,7 +72,11 @@ TypesetBot.lineUtils = (function(obj){
     };
 
     obj.getAdjustmentRatio  = function (idealW, actualW, wordCount, shrink, stretch) {
-        throw "Not implemented";
+        if (actualW < idealW) {
+            return (idealW - actualW) / ((wordCount - 1) * stretch);
+        } else {
+            return (idealW - actualW) / ((wordCount - 1) * shrink);
+        }
     };
 
     return obj;
