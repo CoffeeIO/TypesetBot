@@ -28,6 +28,6 @@ gulp.task('uglify', function() {
         'src/scripts/postModule.js'
     ])
     .pipe(concat('main.min.js'))
-    // .pipe(uglify())
+    // .pipe(uglify()) // uglify doesn't support the newest ES6 syntax
     .pipe(gulp.dest('dist'));
 });

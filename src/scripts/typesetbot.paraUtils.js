@@ -116,7 +116,7 @@ TypesetBot.paraUtils = (function(obj){
      * Show adjustment ratios on plain text paragraph.
      * Return array of adjustment ratios.
      */
-    obj.showAdjustmentRatios = function (dom, showRatio = false) {
+    obj.getAdjustmentRatios = function (dom, showRatio = false) {
         var arr = [];
 
         obj.breakParaInLines(dom);
@@ -129,7 +129,7 @@ TypesetBot.paraUtils = (function(obj){
                 shrink = 16 / 9,
                 stretch = 16 / 6;
 
-            var ratio = TypesetBot.lineUtils.getAdjustmentRatio(idealW, actualW, wordCount, shrink, stretch).toFixed(3);
+            var ratio = TypesetBot.lineUtils.calcAdjustmentRatio(idealW, actualW, wordCount, shrink, stretch).toFixed(3);
             if (elem.attr('lastline') !== undefined) { // Set last line to 0 as it's not a fair evaluation.
                 ratio = 0.001;
             }

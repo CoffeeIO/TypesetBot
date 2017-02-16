@@ -1,17 +1,20 @@
 TypesetBot.lineUtils = (function(obj){
 
     obj.lastLineWidth = 0;
-    obj.searchWidth = function (dom, accuracy, search, offset, p) {
+    /**
+     * Binary search for ideal line width.
+     */
+    function searchWidth (dom, accuracy, search, offset, p) {
         p.elem.css('margin-left', (search - p.baseW) + 'px');
         if (!(p.elem.position().top === p.yPos && p.elem.height() === p.baseH)) {
             // Search lower width.
-            return obj.searchWidth(dom, accuracy, search - offset, offset / 2, p);
+            return searchWidth(dom, accuracy, search - offset, offset / 2, p);
         }
 
         p.elem.css('margin-left', (search - p.baseW + accuracy) + 'px');
         if (p.elem.position().top === p.yPos && p.elem.height() === p.baseH) {
             // Search higher width.
-            return obj.searchWidth(dom, accuracy, search + offset, offset / 2, p);
+            return searchWidth(dom, accuracy, search + offset, offset / 2, p);
         }
 
         // Found width.
@@ -21,8 +24,11 @@ TypesetBot.lineUtils = (function(obj){
     };
 
     /**
-     * Get the ideal line with of the following line.
-     * Assume we are on a newline.
+     * Get the ideal line with of the following line, assuming we're on a newline.
+     *
+     * Most cases will be full width, O(1)
+     * Other cases will use binary search, O(log n)
+     * Repeating of same line width, O(1)
      */
     obj.nextLineWidth  = function (dom, idealW) {
         dom.append('<span class="typeset-linewidth">1 1</span>'); // Assuming all lines are longer than '1 1'
@@ -63,7 +69,7 @@ TypesetBot.lineUtils = (function(obj){
             return idealW;
         }
 
-        return obj.searchWidth(dom, accuracy, idealW / 2, idealW / 4, {
+        return searchWidth(dom, accuracy, idealW / 2, idealW / 4, {
             elem: pointer,
             baseW: baseW,
             baseH: baseH,
@@ -71,7 +77,10 @@ TypesetBot.lineUtils = (function(obj){
         });
     };
 
-    obj.getAdjustmentRatio  = function (idealW, actualW, wordCount, shrink, stretch) {
+    /**
+     * Calculate the adjustment ratio of a line.
+     */
+    obj.calcAdjustmentRatio  = function (idealW, actualW, wordCount, shrink, stretch) {
         if (actualW < idealW) {
             return (idealW - actualW) / ((wordCount - 1) * stretch);
         } else {
