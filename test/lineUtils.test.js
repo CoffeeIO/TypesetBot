@@ -8,6 +8,8 @@ describe('Line utilities:', function () {
         setTimeout(function () {
             done();
         }, 500);
+        // Reset last line variable.
+        TypesetBot.lineUtils.nextLineWidth($('.plain'), $('.plain').width())
     });
 
     describe('Get line width:', function () {
@@ -35,7 +37,8 @@ describe('Line utilities:', function () {
             TypesetBot.lineUtils.nextLineWidth($('.worst'), $('.worst').width());
             var endR = window.performance.now(),
                 timeR = endR - startR;
-            expect(timeR).toBeLessThan(timeT / 2); // Expect at least twice as fast
+
+            expect(timeR).toBeLessThan(timeT / 4); // Expect at least twice as fast
         });
     });
 
