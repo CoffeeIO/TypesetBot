@@ -5,9 +5,6 @@ TypesetBot.settings = (function(obj, $) {
         // Algorithm.
         algorithm: 'total-fit', // Other options are 'first-fit' and 'best-fit'
         alignment: 'justify', // Other options are 'ragged-right' and 'ragged-center'
-        language: 'en-us',
-        leftmin: 2,
-        rightmin: 2,
 
         hyphenPenalty: 50,
         hyphenPenaltyRagged: 500,
@@ -15,6 +12,11 @@ TypesetBot.settings = (function(obj, $) {
 
         maxRatio: 2, // Algorithm will ignore this max if no other solutions are found.
         minRatio: -1,
+
+        // Hyphen.
+        hyphenLanguage: 'en-us',
+        hyphenLeftMin: 2,
+        hyphenRightMin: 2,
 
         // 4 classes of adjustment ratios.
         classes: [-1, -0.5, 0.5, 1, Infinity],
