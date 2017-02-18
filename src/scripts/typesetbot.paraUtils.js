@@ -93,24 +93,24 @@ TypesetBot.paraUtils = (function(obj) {
      * Full credit to 'miketeix' - http://jsfiddle.net/miketeix/2q8ac/
      */
     obj.breakParaInLines = function (dom) {
-         dom.html(dom.html().replace( /\n/g, " " ).replace( /\s+/g, " " ));
-         var spanInserted = dom.html().split(" ").join(" </span><span>");
-         var wrapped = ("<span>").concat(spanInserted, "</span>");
-         dom.html(wrapped);
-         var refPos = dom.find('span:first-child').position().top;
-         var newPos;
-         dom.find('span').each(function(index) {
-             newPos = $(this).position().top;
-             if (index === 0){
-                 return;
-             }
-             if (newPos === refPos){
-                 $(this).prepend($(this).prev().text() + " ");
-                 $(this).prev().remove();
-             }
-             refPos = newPos;
-         });
-     };
+        dom.html(dom.html().replace( /\n/g, " " ).replace( /\s+/g, " " ));
+        var spanInserted = dom.html().split(" ").join(" </span><span>");
+        var wrapped = ("<span>").concat(spanInserted, "</span>");
+        dom.html(wrapped);
+        var refPos = dom.find('span:first-child').position().top;
+        var newPos;
+        dom.find('span').each(function(index) {
+            newPos = $(this).position().top;
+            if (index === 0){
+                return;
+            }
+            if (newPos === refPos){
+                $(this).prepend($(this).prev().text() + " ");
+                $(this).prev().remove();
+            }
+            refPos = newPos;
+        });
+    };
 
     /**
      * Show adjustment ratios on plain text paragraph.
