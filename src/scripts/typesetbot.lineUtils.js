@@ -1,4 +1,4 @@
-TypesetBot.lineUtils = (function(obj){
+TypesetBot.lineUtils = (function(obj) {
 
     obj.lastLineWidth = 0;
 
