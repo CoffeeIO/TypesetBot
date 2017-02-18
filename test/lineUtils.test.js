@@ -26,13 +26,13 @@ describe('Line utilities:', function () {
         });
         it('Fast search for repeating line width', function () {
             var startT = window.performance.now();
-            TypesetBot.lineUtils.nextLineWidth($('.overlay'), $('.overlay').width());
+            TypesetBot.lineUtils.nextLineWidth($('.worst'), $('.worst').width());
             var endT = window.performance.now(),
                 timeT = endT - startT;
 
             $('.overlay').append('Hello world<br>');
             var startR = window.performance.now();
-            TypesetBot.lineUtils.nextLineWidth($('.overlay'), $('.overlay').width());
+            TypesetBot.lineUtils.nextLineWidth($('.worst'), $('.worst').width());
             var endR = window.performance.now(),
                 timeR = endR - startR;
             expect(timeR).toBeLessThan(timeT / 2); // Expect at least twice as fast
