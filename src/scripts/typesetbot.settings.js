@@ -1,4 +1,4 @@
-TypesetBot.settings = (function(obj){
+TypesetBot.settings = (function(obj, $) {
 
     // Default settings the program will use.
     var defaultSettings = {
@@ -8,15 +8,13 @@ TypesetBot.settings = (function(obj){
 
         hyphenPenalty: 50,
         hyphenPenaltyRagged: 500,
-        q: undefined,
+        q: null,
 
-        maxRatio: undefined,
-        minRatio: 1,
+        maxRatio: 2, // Algorithm will ignore this max if no other solutions are found.
+        minRatio: -1,
 
-        tightClass: '-1 to -0.5',
-        normalClass: '-0.5 to 0.5',
-        looseClass: '0.5 to 1',
-        veryLooseClass: '1 to infinite',
+        // 4 classes of adjustment ratios.
+        classes: [-1, -0.5, 0.5, 1, Infinity],
 
         // Font.
         spaceUnit: 'em',
@@ -24,13 +22,36 @@ TypesetBot.settings = (function(obj){
         spaceStretchability: '1/6',
         spaceShrinkability: '1/9',
 
-        // Selectors.
+        // Inline element that the program will unwrap from paragraphs as they could disrupt the line breaking.
         unwrapElements: ['img']
     };
 
-    obj.getSettings  = function (settings) {
-        throw "Not implemented";
+    /**
+    * Merge two json objects.
+    *
+    * @param o1 The default json, base
+    * @param o2 The custom json, overwrite existing elements
+    */
+    function jsonConcat(o1, o2) {
+        for (var key in o2) {
+            if ({}.hasOwnProperty.call(o2, key)) {
+                o1[key] = o2[key];
+            }
+        }
+        return o1;
+    }
+
+    /**
+     * Validate settings and merge with default settings.
+     */
+    obj.validate  = function (settings) {
+        if (settings == null) {
+            return $.extend(true, {}, defaultSettings);
+        }
+        settings = jsonConcat($.extend(true, {}, defaultSettings), settings);
+
+        return settings;
     };
 
     return obj;
-})(TypesetBot.settings || {});
+})(TypesetBot.settings || {}, jQuery);

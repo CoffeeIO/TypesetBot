@@ -23,6 +23,7 @@ module.exports = function(config) {
             // Test files.
             {pattern: 'test/paraUtils.test.js', watched: true, included: true, served: true},
             {pattern: 'test/lineUtils.test.js', watched: true, included: true, served: true},
+            {pattern: 'test/settings.test.js', watched: true, included: true, served: true},
 
         ],
 

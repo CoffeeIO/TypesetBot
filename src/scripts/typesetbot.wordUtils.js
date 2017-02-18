@@ -1,4 +1,4 @@
-TypesetBot.wordUtils = (function(obj){
+TypesetBot.wordUtils = (function(obj) {
 
     obj.hyphenWord  = function () {
         throw "Not implemented";

@@ -1,4 +1,4 @@
-TypesetBot.paraUtils = (function(obj){
+TypesetBot.paraUtils = (function(obj) {
 
     /**
      * Get the width of a space with 'word-spacing: 0'.
