@@ -5,6 +5,9 @@ TypesetBot.settings = (function(obj, $) {
         // Algorithm.
         algorithm: 'total-fit', // Other options are 'first-fit' and 'best-fit'
         alignment: 'justify', // Other options are 'ragged-right' and 'ragged-center'
+        language: 'en-us',
+        leftmin: 2,
+        rightmin: 2,
 
         hyphenPenalty: 50,
         hyphenPenaltyRagged: 500,
