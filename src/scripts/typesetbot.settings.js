@@ -13,6 +13,11 @@ TypesetBot.settings = (function(obj, $) {
         maxRatio: 2, // Algorithm will ignore this max if no other solutions are found.
         minRatio: -1,
 
+        // Hyphen.
+        hyphenLanguage: 'en-us',
+        hyphenLeftMin: 2,
+        hyphenRightMin: 2,
+
         // 4 classes of adjustment ratios.
         classes: [-1, -0.5, 0.5, 1, Infinity],
 
