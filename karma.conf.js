@@ -16,7 +16,7 @@ module.exports = function(config) {
         // list of files / patterns to load in the browser.
         files: [
             // Source files.
-            {pattern: 'dist/main.min.js', watched: true, included: true, served: true},
+            {pattern: 'dist/mainWithPatterns.min.js', watched: true, included: true, served: true},
 
             {pattern: 'fixtures/**/*.html'},
 
@@ -24,7 +24,7 @@ module.exports = function(config) {
             {pattern: 'test/paraUtils.test.js', watched: true, included: true, served: true},
             {pattern: 'test/lineUtils.test.js', watched: true, included: true, served: true},
             {pattern: 'test/settings.test.js', watched: true, included: true, served: true},
-
+            {pattern: 'test/wordUtils.test.js', watched: true, included: true, served: true},
         ],
 
         // list of files to exclude
