@@ -37,7 +37,7 @@ describe('Line utilities:', function () {
             TypesetBot.lineUtils.nextLineWidth($('.worst'), $('.worst').width());
             var endR = window.performance.now(),
                 timeR = endR - startR;
-            expect(timeR).toBeLessThan(timeT / 4); // Expect at least 4 times as fast
+            expect(timeR).toBeLessThan(timeT / 2); // Expect at least twice as fast
         });
     });
 
