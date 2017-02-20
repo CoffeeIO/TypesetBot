@@ -14,5 +14,9 @@ describe('Word utilities:', function () {
             settings = TypesetBot.settings.validate({ hyphenLanguage: 'da', hyphenRightMin: 3, hyphenLeftMin: 4});
             expect(TypesetBot.wordUtils.hyphenWord('hyphenate', settings)).toEqual(['hyphe', 'nate']);
         });
+        it('Language not found', function () {
+            var settings = TypesetBot.settings.validate({ hyphenLanguage: 'gg'});
+            expect(TypesetBot.wordUtils.hyphenWord('hyphenate', settings)).toEqual(null);
+        });
     });
 });
