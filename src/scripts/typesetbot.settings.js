@@ -6,32 +6,32 @@ TypesetBot.settings = (function(obj, $) {
         algorithm: 'total-fit', // Other options are 'first-fit' and 'best-fit'
         alignment: 'justify', // Other options are 'ragged-right' and 'ragged-center'
 
-        hyphenPenalty: 50,
-        hyphenPenaltyRagged: 500,
-        flagPenalty: 3000, // Reffered to as 'α'
-        classSwitchPenalty: 50, // Reffered to as 'γ'
+        hyphenPenalty: 50, // Penalty for line-breaking on a hyphen
+        hyphenPenaltyRagged: 500, // Penalty for line-breaking on a hyphen when using ragged text
+        flagPenalty: 3000, // Penalty when current and last line had flag value 1. Reffered to as 'α'
+        classSwitchPenalty: 50, // Penalty when switching between ratio classes. Reffered to as 'γ'
         badnessOffset: 0.5,
         demeritOffset: 1, // Offset to prefer fewer lines by increasing badness of "zero* badness lines", if increased it will produce fewer lines
 
         // "the value of q is increased by 1 (if q < 0) or decreased by 1 (if q > 0) until a feasible solution is found." - DT p.114
         loosenessParam: 0, // If zero we find to solution with fewest total demerits. Reffered to as 'q'
 
-        maxRatio: 2, // Algorithm will ignore this max if no other solutions are found. Referred to as 'p'
-        minRatio: -1,
+        maxRatio: 2, // Maximum acceptable adjustment ratio. Algorithm will ignore this max if no other solutions are found. Referred to as 'p'
+        minRatio: -1, // Minimum acceptable adjustment ratio. Less than -1 will make the text too closely spaced.
 
         // Hyphen.
-        hyphenLanguage: 'en-us',
-        hyphenLeftMin: 2,
-        hyphenRightMin: 2,
+        hyphenLanguage: 'en-us', // Language of hyphenation patterns to use
+        hyphenLeftMin: 2, // Minimum number of letters to keep on the left side of word
+        hyphenRightMin: 2, // Minimum number of letters to keep on the right side of word
 
         // 4 classes of adjustment ratios.
         classes: [-1, -0.5, 0.5, 1, Infinity],
 
         // Font.
-        spaceUnit: 'em',
-        spaceWidth: '1/3',
-        spaceStretchability: '1/6',
-        spaceShrinkability: '1/9',
+        spaceUnit: 'em', // Space width unit, em is relative to font-size
+        spaceWidth: '1/3', // Ideal space width
+        spaceStretchability: '1/6', // How much can the space width stretch
+        spaceShrinkability: '1/9', // How much can the space width shrink
 
         // Inline element that the program will unwrap from paragraphs as they could disrupt the line breaking.
         unwrapElements: ['img']
