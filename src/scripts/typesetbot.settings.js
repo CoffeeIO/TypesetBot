@@ -38,11 +38,11 @@ TypesetBot.settings = (function(obj, $) {
     };
 
     /**
-    * Merge two json objects.
-    *
-    * @param o1 The default json, base
-    * @param o2 The custom json, overwrite existing elements
-    */
+     * Merge two json objects.
+     *
+     * @param o1 The default json, base
+     * @param o2 The custom json, overwrite existing elements
+     */
     function jsonConcat(o1, o2) {
         for (var key in o2) {
             if ({}.hasOwnProperty.call(o2, key)) {
