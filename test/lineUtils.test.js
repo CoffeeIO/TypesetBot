@@ -9,7 +9,7 @@ describe('Line utilities:', function () {
             done();
         }, 500);
         // Reset last line variable.
-        TypesetBot.lineUtils.nextLineWidth($('.plain'), $('.plain').width())
+        TypesetBot.lineUtils.nextLineWidth($('.plain'), $('.plain').width());
     });
 
     describe('Get line width:', function () {

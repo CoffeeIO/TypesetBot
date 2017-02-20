@@ -8,10 +8,10 @@ describe('Word utilities:', function () {
             expect(TypesetBot.wordUtils.hyphenWord('test', settings)).toEqual(['test']);
         });
         it('Adjusting hyphen settings', function () {
-            var settings = TypesetBot.settings.validate({ hyphenLanguage: 'da'});
+            var settings = TypesetBot.settings.validate({hyphenLanguage: 'da'});
             expect(TypesetBot.wordUtils.hyphenWord('hyphenate', settings)).toEqual(['hyp', 'he', 'na', 'te']);
 
-            settings = TypesetBot.settings.validate({ hyphenLanguage: 'da', hyphenRightMin: 3, hyphenLeftMin: 4});
+            settings = TypesetBot.settings.validate({hyphenLanguage: 'da', hyphenRightMin: 3, hyphenLeftMin: 4});
             expect(TypesetBot.wordUtils.hyphenWord('hyphenate', settings)).toEqual(['hyphe', 'nate']);
         });
     });

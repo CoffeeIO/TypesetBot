@@ -10,9 +10,15 @@ describe('Settings testing:', function () {
 
         hyphenPenalty: 50,
         hyphenPenaltyRagged: 500,
-        q: null,
+        flagPenalty: 3000, // Reffered to as 'α'
+        classSwitchPenalty: 50, // Reffered to as 'γ'
+        badnessOffset: 0.5,
+        demeritOffset: 1, // Offset to prefer fewer lines by increasing badness of "zero* badness lines", if increased it will produce fewer lines
 
-        maxRatio: 2, // Algorithm will ignore this max if no other solutions are found.
+        // "the value of q is increased by 1 (if q < 0) or decreased by 1 (if q > 0) until a feasible solution is found." - DT p.114
+        loosenessParam: 0, // If zero we find to solution with fewest total demerits. Reffered to as 'q'
+
+        maxRatio: 2, // Algorithm will ignore this max if no other solutions are found. Referred to as 'p'
         minRatio: -1,
 
         // Hyphen.
