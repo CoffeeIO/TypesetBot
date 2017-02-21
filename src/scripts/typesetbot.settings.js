@@ -11,7 +11,7 @@ TypesetBot.settings = (function(obj, $) {
         flagPenalty: 3000, // Penalty when current and last line had flag value 1. Reffered to as 'α'
         classSwitchPenalty: 50, // Penalty when switching between ratio classes. Reffered to as 'γ'
         badnessOffset: 0.5,
-        demeritOffset: 1, // Offset to prefer fewer lines by increasing badness of "~zero badness lines"
+        demeritOffset: 1, // Offset to prefer fewer lines by increasing demerit of "~zero badness lines"
 
         // "the value of q is increased by 1 (if q < 0) or decreased by 1 (if q > 0) until a feasible solution is
         //  found." - DT p.114
