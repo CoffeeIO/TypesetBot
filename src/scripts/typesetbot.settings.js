@@ -37,23 +37,23 @@ TypesetBot.settings = (function(obj, $) {
         unwrapElements: ['img'],
 
         // Functions
-        ratio: function (idealW, actualW, wordCount, shrink, stretch, settings) {
+        ratio (idealW, actualW, wordCount, shrink, stretch, settings) {
             if (actualW < idealW) {
                 return (idealW - actualW) / ((wordCount - 1) * stretch);
             }
 
             return (idealW - actualW) / ((wordCount - 1) * shrink);
         },
-        badness: function (ratio, settings) { // Params can't be changed
+        badness (ratio, settings) { // Params can't be changed
             if (ratio == null || ratio < settings.minRatio) {
                 return Infinity;
             }
 
             return 100 * Math.pow(Math.abs(ratio), 3) + 0.5;
         },
-        demerit: function (badness, penalty, settings) {
+        demerit (badness, penalty, settings) {
             if (penalty > 0) {
-                return Math.pow(settings.demeritOffset + badness + penalty, 2) + settings.flagPenalty
+                return Math.pow(settings.demeritOffset + badness + penalty, 2) + settings.flagPenalty;
             } else if (penalty === -Infinity) {
                 return Math.pow(settings.demeritOffset + badness) + settings.flagPenalty;
             } else {

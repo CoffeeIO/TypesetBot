@@ -48,7 +48,8 @@ describe('Line utilities:', function () {
         });
         it('Loose fit', function () {
             var settings = TypesetBot.settings.validate();
-            expect(TypesetBot.lineUtils.calcAdjustmentRatio(500, 480, 10, 16 / 9, 16 / 6, settings)).not.toBeLessThan(0);
+            expect(TypesetBot.lineUtils.calcAdjustmentRatio(500, 480, 10, 16 / 9, 16 / 6, settings))
+                .not.toBeLessThan(0);
         });
         it('Tight fit', function () {
             var settings = TypesetBot.settings.validate();
