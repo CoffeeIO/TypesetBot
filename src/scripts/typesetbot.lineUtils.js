@@ -81,13 +81,17 @@ TypesetBot.lineUtils = (function(obj) {
     /**
      * Calculate the adjustment ratio of a line.
      */
-    obj.calcAdjustmentRatio  = function (idealW, actualW, wordCount, shrink, stretch) {
-        if (actualW < idealW) {
-            return (idealW - actualW) / ((wordCount - 1) * stretch);
-        } else {
-            return (idealW - actualW) / ((wordCount - 1) * shrink);
-        }
+    obj.calcAdjustmentRatio = function (idealW, actualW, wordCount, shrink, stretch, settings) {
+        return settings.adjustmentRatio(idealW, actualW, wordCount, shrink, stretch, settings);
     };
+
+    obj.calcBadness = function (ratio, settings) {
+        return settings.badness(ratio, settings);
+    }
+
+    obj.calcDemerit = function (penalty, settings) {
+        return settings.demerit(penalty, settings);
+    }
 
     return obj;
 })(TypesetBot.lineUtils || {});

@@ -59,36 +59,26 @@ var langBase = 'dist/hyphenation-patterns/',
     langBase + 'tr.js',
     langBase + 'uk.js'
 ];
-
+var source = [
+    'node_modules/jquery/dist/jquery.min.js',
+    'src/scripts/vendor/hypher.js',
+    'src/scripts/vendor/Queue.js',
+    'src/scripts/preModule.js',
+    'src/scripts/typesetbot.lineUtils.js',
+    'src/scripts/typesetbot.wordUtils.js',
+    'src/scripts/typesetbot.paraUtils.js',
+    'src/scripts/typesetbot.settings.js',
+    'src/scripts/typesetbot.js',
+    'src/scripts/postModule.js'
+];
 gulp.task('uglify', function() {
-    return gulp.src([
-        'node_modules/jquery/dist/jquery.min.js',
-        'src/scripts/vendor/hypher.js',
-        'src/scripts/preModule.js',
-        'src/scripts/typesetbot.lineUtils.js',
-        'src/scripts/typesetbot.wordUtils.js',
-        'src/scripts/typesetbot.paraUtils.js',
-        'src/scripts/typesetbot.settings.js',
-        'src/scripts/typesetbot.js',
-        'src/scripts/postModule.js'
-    ])
+    return gulp.src(source)
     .pipe(concat('main.min.js'))
     // .pipe(uglify()) // uglify doesn't support the newest ES6 syntax
     .pipe(gulp.dest('dist'));
 });
 gulp.task('uglifyLang', function() {
-    return gulp.src([
-        'node_modules/jquery/dist/jquery.min.js',
-        'src/scripts/vendor/hypher.js',
-        'src/scripts/preModule.js',
-        'src/scripts/typesetbot.lineUtils.js',
-        'src/scripts/typesetbot.wordUtils.js',
-        'src/scripts/typesetbot.paraUtils.js',
-        'src/scripts/typesetbot.settings.js',
-        'src/scripts/typesetbot.js',
-        'src/scripts/postModule.js'
-    ]
-    .concat(languages))
+    return gulp.src(source.concat(languages))
     .pipe(concat('mainWithPatterns.min.js'))
     // .pipe(uglify()) // uglify doesn't support the newest ES6 syntax
     .pipe(gulp.dest('dist'));
