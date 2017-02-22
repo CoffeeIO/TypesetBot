@@ -42,15 +42,17 @@ describe('Line utilities:', function () {
     });
 
     describe('Calculate adjustment ratio', function () {
-        var settings = TypesetBot.settings.validate();
         it('Perfect fit', function () {
-            expect(TypesetBot.lineUtils.calcAdjustmentRatio(500, 500, 10, 16 / 9, 16 / 6), settings).toEqual(0);
+            var settings = TypesetBot.settings.validate();
+            expect(TypesetBot.lineUtils.calcAdjustmentRatio(500, 500, 10, 16 / 9, 16 / 6, settings)).toEqual(0);
         });
         it('Loose fit', function () {
-            expect(TypesetBot.lineUtils.calcAdjustmentRatio(500, 480, 10, 16 / 9, 16 / 6), settings).not.toBeLessThan(0);
+            var settings = TypesetBot.settings.validate();
+            expect(TypesetBot.lineUtils.calcAdjustmentRatio(500, 480, 10, 16 / 9, 16 / 6, settings)).not.toBeLessThan(0);
         });
         it('Tight fit', function () {
-            expect(TypesetBot.lineUtils.calcAdjustmentRatio(500, 510, 10, 16 / 9, 16 / 6), settings).toBeLessThan(0);
+            var settings = TypesetBot.settings.validate();
+            expect(TypesetBot.lineUtils.calcAdjustmentRatio(500, 510, 10, 16 / 9, 16 / 6, settings)).toBeLessThan(0);
         });
     });
 });

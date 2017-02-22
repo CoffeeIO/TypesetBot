@@ -37,7 +37,7 @@ TypesetBot.settings = (function(obj, $) {
         unwrapElements: ['img'],
 
         // Functions
-        adjustmentRatio: function (idealW, actualW, wordCount, shrink, stretch, settings) {
+        ratio: function (idealW, actualW, wordCount, shrink, stretch, settings) {
             if (actualW < idealW) {
                 return (idealW - actualW) / ((wordCount - 1) * stretch);
             }
