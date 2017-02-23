@@ -15,7 +15,7 @@ describe('Word utilities:', function () {
             expect(TypesetBot.wordUtils.hyphenWord('hyphenate', settings)).toEqual(['hyphe', 'nate']);
         });
         it('Language not found', function () {
-            var settings = TypesetBot.settings.validate({ hyphenLanguage: 'gg'});
+            var settings = TypesetBot.settings.validate({hyphenLanguage: 'gg'});
             expect(TypesetBot.wordUtils.hyphenWord('hyphenate', settings)).toEqual(null);
         });
     });

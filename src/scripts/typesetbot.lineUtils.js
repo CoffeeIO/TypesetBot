@@ -90,14 +90,14 @@ TypesetBot.lineUtils = (function(obj) {
      */
     obj.calcBadness = function (ratio, settings) {
         return settings.badness(ratio, settings);
-    }
+    };
 
     /**
      * Calculate the demerit of a line.
      */
     obj.calcDemerit = function (penalty, settings) {
         return settings.demerit(penalty, settings);
-    }
+    };
 
     return obj;
 })(TypesetBot.lineUtils || {});
