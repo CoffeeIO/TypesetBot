@@ -40,20 +40,4 @@ describe('Line utilities:', function () {
             expect(timeR).toBeLessThan(timeT / 2); // Expect at least twice as fast
         });
     });
-
-    describe('Calculate adjustment ratio', function () {
-        it('Perfect fit', function () {
-            var settings = TypesetBot.settings.validate();
-            expect(TypesetBot.lineUtils.calcAdjustmentRatio(500, 500, 10, 16 / 9, 16 / 6, settings)).toEqual(0);
-        });
-        it('Loose fit', function () {
-            var settings = TypesetBot.settings.validate();
-            expect(TypesetBot.lineUtils.calcAdjustmentRatio(500, 480, 10, 16 / 9, 16 / 6, settings))
-                .not.toBeLessThan(0);
-        });
-        it('Tight fit', function () {
-            var settings = TypesetBot.settings.validate();
-            expect(TypesetBot.lineUtils.calcAdjustmentRatio(500, 510, 10, 16 / 9, 16 / 6, settings)).toBeLessThan(0);
-        });
-    });
 });

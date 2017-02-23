@@ -12,5 +12,30 @@ TypesetBot.wordUtils = (function(obj) {
         return window['Hypher']['languages'][settings.hyphenLanguage].hyphenate(word);
     };
 
+    /**
+     * Analyse words in a paragraph and return the array with all relevant properties.
+     */
+    obj.getWordProperties = function (elem, wordArr) {
+        var html = elem.html(),
+            propArr = new Array(wordArr.length),
+            index = 0,
+            previousWord = '';
+
+        elem.html('');
+        wordArr.forEach(function (word) {
+            elem.find('.typeset-property').remove();
+            elem.append(previousWord + ' <span class="typeset-property">' + word + '</span>');
+            propArr[index] = {
+                str: word,
+                width: elem.find('.typeset-property').width()
+            };
+            previousWord = word;
+            index++;
+        });
+        elem.html(html);
+
+        return propArr;
+    };
+
     return obj;
 })(TypesetBot.wordUtils || {});

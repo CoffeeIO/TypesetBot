@@ -51,13 +51,14 @@ TypesetBot.settings = (function(obj, $) {
 
             return 100 * Math.pow(Math.abs(ratio), 3) + 0.5;
         },
-        demerit (badness, penalty, settings) {
-            if (penalty > 0) {
-                return Math.pow(settings.demeritOffset + badness + penalty, 2) + settings.flagPenalty;
-            } else if (penalty === -Infinity) {
-                return Math.pow(settings.demeritOffset + badness) + settings.flagPenalty;
+        demerit (badness, penalty, flag, settings) {
+            var flagPenalty = flag ? settings.flagPenalty : 0;
+            if (penalty >= 0) {
+                return Math.pow(settings.demeritOffset + badness + penalty, 2) + flagPenalty;
+            } else if (penalty == -Infinity) {
+                return Math.pow(settings.demeritOffset + badness, 2) + flagPenalty;
             } else {
-                return Math.pow(settings.demeritOffset + badness, 2) - Math.pow(penalty, 2) + settings.flagPenalty;
+                return Math.pow(settings.demeritOffset + badness, 2) - Math.pow(penalty, 2) + flagPenalty;
             }
         }
     };

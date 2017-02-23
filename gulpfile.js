@@ -64,6 +64,7 @@ var source = [
     'src/scripts/vendor/hypher.js',
     'src/scripts/vendor/Queue.js',
     'src/scripts/preModule.js',
+    'src/scripts/typesetbot.math.js',
     'src/scripts/typesetbot.lineUtils.js',
     'src/scripts/typesetbot.wordUtils.js',
     'src/scripts/typesetbot.paraUtils.js',
