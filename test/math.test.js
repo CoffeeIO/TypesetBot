@@ -21,8 +21,10 @@ describe('Math calculations:', function () {
         it('Normal ratios', function () {
             var settings = TypesetBot.settings.validate();
             expect(TypesetBot.math.calcBadness(0.5, settings)).toEqual(13); // 100 * |0.5|^3 + 0.5
-            expect(TypesetBot.math.calcBadness(-0.5, settings)).not.toBeLessThan(0); // Should only return positive values
-            expect(TypesetBot.math.calcBadness(0.5, settings)).toBeLessThan(TypesetBot.math.calcBadness(0.51, settings));
+            expect(TypesetBot.math.calcBadness(-0.5, settings))
+                .not.toBeLessThan(0); // Should only return positive values
+            expect(TypesetBot.math.calcBadness(0.5, settings))
+                .toBeLessThan(TypesetBot.math.calcBadness(0.51, settings));
         });
         it('Less than min ratio', function () {
             var settings = TypesetBot.settings.validate();

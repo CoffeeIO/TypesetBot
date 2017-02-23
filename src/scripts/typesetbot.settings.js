@@ -55,7 +55,7 @@ TypesetBot.settings = (function(obj, $) {
             var flagPenalty = flag ? settings.flagPenalty : 0;
             if (penalty >= 0) {
                 return Math.pow(settings.demeritOffset + badness + penalty, 2) + flagPenalty;
-            } else if (penalty == -Infinity) {
+            } else if (penalty === -Infinity) {
                 return Math.pow(settings.demeritOffset + badness, 2) + flagPenalty;
             } else {
                 return Math.pow(settings.demeritOffset + badness, 2) - Math.pow(penalty, 2) + flagPenalty;
