@@ -29,7 +29,7 @@ describe('Word utilities:', function () {
     describe('Word properties:', function () {
         it('Normal words', function () {
             var words = TypesetBot.paraUtils.getWords($('.plain').html());
-            expect(words.length).not.toBeLessThan(0)
+            expect(words.length).not.toBeLessThan(0);
             var props = TypesetBot.wordUtils.getWordProperties($('.plain'), words);
             expect(props.length).toEqual(words.length);
             props.forEach(function (index, item) {
