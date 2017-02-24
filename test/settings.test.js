@@ -12,8 +12,7 @@ describe('Settings testing:', function () {
         hyphenPenaltyRagged: 500, // Penalty for line-breaking on a hyphen when using ragged text
         flagPenalty: 3000, // Penalty when current and last line had flag value 1. Reffered to as 'α'
         classSwitchPenalty: 50, // Penalty when switching between ratio classes. Reffered to as 'γ'
-        badnessOffset: 0.5,
-        demeritOffset: 1, // Offset to prefer fewer lines by increasing badness of "~zero badness lines"
+        demeritOffset: 1, // Offset to prefer fewer lines by increasing demerit of "~zero badness lines"
 
         // "the value of q is increased by 1 (if q < 0) or decreased by 1 (if q > 0) until a feasible solution is
         //  found." - DT p.114
@@ -37,7 +36,33 @@ describe('Settings testing:', function () {
         spaceShrinkability: '1/9', // How much can the space width shrink
 
         // Inline element that the program will unwrap from paragraphs as they could disrupt the line breaking.
-        unwrapElements: ['img']
+        unwrapElements: ['img'],
+
+        // Functions
+        ratio (idealW, actualW, wordCount, shrink, stretch, settings) {
+            if (actualW < idealW) {
+                return (idealW - actualW) / ((wordCount - 1) * stretch);
+            }
+
+            return (idealW - actualW) / ((wordCount - 1) * shrink);
+        },
+        badness (ratio, settings) { // Params can't be changed
+            if (ratio == null || ratio < settings.minRatio) {
+                return Infinity;
+            }
+
+            return 100 * Math.pow(Math.abs(ratio), 3) + 0.5;
+        },
+        demerit (badness, penalty, flag, settings) {
+            var flagPenalty = flag ? settings.flagPenalty : 0;
+            if (penalty >= 0) {
+                return Math.pow(settings.demeritOffset + badness + penalty, 2) + flagPenalty;
+            } else if (penalty === -Infinity) {
+                return Math.pow(settings.demeritOffset + badness, 2) + flagPenalty;
+            } else {
+                return Math.pow(settings.demeritOffset + badness, 2) - Math.pow(penalty, 2) + flagPenalty;
+            }
+        }
     };
 
     beforeEach(function(done) {
@@ -62,12 +87,12 @@ describe('Settings testing:', function () {
 
         it('Empty settings', function () {
             var newSettings = TypesetBot.settings.validate({});
-            expect(newSettings).toEqual(defaultSettings);
+            expect(JSON.stringify(newSettings)).toEqual(JSON.stringify(defaultSettings));
         });
 
         it('Null settings', function () {
             var newSettings = TypesetBot.settings.validate(null);
-            expect(newSettings).toEqual(defaultSettings);
+            expect(JSON.stringify(newSettings)).toEqual(JSON.stringify(defaultSettings));
         });
 
         it('Unknown settings', function () {

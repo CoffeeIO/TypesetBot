@@ -25,6 +25,7 @@ module.exports = function(config) {
             {pattern: 'test/lineUtils.test.js', watched: true, included: true, served: true},
             {pattern: 'test/settings.test.js', watched: true, included: true, served: true},
             {pattern: 'test/wordUtils.test.js', watched: true, included: true, served: true},
+            {pattern: 'test/math.test.js', watched: true, included: true, served: true},
         ],
 
         // list of files to exclude

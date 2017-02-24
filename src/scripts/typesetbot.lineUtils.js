@@ -78,16 +78,5 @@ TypesetBot.lineUtils = (function(obj) {
         });
     };
 
-    /**
-     * Calculate the adjustment ratio of a line.
-     */
-    obj.calcAdjustmentRatio  = function (idealW, actualW, wordCount, shrink, stretch) {
-        if (actualW < idealW) {
-            return (idealW - actualW) / ((wordCount - 1) * stretch);
-        } else {
-            return (idealW - actualW) / ((wordCount - 1) * shrink);
-        }
-    };
-
     return obj;
 })(TypesetBot.lineUtils || {});
