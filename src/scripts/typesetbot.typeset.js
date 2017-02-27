@@ -1,17 +1,6 @@
 TypesetBot.typeset = (function(obj, $) {
 
-    var startingNode = {
-        penalty: 0,
-        flag: false,
-        wordIndex: 0,
-        fitnessClass: 1,
-        lineNumber: 0,
-        wordPointer: words[0],
-        demeritTotal: 0,
-        totalWidth: 0,
-        totalStretch: 0,
-        totalShrink: 0
-    };
+
 
     obj.typesetParagraph = function (elem, settings) {
         TypesetBot.paraUtils.setSpaceWidth(elem, settings.spaceWidth, settings.spaceUnit);
@@ -29,6 +18,19 @@ TypesetBot.typeset = (function(obj, $) {
             activeBreakpoints = new Queue(),
             width = elem.width();
         wordsTemp = null;
+
+        var startingNode = {
+            penalty: 0,
+            flag: false,
+            wordIndex: 0,
+            fitnessClass: 1,
+            lineNumber: 0,
+            wordPointer: words[0],
+            demeritTotal: 0,
+            totalWidth: 0,
+            totalStretch: 0,
+            totalShrink: 0
+        };
 
         breakpoints.push(startingNode);
 
@@ -69,12 +71,13 @@ TypesetBot.typeset = (function(obj, $) {
                 }
                 if (ratio < settings.minRatio) { // stop searching
                     // breakItDown = false;
+                    return;
                 }
                 // console.log('idealW %s, curW %s, wordCount %s, shrink %s, stretch %s, ratio: %s', idealWidth, curWidth, wordCount, 16/9, 16/6, ratio);
                 console.log('cur: %s, ratio %s, str %s', curWidth, ratio, word.str);
 
                 curWidth += spaceWidth; // space
-                wordIndex
+                wordIndex++;
             }
 
             index++;
