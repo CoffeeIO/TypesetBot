@@ -3,6 +3,7 @@ var sass = require('gulp-sass');
 var uglify = require('gulp-uglify');
 var pump = require('pump');
 var concat = require('gulp-concat');
+var watch = require('gulp-watch');
 
 gulp.task('default', ['sass','uglify', 'uglifyLang'], function () {
 
@@ -79,6 +80,15 @@ gulp.task('uglify', function() {
     // .pipe(uglify()) // uglify doesn't support the newest ES6 syntax
     .pipe(gulp.dest('dist'));
 });
+
+gulp.task('watch', function() {
+    return watch('src/**/*.js', function () {
+        gulp.run('sass');
+        gulp.run('uglify');
+        gulp.run('uglifyLang');
+    });
+});
+
 gulp.task('uglifyLang', function() {
     return gulp.src(source.concat(languages))
     .pipe(concat('mainWithPatterns.min.js'))

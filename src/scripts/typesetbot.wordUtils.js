@@ -27,7 +27,8 @@ TypesetBot.wordUtils = (function(obj) {
             elem.append(previousWord + ' <span class="typeset-property">' + word + '</span>');
             propArr[index] = {
                 str: word,
-                width: elem.find('.typeset-property').width()
+                width: elem.find('.typeset-property').width(),
+                height: elem.find('.typeset-property').height()
             };
             previousWord = word;
             index++;

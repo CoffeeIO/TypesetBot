@@ -31,9 +31,9 @@ describe('Settings testing:', function () {
 
         // Font.
         spaceUnit: 'em', // Space width unit, em is relative to font-size
-        spaceWidth: '1/3', // Ideal space width
-        spaceStretchability: '1/6', // How much can the space width stretch
-        spaceShrinkability: '1/9', // How much can the space width shrink
+        spaceWidth: 1/3, // Ideal space width
+        spaceStretchability: 1/6, // How much can the space width stretch
+        spaceShrinkability: 1/9, // How much can the space width shrink
 
         // Inline element that the program will unwrap from paragraphs as they could disrupt the line breaking.
         unwrapElements: ['img'],
