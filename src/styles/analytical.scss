@@ -7,3 +7,23 @@
         content: attr(adjustment-ratio);
     }
 }
+.typeset-paragraph {
+    text-align: justify;
+
+}
+.typeset-line {
+    margin-bottom: -1em !important;
+    display: block;
+    &:after {
+    // content: "\A";
+    // white-space: pre;
+        content: "";
+        display: inline-block;
+        width: 100%;
+    }
+    &:last-of-type {
+        &:after {
+            display: none;
+        }
+    }
+}

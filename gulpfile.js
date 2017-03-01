@@ -82,7 +82,7 @@ gulp.task('uglify', function() {
 });
 
 gulp.task('watch', function() {
-    return watch('src/**/*.js', function () {
+    return watch('src/**/*', function () {
         gulp.run('sass');
         gulp.run('uglify');
         gulp.run('uglifyLang');
