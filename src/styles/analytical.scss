@@ -7,12 +7,15 @@
         content: attr(adjustment-ratio);
     }
 }
+p {
+    line-height: 1.14;
+}
 .typeset-paragraph {
     text-align: justify;
-
 }
 .typeset-line {
-    margin-bottom: -1em !important;
+    // margin-bottom: -1.13em !important;
+    // height: 1.14em;
     display: block;
     &:after {
         content: "";
@@ -24,4 +27,7 @@
             display: none;
         }
     }
+}
+.typeset-block {
+    display: block;
 }

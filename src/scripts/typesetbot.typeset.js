@@ -13,6 +13,7 @@ TypesetBot.typeset = (function(obj, $) {
         var wordsTemp = TypesetBot.paraUtils.getWords(content),
             words = TypesetBot.wordUtils.getWordProperties(elem, wordsTemp),
             width = elem.width();
+        console.log(wordsTemp);
         wordsTemp = null;
 
         var activeBreakpoints = new Queue(),
@@ -30,7 +31,8 @@ TypesetBot.typeset = (function(obj, $) {
             demeritTotal: 0,
             totalWidth: 0,
             totalStretch: 0,
-            totalShrink: 0
+            totalShrink: 0,
+            height: 0
         };
 
         // breakpoints.push(startingNode);
@@ -55,10 +57,13 @@ TypesetBot.typeset = (function(obj, $) {
                 shortestPath[line] = {};
             }
 
+            elem.append('<span class="typeset-block" style="height: ' + a.height + 'px"></span>')
             var findBreaks = true,
                 wordCount = 0,
                 curWidth = 0,
-                idealWidth = TypesetBot.lineUtils.nextLineWidth(elem, width);
+                idealWidth = TypesetBot.lineUtils.nextLineWidth(elem, width),
+                lineHeight = 0;
+            elem.find('.typeset-block').remove();
             console.log('idealWidth %s', idealWidth);
 
             // Check that the active nodes doesn't have a better solution, in which case skip this solution
@@ -73,15 +78,23 @@ TypesetBot.typeset = (function(obj, $) {
             while (findBreaks) {
                 var word = words[wordIndex];
                 if (word == null) {
+                    // console.log(words[wordIndex-1].str);
                     findBreaks = false;
                     var newBreak = {
                         lineNumber: line + 1,
                         demeritTotal: a.demeritTotal,
                         origin: a,
-                        wordIndex: wordIndex - 1
+                        wordIndex: wordIndex - 1,
+                        height: a.height + lineHeight,
+                        curHeight: lineHeight,
+                        idealWidth
+
                     };
                     finalBreaks.push(newBreak);
                     continue;
+                }
+                if (lineHeight < word.height) {
+                    lineHeight = word.height;
                 }
                 wordCount++;
                 curWidth += word.width;
@@ -99,7 +112,10 @@ TypesetBot.typeset = (function(obj, $) {
                         str: word.str,
                         ratio: ratio,
                         badness: badness,
-                        origin: a
+                        origin: a,
+                        height: a.height + lineHeight,
+                        curHeight: lineHeight,
+                        idealWidth
                     };
                     if (shortestPath[line][nextWord] == null || shortestPath[line][nextWord] > demeritAcc) {
                         shortestPath[line][nextWord] = demeritAcc;
@@ -110,8 +126,7 @@ TypesetBot.typeset = (function(obj, $) {
                 if (ratio < settings.minRatio) { // stop searching
                     findBreaks = false;
 
-                    console.log(shortestPath);
-                    console.log(breakpoints);
+
                     // return;
                 }
                 // console.log('idealW %s, curW %s, wordCount %s, shrink %s, stretch %s, ratio: %s', idealWidth, curWidth, wordCount, 16/9, 16/6, ratio);
@@ -122,8 +137,11 @@ TypesetBot.typeset = (function(obj, $) {
 
             }
         }
+        console.log(shortestPath);
+        console.log(breakpoints);
         elem.html(content);
         console.log(finalBreaks);
+
         applyBreaks(elem, words, finalBreaks);
 
     };
@@ -137,8 +155,11 @@ TypesetBot.typeset = (function(obj, $) {
         });
 
         var construct = true,
-            content = '';
-        lastIndex = null;
+            content = '',
+            lastIndex = null,
+            lastHeight = bestFit.curHeight;
+        console.log(bestFit);
+
         bestFit = bestFit.origin;
         while (construct) {
             var slice;
@@ -154,17 +175,18 @@ TypesetBot.typeset = (function(obj, $) {
                 lineContent += elem.str + ' ';
             });
 
-            content = '<span class="typeset-line" line="' + bestFit.lineNumber + '">' + lineContent + '</span>' + content;
+            content = '<span class="typeset-line" line="' + bestFit.lineNumber + '" style="height:' + lastHeight + 'px">' + lineContent + '</span>' + content;
             if (bestFit.origin == null) {
                 construct = false;
                 continue;
             }
+            lastHeight = bestFit.curHeight;
             bestFit = bestFit.origin;
+
         }
         elem.html(content);
         elem.addClass('typeset-paragraph');
 
-        console.log(bestFit);
     }
 
     return obj;
