@@ -59,6 +59,7 @@ TypesetBot.typeset = (function(obj, $) {
                 wordCount = 0,
                 curWidth = 0,
                 idealWidth = TypesetBot.lineUtils.nextLineWidth(elem, width);
+            console.log('idealWidth %s', idealWidth);
 
             // Check that the active nodes doesn't have a better solution, in which case skip this solution
             if (shortestPath[line-1] != null && shortestPath[line-1][a.wordIndex] < a.demeritTotal) {
@@ -122,7 +123,7 @@ TypesetBot.typeset = (function(obj, $) {
             }
         }
         elem.html(content);
-        // console.log(finalBreaks
+        console.log(finalBreaks);
         applyBreaks(elem, words, finalBreaks);
 
     };
