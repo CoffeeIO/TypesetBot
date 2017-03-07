@@ -78,7 +78,6 @@ TypesetBot.typeset = (function(obj, $) {
             while (findBreaks) {
                 var word = words[wordIndex];
                 if (word == null) {
-                    // console.log(words[wordIndex-1].str);
                     findBreaks = false;
                     var newBreak = {
                         lineNumber: line + 1,
@@ -157,7 +156,8 @@ TypesetBot.typeset = (function(obj, $) {
         var construct = true,
             content = '',
             lastIndex = null,
-            lastHeight = bestFit.curHeight;
+            lastHeight = bestFit.curHeight,
+            tagStack = [];
         console.log(bestFit);
 
         bestFit = bestFit.origin;
@@ -171,9 +171,28 @@ TypesetBot.typeset = (function(obj, $) {
             lastIndex = bestFit.wordIndex;
 
             var lineContent = '';
+            lineContent += tagStack.join('');
+            console.log(lineContent);
             slice.forEach(function (elem) {
+                if (elem.tagBegin != null) {
+                    tagStack.concat(elem.tagBegin);
+                    console.log('concat');
+                    // lineContent += elem.tagBegin.join('');
+                }
                 lineContent += elem.str + ' ';
+
+
+                if (elem.tagEnd != null) {
+                    elem.tagEnd.forEach(function (tag) {
+                        console.log('pop');
+                        tagStack.pop();
+                        // lineContent += tag;
+                    });
+                }
             });
+            if (tagStack.length !== 0) {
+                lineContent += reverseStack(tagStack);
+            }
 
             content = '<span class="typeset-line" line="' + bestFit.lineNumber + '" style="height:' + lastHeight + 'px">' + lineContent + '</span>' + content;
             if (bestFit.origin == null) {
@@ -187,6 +206,17 @@ TypesetBot.typeset = (function(obj, $) {
         elem.html(content);
         elem.addClass('typeset-paragraph');
 
+    }
+
+    function reverseStack(arr) {
+        var newArr = [],
+            tagNameRegex = /<(\w*)/;
+        arr.reverse().forEach(function (elem) {
+            console.log(elem);
+            var res = elem.match(tagNameRegex);
+            newArr.push('<' + res + '>');
+        });
+        return newArr;
     }
 
     return obj;
