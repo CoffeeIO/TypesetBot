@@ -152,57 +152,63 @@ TypesetBot.typeset = (function(obj, $) {
                 bestFit = elem;
             }
         });
+        console.log(bestFit);
+
+
+        var lines = [];
+        while (true) {
+            if (bestFit.origin == null) {
+                break; // First line doesn't matter, we know it starts at word index 0
+            }
+            lines.push(bestFit);
+            bestFit = bestFit.origin;
+        }
+        console.log(lines);
 
         var construct = true,
             content = '',
-            lastIndex = null,
+            lastIndex = 0,
             lastHeight = bestFit.curHeight,
             tagStack = [];
-        console.log(bestFit);
 
-        bestFit = bestFit.origin;
         while (construct) {
-            var slice;
-            if (lastIndex == null) {
-                slice = words.slice(bestFit.wordIndex);
-            } else {
-                slice = words.slice(bestFit.wordIndex, lastIndex);
+            var line = lines.pop();
+            if (line == null) {
+                construct = false;
+                continue;
             }
-            lastIndex = bestFit.wordIndex;
+
+            var slice = words.slice(lastIndex, line.wordIndex);
+            lastIndex = line.wordIndex;
 
             var lineContent = '';
             lineContent += tagStack.join('');
-            console.log(lineContent);
+
             slice.forEach(function (elem) {
                 if (elem.tagBegin != null) {
-                    tagStack.concat(elem.tagBegin);
-                    console.log('concat');
-                    // lineContent += elem.tagBegin.join('');
+                    tagStack = tagStack.concat(elem.tagBegin);
+                    console.log('concat %s', elem.tagBegin.join());
                 }
                 lineContent += elem.str + ' ';
-
 
                 if (elem.tagEnd != null) {
                     elem.tagEnd.forEach(function (tag) {
                         console.log('pop');
                         tagStack.pop();
-                        // lineContent += tag;
                     });
                 }
             });
             if (tagStack.length !== 0) {
-                lineContent += reverseStack(tagStack);
+                console.log('-->>' + reverseStack(tagStack).join());
+                lineContent += reverseStack(tagStack).join('');
             }
-
-            content = '<span class="typeset-line" line="' + bestFit.lineNumber + '" style="height:' + lastHeight + 'px">' + lineContent + '</span>' + content;
-            if (bestFit.origin == null) {
-                construct = false;
-                continue;
-            }
-            lastHeight = bestFit.curHeight;
-            bestFit = bestFit.origin;
-
+            console.log('-->' + lineContent);
+            content +=
+                '<span class="typeset-line" line="' + line.lineNumber + '" style="height:' + line.curHeight + 'px">'
+                    + lineContent
+                + '</span>';
         }
+
         elem.html(content);
         elem.addClass('typeset-paragraph');
 
@@ -212,9 +218,10 @@ TypesetBot.typeset = (function(obj, $) {
         var newArr = [],
             tagNameRegex = /<(\w*)/;
         arr.reverse().forEach(function (elem) {
-            console.log(elem);
             var res = elem.match(tagNameRegex);
-            newArr.push('<' + res + '>');
+            // console.log(res);
+
+            newArr.push('</' + res[1] + '>');
         });
         return newArr;
     }
