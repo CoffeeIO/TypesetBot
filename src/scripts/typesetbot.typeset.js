@@ -100,6 +100,8 @@ TypesetBot.typeset = (function(obj, $) {
                 var ratio = TypesetBot.math.calcAdjustmentRatio(idealWidth, curWidth, wordCount, spaceShrink, spaceStretch, settings)
 
                 if (ratio <= settings.maxRatio && ratio >= settings.minRatio) { // Valid breakpoint
+                    // Insert hyphen stuff
+
                     var badness = TypesetBot.math.calcBadness(ratio, settings),
                         demerit = TypesetBot.math.calcDemerit(badness, 0, false, settings),
                         demeritAcc = a.demeritTotal + demerit;
@@ -114,7 +116,10 @@ TypesetBot.typeset = (function(obj, $) {
                         origin: a,
                         height: a.height + lineHeight,
                         curHeight: lineHeight,
-                        idealWidth
+                        idealWidth,
+                        penalty: 0,
+                        penaltyWidth: 0,
+                        hyphenIndex: 0
                     };
                     if (shortestPath[line][nextWord] == null || shortestPath[line][nextWord] > demeritAcc) {
                         shortestPath[line][nextWord] = demeritAcc;
