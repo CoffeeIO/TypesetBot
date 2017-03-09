@@ -1,5 +1,9 @@
 TypesetBot.typeset = (function(obj, $) {
 
+    function hyphenProperties(elem, words, curIndex, searchIndex) {
+
+    }
+
     obj.typesetParagraph = function (elem, settings) {
         // console.log('%s - %s', settings.setSpaceWidth, settings.spaceShrinkability);
         TypesetBot.paraUtils.setSpaceWidth(elem, settings.spaceWidth - settings.spaceShrinkability, settings.spaceUnit);
@@ -13,7 +17,7 @@ TypesetBot.typeset = (function(obj, $) {
         var wordsTemp = TypesetBot.paraUtils.getWords(content),
             words = TypesetBot.wordUtils.getWordProperties(elem, wordsTemp),
             width = elem.width();
-        console.log(wordsTemp);
+        // console.log(wordsTemp);
         wordsTemp = null;
 
         var activeBreakpoints = new Queue(),
@@ -25,7 +29,7 @@ TypesetBot.typeset = (function(obj, $) {
             penalty: 0,
             flag: false,
             wordIndex: 0,
-            fitnessClass: 1,
+            fitnessClass: null,
             lineNumber: 0,
             wordPointer: words[0],
             demeritTotal: 0,
@@ -101,11 +105,17 @@ TypesetBot.typeset = (function(obj, $) {
 
                 if (ratio <= settings.maxRatio && ratio >= settings.minRatio) { // Valid breakpoint
                     // Insert hyphen stuff
-
+                    // Check for fitclass
+                    var fitnessClass = TypesetBot.math.getFitness(ratio, settings);
                     var badness = TypesetBot.math.calcBadness(ratio, settings),
-                        demerit = TypesetBot.math.calcDemerit(badness, 0, false, settings),
-                        demeritAcc = a.demeritTotal + demerit;
-                    var nextWord = wordIndex + 1;
+                        demerit = TypesetBot.math.calcDemerit(badness, 0, false, settings);
+
+                    if (a.fitnessClass != null && Math.abs(a.fitnessClass - fitnessClass) > 1) {
+                        demerit += settings.fitnessClassDemerit;
+                    }
+                    var demeritAcc = a.demeritTotal + demerit,
+                        nextWord = wordIndex + 1;
+
                     var newBreak = {
                         wordIndex: nextWord,
                         lineNumber: line + 1,
@@ -119,7 +129,8 @@ TypesetBot.typeset = (function(obj, $) {
                         idealWidth,
                         penalty: 0,
                         penaltyWidth: 0,
-                        hyphenIndex: 0
+                        hyphenIndex: 0,
+                        fitnessClass
                     };
                     if (shortestPath[line][nextWord] == null || shortestPath[line][nextWord] > demeritAcc) {
                         shortestPath[line][nextWord] = demeritAcc;
@@ -129,9 +140,6 @@ TypesetBot.typeset = (function(obj, $) {
                 }
                 if (ratio < settings.minRatio) { // stop searching
                     findBreaks = false;
-
-
-                    // return;
                 }
                 // console.log('idealW %s, curW %s, wordCount %s, shrink %s, stretch %s, ratio: %s', idealWidth, curWidth, wordCount, 16/9, 16/6, ratio);
                 // console.log('cur: %s, ratio %s, str %s', curWidth, ratio, word.str);
@@ -171,7 +179,7 @@ TypesetBot.typeset = (function(obj, $) {
             lines.push(bestFit);
             bestFit = bestFit.origin;
         }
-        console.log(lines);
+        // console.log(lines);
 
         var construct = true,
             content = '',
@@ -191,22 +199,27 @@ TypesetBot.typeset = (function(obj, $) {
             lastIndex = line.wordIndex;
 
             var lineContent = '';
-            lineContent += tagStack.join('');
+            if (tagStack.length > 0) {
+                lineContent += tagStack.join('');
+            }
 
             slice.forEach(function (elem) {
                 // Check if we should insert tags on the stack.
                 if (elem.tagBegin != null) {
                     tagStack = tagStack.concat(elem.tagBegin);
+                    // console.log(elem.tagBegin.join());
+                    // console.log(tagStack.join());
                 }
                 lineContent += elem.str + ' ';
 
                 if (elem.tagEnd != null) {
                     elem.tagEnd.forEach(function (tag) {
                         tagStack.pop();
+                        // console.log('pop');
                     });
                 }
             });
-            lineContent = lineContent.substring(0, lineContent.length - 1); // Remove last whitespace char
+            lineContent = lineContent.substring(0, lineContent.length - 1); // Remove last whitespace character
 
             // Close all tags on the stack.
             if (tagStack.length !== 0) {
@@ -230,10 +243,9 @@ TypesetBot.typeset = (function(obj, $) {
     function reverseStack(arr) {
         var newArr = [],
             tagNameRegex = /<(\w*)/;
-        arr.reverse().forEach(function (elem) {
+        // Create a copy of array to not reverse original array.
+        [].concat(arr).reverse().forEach(function (elem) {
             var res = elem.match(tagNameRegex);
-            // console.log(res);
-
             newArr.push('</' + res[1] + '>');
         });
         return newArr;

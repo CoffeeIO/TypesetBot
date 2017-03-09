@@ -11,7 +11,7 @@ describe('Settings testing:', function () {
         hyphenPenalty: 50, // Penalty for line-breaking on a hyphen
         hyphenPenaltyRagged: 500, // Penalty for line-breaking on a hyphen when using ragged text
         flagPenalty: 3000, // Penalty when current and last line had flag value 1. Reffered to as 'α'
-        classSwitchPenalty: 50, // Penalty when switching between ratio classes. Reffered to as 'γ'
+        fitnessClassDemerit: 3000, // Penalty when switching between ratio classes. Reffered to as 'γ'
         demeritOffset: 1, // Offset to prefer fewer lines by increasing demerit of "~zero badness lines"
 
         // "the value of q is increased by 1 (if q < 0) or decreased by 1 (if q > 0) until a feasible solution is
@@ -27,7 +27,7 @@ describe('Settings testing:', function () {
         hyphenRightMin: 2, // Minimum number of letters to keep on the right side of word
 
         // 4 classes of adjustment ratios.
-        classes: [-1, -0.5, 0.5, 1, Infinity],
+        fitnessClass: [-1, -0.5, 0.5, 1, Infinity],
 
         // Font.
         spaceUnit: 'em', // Space width unit, em is relative to font-size
