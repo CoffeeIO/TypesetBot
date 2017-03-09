@@ -150,6 +150,9 @@ TypesetBot.typeset = (function(obj, $) {
 
     };
 
+    /**
+     * Apply the found solutions to the element.
+     */
     function applyBreaks(elem, words, breaks) {
         var bestFit = null;
         breaks.forEach(function (elem) {
@@ -159,7 +162,7 @@ TypesetBot.typeset = (function(obj, $) {
         });
         console.log(bestFit);
 
-
+        // Change the nodes to an array so we can pop them off in correct order.
         var lines = [];
         while (true) {
             if (bestFit.origin == null) {
@@ -176,6 +179,7 @@ TypesetBot.typeset = (function(obj, $) {
             lastHeight = bestFit.curHeight,
             tagStack = [];
 
+        // Construct the content from first line to last.
         while (construct) {
             var line = lines.pop();
             if (line == null) {
@@ -190,24 +194,26 @@ TypesetBot.typeset = (function(obj, $) {
             lineContent += tagStack.join('');
 
             slice.forEach(function (elem) {
+                // Check if we should insert tags on the stack.
                 if (elem.tagBegin != null) {
                     tagStack = tagStack.concat(elem.tagBegin);
-                    console.log('concat %s', elem.tagBegin.join());
                 }
                 lineContent += elem.str + ' ';
 
                 if (elem.tagEnd != null) {
                     elem.tagEnd.forEach(function (tag) {
-                        console.log('pop');
                         tagStack.pop();
                     });
                 }
             });
+            lineContent = lineContent.substring(0, lineContent.length - 1); // Remove last whitespace char
+
+            // Close all tags on the stack.
             if (tagStack.length !== 0) {
-                console.log('-->>' + reverseStack(tagStack).join());
                 lineContent += reverseStack(tagStack).join('');
             }
-            console.log('-->' + lineContent);
+
+            // Add line to paragraph.
             content +=
                 '<span class="typeset-line" line="' + line.lineNumber + '" style="height:' + line.curHeight + 'px">'
                     + lineContent
@@ -216,9 +222,11 @@ TypesetBot.typeset = (function(obj, $) {
 
         elem.html(content);
         elem.addClass('typeset-paragraph');
-
     }
 
+    /**
+     * Take an array of begin tags, reverse them and create their closing tags.
+     */
     function reverseStack(arr) {
         var newArr = [],
             tagNameRegex = /<(\w*)/;
