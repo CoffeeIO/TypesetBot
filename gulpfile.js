@@ -3,6 +3,7 @@ var sass = require('gulp-sass');
 var uglify = require('gulp-uglify');
 var pump = require('pump');
 var concat = require('gulp-concat');
+var watch = require('gulp-watch');
 
 gulp.task('default', ['sass','uglify', 'uglifyLang'], function () {
 
@@ -69,6 +70,7 @@ var source = [
     'src/scripts/typesetbot.wordUtils.js',
     'src/scripts/typesetbot.paraUtils.js',
     'src/scripts/typesetbot.settings.js',
+    'src/scripts/typesetbot.typeset.js',
     'src/scripts/typesetbot.js',
     'src/scripts/postModule.js'
 ];
@@ -78,6 +80,15 @@ gulp.task('uglify', function() {
     // .pipe(uglify()) // uglify doesn't support the newest ES6 syntax
     .pipe(gulp.dest('dist'));
 });
+
+gulp.task('watch', function() {
+    return watch('src/**/*', function () {
+        gulp.run('sass');
+        gulp.run('uglify');
+        gulp.run('uglifyLang');
+    });
+});
+
 gulp.task('uglifyLang', function() {
     return gulp.src(source.concat(languages))
     .pipe(concat('mainWithPatterns.min.js'))

@@ -21,5 +21,13 @@ TypesetBot.math = (function(obj) {
         return settings.demerit(badness, penalty, flag, settings);
     };
 
+    obj.getFitness = function(ratio, settings) {
+        for (var i = 0; i < settings.fitnessClass.length; i++) {
+            if (ratio < settings.fitnessClass[i]) {
+                return i;
+            }
+        }
+    }
+
     return obj;
 })(TypesetBot.math || {});
