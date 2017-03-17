@@ -33,9 +33,14 @@ TypesetBot.typeset = (function(obj, $) {
             hyphenIndex = 0; // Index for last hyphened word
 
         var wordsTemp = TypesetBot.paraUtils.getWords(content),
-            words = TypesetBot.wordUtils.getWordProperties(elem, wordsTemp),
+            nodes = TypesetBot.wordUtils.wordsToNodes(wordsTemp),
+            props = TypesetBot.wordUtils.getWordProperties(elem, nodes),
             width = elem.width();
         wordsTemp = null;
+
+        console.log(nodes);
+        console.log(props);
+        return;
 
         var activeBreakpoints = new Queue(),
             breakpoints = [],
