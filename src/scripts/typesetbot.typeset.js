@@ -21,8 +21,7 @@ TypesetBot.typeset = (function(obj, $) {
         words[searchIndex].hyphen = hyphen;
     }
 
-    obj.typesetParagraph = function (elem, settings) {
-        TypesetBot.paraUtils.setSpaceWidth(elem, settings.spaceWidth - settings.spaceShrinkability, settings.spaceUnit);
+    obj.initVars = function (elem, settings) {
         var fontSize = Number(elem.css('font-size').replace('px', '')),
             spaceWidth = fontSize * settings.spaceWidth,
             spaceShrink = fontSize * settings.spaceShrinkability,
@@ -32,14 +31,41 @@ TypesetBot.typeset = (function(obj, $) {
             hyphenContent = '', // Content for checking hyphen dimensions
             hyphenIndex = 0; // Index for last hyphened word
 
-        var wordsTemp = TypesetBot.paraUtils.getWords(content),
-            nodes = TypesetBot.wordUtils.wordsToNodes(wordsTemp),
-            props = TypesetBot.wordUtils.getWordProperties(elem, nodes),
+        var words = TypesetBot.paraUtils.getWords(content),
+            nodes = TypesetBot.wordUtils.wordsToNodes(words),
+            props = TypesetBot.wordUtils.getNodeProperties(elem, nodes),
             width = elem.width();
-        wordsTemp = null;
 
-        console.log(nodes);
-        console.log(props);
+        return {
+            fontSize,
+            spaceWidth,
+            spaceShrink,
+            spaceStretch,
+            nodes: props,
+            width
+        };
+    };
+
+    obj.initLineVars = function (elem, settings, vars, node) {
+        var wordIndex = node.wordIndex,
+            line = node.lineNumber,
+            wordCount = 0,
+            curWidth = 0,
+            idealWidth = TypesetBot.lineUtils.nextLineWidth(elem, width),
+            lineHeight = 0;
+
+        
+    };
+
+    obj.typesetParagraph = function (elem, settings) {
+        TypesetBot.paraUtils.setSpaceWidth(elem, settings.spaceWidth - settings.spaceShrinkability, settings.spaceUnit);
+
+        var vars = initVars(elem, settings);
+
+
+        props.forEach(function (prop) {
+            console.log(prop);
+        });
         return;
 
         var activeBreakpoints = new Queue(),
@@ -55,9 +81,6 @@ TypesetBot.typeset = (function(obj, $) {
             lineNumber: 0,
             wordPointer: words[0],
             demeritTotal: 0,
-            totalWidth: 0,
-            totalStretch: 0,
-            totalShrink: 0,
             height: 0
         };
 
@@ -73,19 +96,18 @@ TypesetBot.typeset = (function(obj, $) {
                 continue;
             }
 
+            var lineVars = obj.initLineVars(elem, settings, vars, a);
+
             var wordIndex = a.wordIndex,
                 line = a.lineNumber;
 
-            if (shortestPath[line] == null) {
+            if (shortestPath[line] == null) { // Add line object
                 shortestPath[line] = {};
             }
 
             elem.append('<span class="typeset-block" style="height: ' + a.height + 'px"></span>')
-            var findBreaks = true,
-                wordCount = 0,
-                curWidth = 0,
-                idealWidth = TypesetBot.lineUtils.nextLineWidth(elem, width),
-                lineHeight = 0;
+            var findBreaks = true;
+
             elem.find('.typeset-block').remove();
             console.log('idealWidth %s', idealWidth);
 

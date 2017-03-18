@@ -51,10 +51,6 @@ TypesetBot.wordUtils = (function(obj) {
                         str: tag,
                         endtag: isEndTag(tag)
                     });
-                    // console.log(word);
-                    // console.log(match);
-                    // console.log(index);
-                    // console.log(word.substr(index, match.length));
                     return word.substr(index + match.length);
                 }
             }
@@ -86,62 +82,74 @@ TypesetBot.wordUtils = (function(obj) {
         return nodes;
     }
 
+    obj.spaceStore = {};
+    obj.hyphenStore = {};
+
+
     /**
      * Analyse words in a paragraph and return the array with all relevant properties.
      */
-    obj.getWordProperties = function (elem, wordArr) {
+    obj.getNodeProperties = function (elem, nodes) {
 
         var html = elem.html(),
-            propArr = new Array(wordArr.length),
-            index = 0,
-            previousWord = '';
+            props = [],
+            allowSpace = false, // Disallow space as first node
+            content = ''; // Html content, to correct for auto-closing tags when rendering
 
         elem.html('');
-        wordArr.forEach(function (word) {
-            console.log(word);
-            var tagBegin = [],
-                tagEnd = [];
+        nodes.forEach(function (node) {
+            if (node.type === 'word') {
+                // Add the word after, for when we remove typeset-property elem.
+                elem.html(content + '<span class="typeset-property">' + node.str + '</span>' + node.str);
+                content += node.str;
 
-            // Analyse html tag begining and ending.
-            while (matches = tagRegex.exec(word)) {
-                // console.log('match --> %s', matches[0]);
-                var match = matches[0];
-                if (match.charAt(1) == '/') { // Check end tag
-                    tagEnd.push(match);
-                } else {
-                    tagBegin.push(match);
+                var word = elem.find('.typeset-property');
+                props.push({
+                    type: node.type,
+                    str: node.str,
+                    width: word.width(),
+                    height: word.height()
+                });
+
+                elem.find('.typeset-property').remove();
+
+                allowSpace = true;
+            } else if (node.type === 'tag') {
+                var fontSize = null;
+
+                content += node.str;
+
+                if (! node.endtag) {
+                    elem.html(content);
+                    var tag = elem.find('*:last');
+                    fontSize = Number(tag.css('font-size').replace('px', ''));
+                }
+
+                props.push({
+                    type: node.type,
+                    str: node.str,
+                    endtag: node.endtag,
+                    fontSize
+                });
+            } else if (node.type === 'space') {
+                // Remove extra spaces, first space takes priority.
+                // Fx: hello_<b>_world</b>
+                // Real ->  |   |   <- Invisible
+                if (allowSpace) {
+                    content += ' ';
+                    elem.html(content);
+
+                    props.push({
+                        type: node.type
+                    });
+                    allowSpace = false;
                 }
             }
-            if (tagEnd != '' || tagBegin != '') {
-                console.log('Found --> %s --- %s', tagBegin, tagEnd);
-            }
 
-            elem.find('.typeset-property').remove();
-            elem.append(previousWord + ' <span class="typeset-property">' + word + '</span>');
-            propArr[index] = {
-                type: 'word',
-                str: word,
-                // str: word.replace(tagRegex, ''),
-                width: elem.find('.typeset-property').width(),
-                height: elem.find('.typeset-property').css('display', 'block').height(),
-                tagBegin: (tagBegin.length === 0) ? null : tagBegin,
-                tagEnd: (tagEnd.length === 0) ? null : tagEnd
-            };
-            propArr[index] = {
-                type: 'space',
-                str: word,
-                // str: word.replace(tagRegex, ''),
-                width: elem.find('.typeset-property').width(),
-                height: elem.find('.typeset-property').css('display', 'block').height(),
-                tagBegin: (tagBegin.length === 0) ? null : tagBegin,
-                tagEnd: (tagEnd.length === 0) ? null : tagEnd
-            };
-            previousWord = word;
-            index++;
         });
-        elem.html(html);
+        elem.html(html); // Put back html
 
-        return propArr;
+        return props;
     };
 
     return obj;
