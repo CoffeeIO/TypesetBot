@@ -42,174 +42,199 @@ TypesetBot.typeset = (function(obj, $) {
             spaceShrink,
             spaceStretch,
             nodes: props,
-            width
+            width,
+            shortestPath: {}, // Smallest demerit for each breakpoint on each line.
+            done: false
         };
     };
 
-    obj.initLineVars = function (elem, settings, vars, node) {
-        var wordIndex = node.wordIndex,
-            line = node.lineNumber,
-            wordCount = 0,
-            curWidth = 0,
-            idealWidth = TypesetBot.lineUtils.nextLineWidth(elem, width),
-            lineHeight = 0;
+    obj.initLineVars = function (elem, settings, vars, a) {
+        elem.append('<span class="typeset-block" style="height: ' + a.height + 'px"></span>')
 
-        
+        var nodeIndex = a.nodeIndex,
+            line = a.lineNumber,
+            idealWidth = TypesetBot.lineUtils.nextLineWidth(elem, vars.width);
+
+        if (vars.shortestPath[line] == null) { // Add line object
+            vars.shortestPath[line] = {};
+        }
+
+        var done = false;
+
+        // Check that the active nodes doesn't have a better solution, in which case skip this solution.
+        if (vars.shortestPath[line - 1] != null && vars.shortestPath[line - 1][a.wordIndex] < a.demerit) {
+            done = true; // Skip node, we have a better solution
+        }
+
+        elem.find('.typeset-block').remove();
+        console.log('idealWidth %s', idealWidth);
+
+        return {
+            nodeIndex,
+            line,
+            wordCount: 0,
+            curWidth: 0,
+            lineHeight: 0,
+            idealWidth,
+            done
+        };
     };
 
     obj.typesetParagraph = function (elem, settings) {
+        // Set wordspacing.
         TypesetBot.paraUtils.setSpaceWidth(elem, settings.spaceWidth - settings.spaceShrinkability, settings.spaceUnit);
 
-        var vars = initVars(elem, settings);
+        // Get variables for algorithm.
+        var vars = obj.initVars(elem, settings);
 
+        vars.nodes.forEach(function (node) { console.log(node); }); // Debug
 
-        props.forEach(function (prop) {
-            console.log(prop);
-        });
-        return;
-
+        // Init lists.
         var activeBreakpoints = new Queue(),
             breakpoints = [],
-            finalBreaks = [],
-            done = false;
+            finalBreaks = [];
 
-        var startingNode = {
-            penalty: 0,
-            flag: false,
-            wordIndex: 0,
-            fitnessClass: null,
-            lineNumber: 0,
-            wordPointer: words[0],
-            demeritTotal: 0,
-            height: 0
-        };
-
-        activeBreakpoints.enqueue(startingNode);
+        // Queue starting node.
+        activeBreakpoints.enqueue(
+            TypesetBot.node.createBreak(0, 0, null, 0, false, null, 0, 0) // Starting node
+        );
 
         elem.html('');
-        var shortestPath = {}; // Smallest demerit for each breakpoint on each line.
 
-        while (!done) {
+        // Main loop
+        while (! vars.done) {
             var a = activeBreakpoints.dequeue();
-            if (a == null) {
-                done = true;
+            if (a == null) { // No more queue elements
+                vars.done = true;
                 continue;
             }
 
+            // Get relevant line variables for algorithm.
             var lineVars = obj.initLineVars(elem, settings, vars, a);
 
-            var wordIndex = a.wordIndex,
-                line = a.lineNumber;
+            console.log(vars);
+            console.log(lineVars);
+            // Find breakpoints on line.
+            while (! lineVars.done) {
 
-            if (shortestPath[line] == null) { // Add line object
-                shortestPath[line] = {};
-            }
+                // ----------------------- Add nodes until word is done
 
-            elem.append('<span class="typeset-block" style="height: ' + a.height + 'px"></span>')
-            var findBreaks = true;
+                var word = appendWord(vars, lineVars);
+                var ratio = TypesetBot.math.calcAdjustmentRatio(
+                    lineVars.idealWidth,
+                    lineVars.curWidth,
+                    lineVars.wordCount,
+                    vars.spaceShrink,
+                    vars.spaceStretch,
+                    settings
+                );
 
-            elem.find('.typeset-block').remove();
-            console.log('idealWidth %s', idealWidth);
 
-            // Check that the active nodes doesn't have a better solution, in which case skip this solution.
-            if (shortestPath[line-1] != null && shortestPath[line-1][a.wordIndex] < a.demeritTotal) {
-                // console.log('compare %s --- %s', shortestPath[line-1][a.wordIndex], a.demeritTotal);
-                findBreaks = false; // Skip node, we have a better solution
-            }
-
-            while (findBreaks) {
-                var word = words[wordIndex];
-                if (word == null) { // Possible final break
-                    findBreaks = false;
-                    var newBreak = {
-                        lineNumber: line + 1,
-                        demeritTotal: a.demeritTotal,
-                        origin: a,
-                        wordIndex: wordIndex - 1,
-                        height: a.height + lineHeight,
-                        curHeight: lineHeight,
-                        idealWidth
-                    };
-                    finalBreaks.push(newBreak);
-                    continue;
-                }
-                if (lineHeight < word.height) {
-                    lineHeight = word.height;
-                }
-                wordCount++;
-                curWidth += word.width;
-                var ratio = TypesetBot.math.calcAdjustmentRatio(idealWidth, curWidth, wordCount, spaceShrink, spaceStretch, settings);
+                console.log(ratio);
+                console.log(word);
 
                 if (ratio <= settings.maxRatio && ratio >= settings.minRatio) { // Valid breakpoint
-                    // Insert hyphen stuff.
-                    if (word.hyphen == null) { // Make hyphen
-                        hyphenContent = hyphenProperties(elem, words, hyphenIndex, wordIndex, settings);
+                    var offset = TypesetBot.wordUtils.hyphenOffset(word.str),
+                        hyphens = TypesetBot.wordUtils.hyphenWord(word.str, settings, offset.left, offset.right);
+
+                    console.log(hyphens);
+
+                    var index = 0;
+                    var hyphenNode = vars.nodes[word.wordIndex[index++]];
+                    var wordLen = hyphenNode.str.length,
+                        prevLen = 0;
+
+                    if (hyphens.length > 1) {
+                        for (var i = 0; i < hyphens.length - 1; i++) {
+                            var hyphenLen = hyphens[i].length;
+                            while (wordLen < hyphenLen) {
+                                hyphenNode = vars.nodes[word.wordIndex[index++]];
+                                prevLen = wordLen;
+                                wordLen += hyphenNode.str.length;
+                            }
+                            var hyphenIndex = hyphenLen - prevLen;
+
+                            console.log(hyphenNode);
+                            var abc = TypesetBot.node.createBreak(
+                                lineVars.nodeIndex,
+                                hyphenIndex,
+                                a,
+                                0,
+                                true,
+                                0,
+                                lineVars.line + 1,
+                                a.height + lineVars.lineHeight
+                            );
+                            console.log(abc);
+                        }
                     }
-                    // var word = words[wordIndex];
-                    console.log(word.hyphen);
-
-                    return;
-
-                    // Check for fitclass.
-                    var fitnessClass = TypesetBot.math.getFitness(ratio, settings);
-                    var badness = TypesetBot.math.calcBadness(ratio, settings),
-                        demerit = TypesetBot.math.calcDemerit(badness, 0, false, settings);
-
-                    // Add demerit if fitness class moves more than 1.
-                    if (a.fitnessClass != null && Math.abs(a.fitnessClass - fitnessClass) > 1) {
-                        demerit += settings.fitnessClassDemerit;
-                    }
-                    var demeritAcc = a.demeritTotal + demerit,
-                        nextWord = wordIndex + 1;
-
-                    var newBreak = {
-                        wordIndex: nextWord,
-                        lineNumber: line + 1,
-                        demeritTotal: demeritAcc,
-                        str: word.str,
-                        ratio: ratio,
-                        badness: badness,
-                        origin: a,
-                        height: a.height + lineHeight,
-                        curHeight: lineHeight,
-                        idealWidth,
-                        penalty: 0,
-                        penaltyWidth: 0,
-                        hyphenIndex: 0,
-                        fitnessClass
-                    };
-
-                    // Update lowest demerit on break point on specific line.
-                    if (shortestPath[line][nextWord] == null || shortestPath[line][nextWord] > demeritAcc) {
-                        shortestPath[line][nextWord] = demeritAcc;
-                        activeBreakpoints.enqueue(newBreak); // Only add items to queue if they have better demerit
-                    }
-                    breakpoints.push(newBreak);
                 }
                 if (ratio < settings.minRatio) { // stop searching
-                    // Check for the ratio of hyphened version
-                    if (word.hyphen == null) { // Make hyphen
-                        hyphenContent = hyphenProperties(elem, words, hyphenIndex, wordIndex, settings);
-                    }
-
-                    findBreaks = false;
+                    return;
                 }
-                // console.log('idealW %s, curW %s, wordCount %s, shrink %s, stretch %s, ratio: %s', idealWidth, curWidth, wordCount, 16/9, 16/6, ratio);
-                // console.log('cur: %s, ratio %s, str %s', curWidth, ratio, word.str);
 
-                // Append width of space after word.
-                curWidth += spaceWidth;
-                wordIndex++;
+                // Append space
+                lineVars.curWidth += vars.spaceWidth;
+
+                // -----------------------
+
             }
         }
+
+        // Run again if no solution was found.-------------------
+
+
+        // ------------------------------------------------------
+
         console.log(shortestPath);
         console.log(breakpoints);
         elem.html(content);
         console.log(finalBreaks);
 
+        // Apply found solution.
         applyBreaks(elem, words, finalBreaks);
 
     };
+
+    function appendWord(vars, lineVars) {
+        var done = false,
+            word = '',
+            wordIndex = [];
+
+        while (! done) {
+            var node = vars.nodes[lineVars.nodeIndex];
+            if (node == null) { // Possible final break
+
+            }
+
+            console.log(node);
+            if (node.type === 'word') {
+                word += node.str;
+                lineVars.curWidth += node.width;
+                if (lineVars.lineHeight < node.height) { // Update max height for this line
+                    lineVars.lineHeight = node.height;
+                }
+                wordIndex.push(lineVars.nodeIndex);
+            } else if (node.type === 'tag') {
+                if (! node.endtag) {
+                    vars.fontSize = node.fontSize; // Update other properties?
+
+                }
+
+            } else if (node.type === 'space') {
+                done = true;
+            }
+
+            lineVars.nodeIndex++;
+        }
+        lineVars.wordCount++;
+
+        console.log(word);
+        return {
+            str: word,
+            wordIndex
+        };
+    }
 
     /**
      * Apply the found solutions to the element.

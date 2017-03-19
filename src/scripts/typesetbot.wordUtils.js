@@ -1,5 +1,27 @@
 TypesetBot.wordUtils = (function(obj) {
 
+    obj.hyphenOffset = function (word) {
+        var beginRegex = /^[\W]*/,
+            endRegex = /[\W]*$/;
+
+        var left = 0,
+            right = 0;
+
+        if (matches = word.match(beginRegex)) {
+            var match = matches[0];
+            left = match.length;
+        }
+        if (matches = word.match(endRegex)) {
+            var match = matches[0];
+            right = match.length;
+        }
+
+        return {
+            left,
+            right
+        }
+    };
+
     /**
      * Hyphen word with specific settings.
      */
