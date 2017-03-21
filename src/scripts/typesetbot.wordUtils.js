@@ -47,40 +47,23 @@ TypesetBot.wordUtils = (function(obj) {
         if (matches = word.match(tagRegex)) {
             var match = matches[0];
             if (match.length === word.length) {
-                nodes.push({
-                    type: 'tag',
-                    str: word,
-                    endtag: false
-                });
+                nodes.push(TypesetBot.node.createTag(word, false));
                 return '';
             } else {
                 var index = word.indexOf(match);
                 if (index === 0) {
-                    nodes.push({
-                        type: 'tag',
-                        str: match,
-                        endtag: isEndTag(match)
-                    });
+                    nodes.push(TypesetBot.node.createTag(match, isEndTag(match)));
                     return word.substr(match.length);
                 } else {
-                    nodes.push({
-                        type: 'word',
-                        str: word.substr(0, index)
-                    });
-                    var tag = word.substr(index, match.length)
-                    nodes.push({
-                        type: 'tag',
-                        str: tag,
-                        endtag: isEndTag(tag)
-                    });
+                    nodes.push(TypesetBot.node.createWord(word.substr(0, index)));
+
+                    var tag = word.substr(index, match.length);
+                    nodes.push(TypesetBot.node.createTag(tag, isEndTag(tag)));
                     return word.substr(index + match.length);
                 }
             }
         } else {
-            nodes.push({
-                type: 'word',
-                str: word
-            });
+            nodes.push(TypesetBot.node.createWord(word));
             return '';
         }
 
@@ -96,9 +79,7 @@ TypesetBot.wordUtils = (function(obj) {
             while(word.length > 0) {
                 word = getTag(nodes, word)
             }
-            nodes.push({
-                type: 'space'
-            });
+            nodes.push(TypesetBot.node.createSpace());
         });
         nodes.pop(); // Remove last space
         return nodes;
@@ -126,12 +107,11 @@ TypesetBot.wordUtils = (function(obj) {
                 content += node.str;
 
                 var word = elem.find('.typeset-property');
-                props.push({
-                    type: node.type,
-                    str: node.str,
-                    width: word.width(),
-                    height: word.height()
-                });
+
+                node.width = word.width();
+                node.height = word.height();
+
+                props.push(node);
 
                 elem.find('.typeset-property').remove();
 
@@ -147,12 +127,9 @@ TypesetBot.wordUtils = (function(obj) {
                     fontSize = Number(tag.css('font-size').replace('px', ''));
                 }
 
-                props.push({
-                    type: node.type,
-                    str: node.str,
-                    endtag: node.endtag,
-                    fontSize
-                });
+                node.fontSize = fontSize
+
+                props.push(node);
             } else if (node.type === 'space') {
                 // Remove extra spaces, first space takes priority.
                 // Fx: hello_<b>_world</b>
@@ -161,9 +138,7 @@ TypesetBot.wordUtils = (function(obj) {
                     content += ' ';
                     elem.html(content);
 
-                    props.push({
-                        type: node.type
-                    });
+                    props.push(node);
                     allowSpace = false;
                 }
             }
