@@ -30,7 +30,8 @@ TypesetBot.node = (function(obj, $) {
 
     obj.createSpace = function () {
         return {
-            type: 'space'
+            type: 'space',
+            str: ' '
         };
     };
 

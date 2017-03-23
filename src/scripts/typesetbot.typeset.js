@@ -44,12 +44,14 @@ TypesetBot.typeset = (function(obj, $) {
             nodes: props,
             width,
             shortestPath: {}, // Smallest demerit for each breakpoint on each line.
-            done: false
+            done: false,
+            lastRenderNode: 0, // The last node we rendered
+            renderContent: ''
         };
     };
 
     obj.initLineVars = function (elem, settings, vars, a) {
-        elem.append('<span class="typeset-block" style="height: ' + a.height + 'px"></span>')
+        elem.html('<span class="typeset-block" style="height: ' + a.height + 'px"></span>');
 
         var nodeIndex = a.nodeIndex,
             line = a.lineNumber,
@@ -136,12 +138,11 @@ TypesetBot.typeset = (function(obj, $) {
                 if (ratio <= settings.maxRatio && ratio >= settings.minRatio) { // Valid breakpoint
 
                     if (hyphenNodes(word, vars.nodes, settings)) {
-                        renderHyphens(word);
+                        renderHyphens(elem, word, vars, settings);
                     }
 
-
                     // We expect hyphens to be specified.
-                    return;
+                    
                 }
                 if (ratio < settings.minRatio) { // stop searching
                     return;
@@ -169,6 +170,38 @@ TypesetBot.typeset = (function(obj, $) {
         applyBreaks(elem, words, finalBreaks);
 
     };
+
+    function renderHyphens(elem, word, vars, settings) {
+        var nodes = vars.nodes,
+            lastWordIndex = word.index[word.index.length - 1];
+        for (var i = vars.lastRenderNode; i < nodes.length && i <= lastWordIndex; i++) {
+
+            var node = nodes[i];
+            var found = word.index.indexOf(i);
+            if (found === -1) {
+                vars.renderContent += node.str;
+                continue;
+            }
+
+            // Found relevant word node.
+            var lastIndex = 0;
+            console.log(found);
+            console.log(node);
+            node.hyphenIndex.forEach(function (index) {
+                var cut = node.str.substring(lastIndex, index + 1);
+                lastIndex = index + 1;
+                elem.html(vars.renderContent + '<span class="typeset-hyphen-check">' + cut + '</span>');
+                // vars.renderContent += cut;
+
+                // Check render properties
+                node.hyphenWidth.push(elem.find('.typeset-hyphen-check').width());
+
+            });
+            vars.renderContent += node.str;
+        }
+        elem.html(vars.renderContent);
+        vars.lastRenderNode = lastWordIndex + 1;
+    }
 
     function hyphenNodes(word, nodes, settings) {
         var index = 0;
@@ -212,7 +245,6 @@ TypesetBot.typeset = (function(obj, $) {
             var hyphenIndex = curHyphen - prevLen - 1; // 1 for index offset
             console.log('hy: %s, at %s', node.str, hyphenIndex);
             node.hyphenIndex.push(hyphenIndex);
-            node.hyphenWidth.push(0);
             console.log(node);
         });
 
