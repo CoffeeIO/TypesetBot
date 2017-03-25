@@ -1,5 +1,5 @@
 TypesetBot.node = (function(obj, $) {
-    obj.createBreak = function (nodeIndex, hyphenIndex, origin, demerit, flag, fitnessClass, lineNumber, height) {
+    obj.createBreak = function (nodeIndex, hyphenIndex, origin, demerit, flag, fitnessClass, lineNumber, height, curHeight, tagStack) {
         return {
             nodeIndex,
             hyphenIndex,
@@ -8,7 +8,9 @@ TypesetBot.node = (function(obj, $) {
             flag,
             fitnessClass,
             lineNumber,
-            height
+            height,
+            curHeight,
+            tagStack
         };
     };
 
