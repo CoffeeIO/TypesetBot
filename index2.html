@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="/dist/main.min.css">
+    <script type="text/javascript" src="/dist/mainWithPatterns.min.js"></script>
+    <style media="screen">
+        body {
+            width: 300px;
+            font-size: 16px;
+        }
+    </style>
+    <script type="text/javascript">
+        $(window).on('load', function () {
+            var custom = { maxRatio: 3}; // change to 3
+            var settings = TypesetBot.settings.validate({});
+            var elem = $('p');
+            settings.loosenessParam = 0;
+            var obj = TypesetBot.typeset.typesetParagraph(elem, settings);
+            if (obj != null) {
+                TypesetBot.typeset.applyBreaks(elem, obj.nodes, obj.solutions);
+            }
+            console.log(settings);
+        });
+    </script>
+</head>
+<body>
+    <!-- <img src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Sad-pug.jpg"  style="float: right;" width="20%"> -->
+
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur congue facilisis libero, id fermentum magna pellentesque sodales. Interdum et malesuada fames ac ante ipsum primis in faucibus. Duis lacinia, enim at dapibus <b>vehicula, ipsum elit</b> congue ex, nec fringilla orci sapien quis nisi. Sed ut neque quam. Sed accumsan orci non eleifend suscipit. Fusce rutrum ligula nibh, in aliquam lacus pharetra sed. Praesent pellentesque maximus nisi et congue. Praesent vel libero maximus, sagittis sapien vel, laoreet leo. Sed aliquet vulputate mi a cursus. Vestibulum vel ex sed sapien placerat venenatis. Nunc nec erat orci.
+
+Integer luctus nec nulla ut commodo. Duis ut feugiat massa, porttitor aliquam leo. Proin feugiat purus ac nisi tristique, eu semper sapien gravida. Curabitur malesuada ante a lacus scelerisque tempus. Curabitur ac metus ac arcu luctus dignissim in in urna. Maecenas pharetra eros vitae nibh condimentum dictum. Nam dapibus augue sed odio elementum feugiat. Phasellus cursus nulla justo, et vestibulum augue commodo ut. Aenean tincidunt lectus vel velit tempus dignissim. Nulla suscipit vel nisi a tincidunt. Aliquam erat volutpat. Nunc at tortor ipsum.
+
+Etiam luctus sollicitudin dui. Maecenas ultricies lacinia nulla eget imperdiet. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum dictum suscipit enim, nec bibendum nisl dignissim quis. In luctus nunc justo, in condimentum justo sagittis a. Suspendisse sit amet sapien tellus. Proin dapibus est eu urna lobortis, sed aliquet neque feugiat. Nam ornare condimentum finibus. Fusce feugiat a ligula quis vehicula. Cras feugiat, nisi eget commodo hendrerit, diam tellus finibus est, vel lacinia mi massa sit amet nulla. Vestibulum viverra vestibulum sem fermentum vulputate.
+
+
+    </p>
+    </body>
+    </html>

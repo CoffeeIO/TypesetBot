@@ -1,27 +1,7 @@
 TypesetBot.typeset = (function(obj, $) {
 
-    // function hyphenProperties(elem, words, curIndex, searchIndex, settings) {
-    //     for (var i = curIndex + 1; i < searchIndex; i++) {
-    //         elem.append(words[i].str + ' ');
-    //     }
-    //     var hyphen = TypesetBot.wordUtils.hyphenWord(words[searchIndex].str, settings);
-    //     // Ignore if word can't be hyphened.
-    //     if (hyphen.length == 1) {
-    //         elem.append(words[searchIndex].str + ' ');
-    //         words[searchIndex].hyphenWidth = words[searchIndex].width;
-    //         return elem.html();
-    //     }
-    //     console.log(hyphen);
-    //
-    //     // Check width or individual parts.
-    //
-    //
-    //     // Check width of '-' character.
-    //
-    //     words[searchIndex].hyphen = hyphen;
-    // }
-
     obj.initVars = function (elem, settings) {
+
         var fontSize = Number(elem.css('font-size').replace('px', '')),
             spaceWidth = fontSize * settings.spaceWidth,
             spaceShrink = fontSize * settings.spaceShrinkability,
@@ -66,22 +46,9 @@ TypesetBot.typeset = (function(obj, $) {
             vars.shortestPath[line] = {};
         }
 
-        var done = false;
-
-        // Check that the active nodes doesn't have a better solution, in which case skip this solution.
-        // if (vars.shortestPath[line - 1] != null && vars.shortestPath[line - 1][a.wordIndex] < a.demerit) {
-        //     done = true; // Skip node, we have a better solution
-        // }
-
-        done = checkShortestPath(vars, line - 1, a);
-        // Check that the active nodes doesn't have a better solution, in which case skip this solution.
-        // if (shortestPath[line-1] != null && shortestPath[line-1][a.wordIndex] < a.demeritTotal) {
-        //     // console.log('compare %s --- %s', shortestPath[line-1][a.wordIndex], a.demeritTotal);
-        //     findBreaks = false; // Skip node, we have a better solution
-        // }
+        var done = checkShortestPath(vars, line - 1, a);
 
         elem.find('.typeset-block').remove();
-        // console.log('idealWidth %s', idealWidth);
 
         return {
             nodeIndex,
@@ -113,12 +80,7 @@ TypesetBot.typeset = (function(obj, $) {
         // Get variables for algorithm.
         var vars = obj.initVars(elem, settings);
 
-        vars.nodes.forEach(function (node) { console.log(node); }); // Debug
-
-        // Init lists.
-        // var activeBreakpoints = new Queue(),
-        //     breakpoints = [],
-        //     finalBreaks = [];
+        // vars.nodes.forEach(function (node) { console.log(node); }); // Debug
 
         // Queue starting node.
         vars.activeBreakpoints.enqueue(
@@ -140,7 +102,6 @@ TypesetBot.typeset = (function(obj, $) {
 
             // Find breakpoints on line.
             while (! lineVars.done) {
-                // ----------------------- Add nodes until word is done
 
                 var oldWidth = lineVars.curWidth;
                 var word = appendWord(vars, lineVars);
@@ -160,7 +121,7 @@ TypesetBot.typeset = (function(obj, $) {
                     continue;
                 }
 
-                if (ratio <= settings.maxRatio) { // Valid breakpoint
+                if (ratio <= settings.maxRatio + settings.loosenessParam) { // Valid breakpoint
 
                     if (hyphenNodes(word, vars.nodes, settings)) {
                         renderHyphens(elem, word, vars, settings);
@@ -182,8 +143,6 @@ TypesetBot.typeset = (function(obj, $) {
                             );
 
                             if (TypesetBot.math.validRatio(hyphenRatio, settings)) {
-                                // console.log('hyphenRatio: %s --> %s --- %s', node.str, hyphenRatio, ratio);
-                                // console.log('oldw --> %s --- %s', oldWidth + node.dashWidth, lineVars.curWidth);
                                 var fitnessClass = TypesetBot.math.getFitness(hyphenRatio, settings);
                                 var flag = a.flag ? true : false; // Check if previous node was flagged
                                 var demerit = TypesetBot.math.calcDemerit(hyphenRatio, 50, flag, settings);
@@ -207,12 +166,8 @@ TypesetBot.typeset = (function(obj, $) {
                                 breakNode.ratio = hyphenRatio;
                                 breakNode.curWidth = oldWidth;
                                 breakNode.wordCount = lineVars.wordCount;
-                                // console.log('Hyphen break --- %s', hyphenRatio);
-                                // console.log(breakNode);
-                                // console.log(vars.nodes[wordIndex]);
 
                                 updateShortestPath(vars, lineVars, wordIndex, key, breakNode);
-                                // vars.activeBreakpoints.enqueue(breakNode);
                                 vars.breakpoints.push(breakNode);
 
                             }
@@ -223,7 +178,6 @@ TypesetBot.typeset = (function(obj, $) {
 
                     if (ratio < settings.minRatio) {
                         lineVars.done = true;
-                        // console.log('line done');
                         continue; // Don't add the last node.
                     }
 
@@ -247,7 +201,6 @@ TypesetBot.typeset = (function(obj, $) {
                     breakNode.wordCount = lineVars.wordCount;
 
                     updateShortestPath(vars, lineVars, lineVars.nodeIndex, null, breakNode);
-                    // vars.activeBreakpoints.enqueue(breakNode);
                     vars.breakpoints.push(breakNode);
                 }
 
@@ -256,16 +209,23 @@ TypesetBot.typeset = (function(obj, $) {
             }
         }
 
-        // Run again if no solution was found.-------------------
+        elem.html(vars.content);
 
+        // Run again if no solution was found.-------------------
+        if (vars.finalBreaks.length == 0) {
+            settings.loosenessParam += 1;
+            return obj.typesetParagraph(elem, settings);
+        }
 
         console.log(vars.shortestPath);
         console.log(vars.breakpoints);
-        elem.html(vars.content);
         console.log(vars.finalBreaks);
 
         // Apply found solution.
-        applyBreaks(elem, vars.nodes, vars.finalBreaks);
+        return {
+            nodes: vars.nodes,
+            solutions: vars.finalBreaks
+        };
     };
 
 
@@ -285,8 +245,7 @@ TypesetBot.typeset = (function(obj, $) {
 
             // Found relevant word node.
             var lastIndex = 0;
-            // console.log(found);
-            // console.log(node);
+
             // Iterate over the word hyphens.
             node.hyphenIndex.forEach(function (index) {
                 var cut = node.str.substring(lastIndex, index + 1);
@@ -307,7 +266,6 @@ TypesetBot.typeset = (function(obj, $) {
 
             });
             // Add remaining length.
-            // console.log('str %s, strlen: %s, index %s', node.str, node.str.length, lastIndex);
             if (node.hyphenIndex.length != 0 && node.str.length !== lastIndex) {
                 var cut = node.str.substr(lastIndex);
                 elem.html(vars.renderContent + '<span class="typeset-hyphen-check">' + cut + '</span>');
@@ -331,7 +289,6 @@ TypesetBot.typeset = (function(obj, $) {
         var offset = TypesetBot.wordUtils.hyphenOffset(word.str),
             hyphens = TypesetBot.wordUtils.hyphenWord(word.str, settings, offset.left, offset.right);
 
-        // console.log(hyphens);
         var curLen = node.str.length, // First word-part
             prevLen = 0;
 
@@ -350,21 +307,17 @@ TypesetBot.typeset = (function(obj, $) {
 
         var hyphenIndexes = getHyphenIndex(hyphens);
 
-        // console.log(hyphenIndexes);
         var curHyphen = 0;
         hyphenIndexes.forEach(function (hyphenLen) {
             curHyphen += hyphenLen;
             while (curLen < curHyphen) {
                 prevLen = curLen;
-                // console.log('inner');
                 node = nodes[word.index[index++]];
                 curLen += node.str.length;
             }
 
             var hyphenIndex = curHyphen - prevLen - 1; // 1 for index offset
-            // console.log('hy: %s, at %s', node.str, hyphenIndex);
             node.hyphenIndex.push(hyphenIndex);
-            // console.log(node);
         });
 
         return true;
@@ -390,7 +343,6 @@ TypesetBot.typeset = (function(obj, $) {
         while (! done) {
             var node = vars.nodes[lineVars.nodeIndex];
             if (node == null) { // Possible final break
-                // console.log('possible final break');
                 vars.finalBreaks.push(TypesetBot.node.createBreak(
                     wordIndex - 1,
                     null,
@@ -410,13 +362,10 @@ TypesetBot.typeset = (function(obj, $) {
             // console.log(node);
             if (node.type === 'word') {
                 if (lineVars.hyphenIndex !== null) {
-                    // console.log('Hyphen index start position --> %s', tempHyphenIndex);
                     var cutIndex = node.hyphenIndex[tempHyphenIndex];
                     var cut = node.str.substr(cutIndex + 1); // Offset by 1, fx: hy[p]-hen
                     var cutWidth = getSliceWidth(node.hyphenWidth, tempHyphenIndex, node.width);
 
-                    // console.log('cut --> %s -- %s', cut, cutWidth);
-                    // console.log(node.hyphenWidth);
                     word += cut;
                     lineVars.curWidth += cutWidth;
                     lineVars.hyphenIndex = null; // Reset hyphenIndex
@@ -476,7 +425,7 @@ TypesetBot.typeset = (function(obj, $) {
     /**
      * Apply the found solutions to the element.
      */
-    function applyBreaks(elem, nodes, breaks) {
+    obj.applyBreaks = function(elem, nodes, breaks) {
         var bestFit = null;
         breaks.forEach(function (elem) {
             if (bestFit == null || elem.demerit < bestFit.demerit) {
@@ -494,8 +443,7 @@ TypesetBot.typeset = (function(obj, $) {
             lines.push(bestFit);
             bestFit = bestFit.origin;
         }
-        // console.log(lines);
-        // return;
+
         var done = false,
             content = '',
             lastIndex = 0,

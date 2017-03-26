@@ -35,7 +35,7 @@ TypesetBot.math = (function(obj) {
     };
 
     obj.validRatio = function(ratio, settings) {
-        if (ratio <= settings.maxRatio && ratio >= settings.minRatio) {
+        if (ratio <= settings.maxRatio + settings.loosenessParam && ratio >= settings.minRatio) {
             return true;
         }
 
