@@ -73,6 +73,57 @@ TypesetBot.typeset = (function(obj, $) {
         return false;
     }
 
+    obj.typeset = function (selector, settings) {
+        selector.each(function () {
+            var elem = $(this);
+            if (elem.prop("tagName") === 'P' && !elem.hasClass('typeset-paragraph')) {
+                // Typeset the element itself.
+                obj.typesetElem(elem, settings);
+            } else {
+                // Typeset any <p> element inside.
+                elem.find('p').each(function () {
+                    var innerElem = $(this);
+
+                    console.log('one elem');
+                    if (innerElem.hasClass('typeset-hidden')) {
+                        innerElem.removeClass('typeset-hidden');
+                        obj.typesetElem(innerElem, settings);
+
+                    } else if (innerElem.hasClass('typeset-paragraph')) {
+                        innerElem.remove();
+                    } else {
+                        obj.typesetElem(innerElem, settings);
+                    }
+                });
+            }
+        });
+    }
+
+    obj.detach = function (selector) {
+        console.log('selector --> %s', selector);
+        console.log($(selector).find('.typeset-paragraph').length);
+        $(selector).find('.typeset-paragraph').remove();
+
+        $(selector).find('.typeset-hidden').removeClass('typeset-hidden');
+
+        TypesetBot.runAllAttached();
+    };
+
+    obj.typesetElem = function (elem, settings) {
+        settings.loosenessParam = 0;
+
+        var copy = elem[0].outerHTML;
+        elem.addClass('typeset-hidden');
+
+        elem.after(copy);
+        var workElem = elem.next();
+
+        var breaks = obj.typesetParagraph(workElem, settings);
+        if (breaks != null) {
+            obj.applyBreaks(workElem, breaks.nodes, breaks.solutions);
+        }
+    };
+
     obj.typesetParagraph = function (elem, settings) {
         // Set wordspacing.
         TypesetBot.paraUtils.setSpaceWidth(elem, settings.spaceWidth - settings.spaceShrinkability, settings.spaceUnit);
@@ -528,9 +579,11 @@ TypesetBot.typeset = (function(obj, $) {
                 + '</span>';
             console.log(lineContent);
         }
+        console.log(elem[0].outerHTML);
+
 
         elem.html(content);
-        elem.addClass('typeset-paragraph');
+        elem.addClass('typeset-paragraph typeset-justify');
     }
 
     /**

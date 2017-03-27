@@ -1,0 +1,13 @@
+.typeset-hidden {
+    display: none;
+    text-align: justify;
+}
+
+.typeset-viewport {
+    .typeset-hidden {
+        display: block;
+    }
+    .typeset-paragraph {
+        display: none;
+    }
+}
