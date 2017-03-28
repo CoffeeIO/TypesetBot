@@ -6,7 +6,6 @@ TypesetBot.viewport = (function(obj) {
         window.load = true;
     });
 
-
     var rtime;
     var timeout = false;
     var delta = 200;
@@ -25,13 +24,12 @@ TypesetBot.viewport = (function(obj) {
         } else {
             timeout = false;
             console.log('change viewport');
+            console.time('typesetting');
             TypesetBot.runAllAttached();
             $('body').removeClass('typeset-viewport');
+            console.timeEnd('typesetting');
         }
     }
-
-
-
 
     return obj;
 })(TypesetBot.viewport || {});
