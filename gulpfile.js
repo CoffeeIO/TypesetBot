@@ -70,6 +70,8 @@ var source = [
     'src/scripts/typesetbot.lineUtils.js',
     'src/scripts/typesetbot.wordUtils.js',
     'src/scripts/typesetbot.paraUtils.js',
+    'src/scripts/typesetbot.hyphen.js',
+    'src/scripts/typesetbot.utils.js',
     'src/scripts/typesetbot.settings.js',
     'src/scripts/typesetbot.typeset.js',
     'src/scripts/typesetbot.viewport.js',

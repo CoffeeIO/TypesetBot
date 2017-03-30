@@ -4,7 +4,7 @@ TypesetBot.settings = (function(obj, $) {
     var defaultSettings = {
         // Algorithm.
         algorithm: 'total-fit', // Other options are 'first-fit' and 'best-fit'
-        alignment: 'justify', // Other options are 'ragged-right' and 'ragged-center'
+        alignment: 'justify', // Other options are 'ragged-right', 'ragged-left' and 'ragged-center'
 
         hyphenPenalty: 50, // Penalty for line-breaking on a hyphen
         hyphenPenaltyRagged: 500, // Penalty for line-breaking on a hyphen when using ragged text
@@ -15,6 +15,7 @@ TypesetBot.settings = (function(obj, $) {
         // "the value of q is increased by 1 (if q < 0) or decreased by 1 (if q > 0) until a feasible solution is
         //  found." - DT p.114
         loosenessParam: 0, // If zero we find to solution with fewest total demerits. Reffered to as 'q'
+        absoluteMaxRatio: 5, // Max adjustment ratio before we give up on finding solutions
 
         maxRatio: 2, // Maximum acceptable adjustment ratio. Referred to as 'p'
         minRatio: -1, // Minimum acceptable adjustment ratio. Less than -1 will make the text too closely spaced.

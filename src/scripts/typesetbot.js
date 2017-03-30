@@ -4,6 +4,13 @@ TypesetBot = (function(obj, $) {
     selectors = {};
 
     /**
+     * Map of paragraph variables.
+     */
+    obj.vars = {
+
+    }
+
+    /**
      * Typeset selected elements.
      */
     obj.run = function(selector, custom = null) {
@@ -40,8 +47,10 @@ TypesetBot = (function(obj, $) {
      */
     obj.detach = function(id) {
         if (selectors[id] != null) {
-            TypesetBot.typeset.detach(selectors[id]);
+            var val = selectors[id]
             delete selectors[id];
+
+            TypesetBot.typeset.detach(val);
             return true;
         }
 

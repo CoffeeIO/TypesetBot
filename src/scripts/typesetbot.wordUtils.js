@@ -1,46 +1,5 @@
 TypesetBot.wordUtils = (function(obj) {
 
-    obj.hyphenOffset = function (word) {
-        var beginRegex = /^[\W]*/,
-            endRegex = /[\W]*$/;
-
-        var left = 0,
-            right = 0;
-
-        if (matches = word.match(beginRegex)) {
-            var match = matches[0];
-            left = match.length;
-        }
-        if (matches = word.match(endRegex)) {
-            var match = matches[0];
-            right = match.length;
-        }
-
-        return {
-            left,
-            right
-        }
-    };
-
-    /**
-     * Hyphen word with specific settings.
-     */
-    obj.hyphenWord  = function (word, settings, left = 0, right = 0) {
-        if (window['Hypher']['languages'][settings.hyphenLanguage] == null) {
-            return null;
-        }
-        window['Hypher']['languages'][settings.hyphenLanguage].leftMin = settings.hyphenLeftMin + left;
-        window['Hypher']['languages'][settings.hyphenLanguage].rightMin = settings.hyphenRightMin + right;
-        return window['Hypher']['languages'][settings.hyphenLanguage].hyphenate(word);
-    };
-
-    function isEndTag(tag) {
-        if (tag.charAt(1) === '/') {
-            return true;
-        }
-        return false;
-    }
-
     function getTag(nodes, word) {
         var tagRegex = /<(?:.|\n)*?>/;
 
@@ -68,6 +27,13 @@ TypesetBot.wordUtils = (function(obj) {
         }
 
         return word;
+    }
+
+    function isEndTag(tag) {
+        if (tag.charAt(1) === '/') {
+            return true;
+        }
+        return false;
     }
 
     /**

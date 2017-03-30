@@ -31,8 +31,10 @@ TypesetBot.lineUtils = (function(obj) {
      * Other cases will use binary search, O(log n)
      * Repeating of same line width, O(1)
      */
-    obj.nextLineWidth  = function (dom, idealW) {
-        dom.append('<span class="typeset-linewidth">1 1</span>'); // Assuming all lines are longer than '1 1'
+    obj.nextLineWidth  = function (dom, idealW, i) {
+        dom.html('<span class="typeset-block" style="height: ' + i + 'px"></span><span class="typeset-linewidth">1 1</span>');
+
+        // dom.append('<span class="typeset-linewidth">1 1</span>'); // Assuming all lines are longer than '1 1'
 
         var pointer = dom.find('.typeset-linewidth'),
             yPos = pointer.position().top,
@@ -77,6 +79,21 @@ TypesetBot.lineUtils = (function(obj) {
             yPos
         });
     };
+
+    obj.getAllLinewidths = function (elem, width, maxheight) {
+        var arr = [];
+
+        var content = elem.html();
+
+        for (var i = 0; i <= maxheight; i++) {
+            arr.push(TypesetBot.lineUtils.nextLineWidth(elem, width, i));
+
+        }
+
+        elem.html(content); // Reset content
+        console.log(arr);
+        return arr;
+    }
 
     return obj;
 })(TypesetBot.lineUtils || {});

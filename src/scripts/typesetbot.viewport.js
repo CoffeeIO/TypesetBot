@@ -25,8 +25,9 @@ TypesetBot.viewport = (function(obj) {
             timeout = false;
             console.log('change viewport');
             console.time('typesetting');
-            TypesetBot.runAllAttached();
             $('body').removeClass('typeset-viewport');
+
+            TypesetBot.runAllAttached();
             console.timeEnd('typesetting');
         }
     }
