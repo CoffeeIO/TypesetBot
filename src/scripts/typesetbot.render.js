@@ -81,10 +81,12 @@ TypesetBot.render = (function(obj, $) {
 
 
         // Change the nodes to an array so we can pop them off in correct order.
-        var lines = [];
-        while (true) {
+        var lines = [],
+            done = false;
+        while (! done) {
             if (bestFit.origin == null) {
-                break; // First line doesn't matter, we know it starts at word index 0
+                done = true;
+                continue; // First line doesn't matter, we know it starts at word index 0
             }
             lines.push(bestFit);
             bestFit = bestFit.origin;
@@ -126,7 +128,7 @@ TypesetBot.render = (function(obj, $) {
 
                 if (node.type === 'word') {
 
-                    if (line.hyphenIndex != null && cutIndex - 1 == i) { // Last word on line
+                    if (line.hyphenIndex != null && cutIndex - 1 === i) { // Last word on line
                         var index = node.hyphenIndex[line.hyphenIndex] + 1;
                         lineContent += node.str.substring(0, index) + '-';
 
@@ -149,7 +151,7 @@ TypesetBot.render = (function(obj, $) {
                     }
 
                 } else if (node.type === 'space') {
-                    if (cutIndex - 1 != i) {
+                    if (cutIndex - 1 !== i) {
                         lineContent += ' ';
                     }
                 }

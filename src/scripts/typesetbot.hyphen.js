@@ -74,7 +74,7 @@ TypesetBot.hyphen = (function(obj) {
 
             });
             // Add remaining length.
-            if (node.hyphenIndex.length != 0 && node.str.length !== lastIndex) {
+            if (node.hyphenIndex.length !== 0 && node.str.length !== lastIndex) {
                 var cut = node.str.substr(lastIndex);
                 elem.html(vars.renderContent + '<span class="typeset-hyphen-check">' + cut + '</span>');
                 node.hyphenRemain = elem.find('.typeset-hyphen-check').width();

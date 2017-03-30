@@ -19,7 +19,7 @@ TypesetBot = (function(obj, $) {
 
         var elem = $(selector);
 
-        if (elem.length == 0) {
+        if (elem.length === 0) {
             return false;
         }
 

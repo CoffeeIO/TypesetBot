@@ -261,7 +261,7 @@ TypesetBot.typeset = (function(obj, $) {
         elem.html(vars.content);
 
         // Run again if no solution was found.-------------------
-        if (vars.finalBreaks.length == 0) {
+        if (vars.finalBreaks.length === 0) {
             console.log('no solution found');
             if (settings.loosenessParam >= settings.absoluteMaxRatio) {
                 return null;
