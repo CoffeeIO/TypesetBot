@@ -127,8 +127,6 @@ TypesetBot.typeset = (function(obj, $) {
     };
 
     obj.typesetElem = function (elem, settings) {
-        console.time('pre');
-
         settings.loosenessParam = 0;
         var hash = TypesetBot.utils.hashCode(elem.html());
         if (elem.attr('hashcode') != null) {
@@ -137,30 +135,19 @@ TypesetBot.typeset = (function(obj, $) {
         }
 
         elem.attr('hashcode', hash);
-
         var copy = elem[0].outerHTML;
-
         elem.addClass('typeset-hidden');
-
         elem.after(copy);
         var workElem = elem.next();
 
-        console.timeEnd('pre');
-
         console.time('breaking');
-
         var breaks = obj.typesetParagraph(workElem, settings);
         console.timeEnd('breaking');
 
-        console.log('solutions --> ', breaks.solutions.length);
-
-        console.time('apply');
         if (breaks != null) {
             TypesetBot.vars['x' + hash] = breaks.nodes;
             TypesetBot.render.applyBreaks(workElem, breaks.nodes, breaks.solutions);
         }
-        console.timeEnd('apply');
-
     };
 
     obj.typesetParagraph = function (elem, settings) {
@@ -306,10 +293,7 @@ TypesetBot.typeset = (function(obj, $) {
 
         updateShortestPath(vars, lineVars, wordIndex, hyphenIndex, breakNode);
         vars.breakpoints.push(breakNode);
-    }
-
-
-
+    };
 
     function checkShortestPath(vars, line, a) {
         var hIndex = a.hyphenIndex == null ? -1 : a.hyphenIndex;

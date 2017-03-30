@@ -181,7 +181,7 @@ TypesetBot.render = (function(obj, $) {
         elem.html(content);
         var alignmentClass = TypesetBot.utils.getAlignmentClass(settings.alignment);
         elem.addClass('typeset-paragraph ' + alignmentClass);
-    }
+    };
 
 
     return obj;

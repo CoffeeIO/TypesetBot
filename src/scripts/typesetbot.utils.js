@@ -21,16 +21,16 @@ TypesetBot.utils = (function(obj) {
 
     obj.getAlignmentClass = function (alignment) {
         switch (alignment) {
-            case 'justify':
-                return 'typeset-justify';
-            case 'ragged-right':
-                return 'typeset-left';
-            case 'ragged-left':
-                return 'typeset-right';
-            case 'ragged-center':
-                return 'typeset-center';
-            default:
-                return '';
+        case 'justify':
+            return 'typeset-justify';
+        case 'ragged-right':
+            return 'typeset-left';
+        case 'ragged-left':
+            return 'typeset-right';
+        case 'ragged-center':
+            return 'typeset-center';
+        default:
+            return '';
         }
     };
 

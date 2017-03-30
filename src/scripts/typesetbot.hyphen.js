@@ -19,7 +19,7 @@ TypesetBot.hyphen = (function(obj) {
         return {
             left,
             right
-        }
+        };
     };
 
     /**

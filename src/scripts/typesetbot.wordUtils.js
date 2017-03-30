@@ -43,13 +43,13 @@ TypesetBot.wordUtils = (function(obj) {
         var nodes = [];
         words.forEach(function (word) {
             while(word.length > 0) {
-                word = getTag(nodes, word)
+                word = getTag(nodes, word);
             }
             nodes.push(TypesetBot.node.createSpace());
         });
         nodes.pop(); // Remove last space
         return nodes;
-    }
+    };
 
     obj.spaceStore = {};
     obj.hyphenStore = {};

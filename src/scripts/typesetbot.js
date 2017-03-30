@@ -7,9 +7,7 @@ TypesetBot = (function(obj, $) {
     /**
      * Map of paragraph variables.
      */
-    obj.vars = {
-
-    }
+    obj.vars = {};
 
     /**
      * Typeset selected elements.
