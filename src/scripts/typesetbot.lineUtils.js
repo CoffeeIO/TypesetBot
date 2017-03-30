@@ -34,6 +34,9 @@ TypesetBot.lineUtils = (function(obj) {
     obj.nextLineWidth  = function (dom, idealW, i) {
         dom.html('<span class="typeset-block" style="height: ' + i + 'px"></span><span class="typeset-linewidth">1 1</span>');
 
+        // The vertical scrollbar might dissapear when we remove the original content, giving more horizontal space, so we need to offset the returned result for this.
+        var scrollbarOffset = dom.width() - idealW;
+
         // dom.append('<span class="typeset-linewidth">1 1</span>'); // Assuming all lines are longer than '1 1'
 
         var pointer = dom.find('.typeset-linewidth'),
@@ -59,7 +62,7 @@ TypesetBot.lineUtils = (function(obj) {
 
             if (lowT && highT) {
                 pointer.remove();
-                return obj.lastLineWidth;
+                return obj.lastLineWidth - scrollbarOffset;
             }
         }
 
@@ -77,21 +80,20 @@ TypesetBot.lineUtils = (function(obj) {
             baseW,
             baseH,
             yPos
-        });
+        }) - scrollbarOffset;
     };
 
-    obj.getAllLinewidths = function (elem, width, maxheight) {
+    obj.getAllLinewidths = function (elem, width, maxheight, settings) {
         var arr = [];
 
         var content = elem.html();
 
-        for (var i = 0; i <= maxheight; i++) {
+        arr.push(TypesetBot.lineUtils.nextLineWidth(elem, width, 0));
+        for (var i = 1; i <= maxheight + settings.dynamicWidthIncrement; i += settings.dynamicWidthIncrement) {
             arr.push(TypesetBot.lineUtils.nextLineWidth(elem, width, i));
-
         }
 
         elem.html(content); // Reset content
-        console.log(arr);
         return arr;
     }
 

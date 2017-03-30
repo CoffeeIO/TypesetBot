@@ -37,7 +37,11 @@ TypesetBot.settings = (function(obj, $) {
         // Inline element that the program will unwrap from paragraphs as they could disrupt the line breaking.
         unwrapElements: ['img'],
 
-        // Functions
+        // Dynamic width.
+        dynamicWidth: true, // Allow the paragraph to account for overlapping elements, turn this off if you know there's no overlapping element to gain performance
+        dynamicWidthIncrement: 5, // Pixel increment of vertical search, higher better performance, lower more accurate result
+
+        // Functions.
         ratio (idealW, actualW, wordCount, shrink, stretch, settings) {
             if (actualW < idealW) {
                 return (idealW - actualW) / ((wordCount - 1) * stretch);

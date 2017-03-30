@@ -2,6 +2,7 @@ TypesetBot = (function(obj, $) {
 
     id = 0;
     selectors = {};
+    settingsStore = {};
 
     /**
      * Map of paragraph variables.
@@ -30,6 +31,7 @@ TypesetBot = (function(obj, $) {
      */
     obj.attach = function(selector, custom = null) {
         selectors[id] = selector;
+        settingsStore[id] = custom;
         obj.run(selector, custom);
 
         return id++;
@@ -49,6 +51,7 @@ TypesetBot = (function(obj, $) {
         if (selectors[id] != null) {
             var val = selectors[id]
             delete selectors[id];
+            delete settingsStore[id];
 
             TypesetBot.typeset.detach(val);
             return true;
@@ -69,7 +72,8 @@ TypesetBot = (function(obj, $) {
      */
     obj.runAllAttached = function() {
         for (var key in selectors) {
-            obj.run(selectors[key], null)
+            console.log(settingsStore[key]);
+            obj.run(selectors[key], settingsStore[key]);
         }
     };
 

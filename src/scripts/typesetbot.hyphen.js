@@ -143,13 +143,13 @@ TypesetBot.hyphen = (function(obj) {
         return indexes;
     }
 
-    obj.getSliceWidth = function (hyphenArr, index, fullWidth) {
+    obj.getSliceWidth = function (hyphenArr, index, remain) {
         var arr = hyphenArr.slice(index + 1),
             width = 0;
         arr.forEach(function (elem) {
             width += elem;
         });
-        return fullWidth - width;
+        return remain + width;
     }
 
 
