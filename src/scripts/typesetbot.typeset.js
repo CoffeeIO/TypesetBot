@@ -98,8 +98,6 @@ TypesetBot.typeset = (function(obj, $) {
                 // Typeset any <p> element inside.
                 elem.find('p:not(.typeset-paragraph)').each(function () {
                     var innerElem = $(this);
-                    console.log('Found elem');
-                    // console.log('one elem');
                     if (innerElem.hasClass('typeset-hidden')) {
                         innerElem.removeClass('typeset-hidden');
                         obj.typesetElem(innerElem, settings);
@@ -110,7 +108,7 @@ TypesetBot.typeset = (function(obj, $) {
                 });
             }
         });
-    }
+    };
 
     obj.detach = function (selector) {
         $(selector).each(function () {
@@ -262,7 +260,6 @@ TypesetBot.typeset = (function(obj, $) {
 
         // Run again if no solution was found.-------------------
         if (vars.finalBreaks.length === 0) {
-            console.log('no solution found');
             if (settings.loosenessParam >= settings.absoluteMaxRatio) {
                 return null;
             }

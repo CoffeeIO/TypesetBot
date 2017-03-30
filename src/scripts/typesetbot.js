@@ -49,7 +49,7 @@ TypesetBot = (function(obj, $) {
      */
     obj.detach = function(id) {
         if (selectors[id] != null) {
-            var val = selectors[id]
+            var val = selectors[id];
             delete selectors[id];
             delete settingsStore[id];
 
@@ -72,7 +72,6 @@ TypesetBot = (function(obj, $) {
      */
     obj.runAllAttached = function() {
         for (var key in selectors) {
-            console.log(settingsStore[key]);
             obj.run(selectors[key], settingsStore[key]);
         }
     };

@@ -23,7 +23,7 @@ TypesetBot.math = (function(obj) {
 
     obj.calcDemerit = function (ratio, penalty, flag, settings) {
         var badness = obj.getBadness(ratio, settings);
-        return obj.getDemerit(badness, penalty, flag, settings)
+        return obj.getDemerit(badness, penalty, flag, settings);
     };
 
     obj.getFitness = function(ratio, settings) {

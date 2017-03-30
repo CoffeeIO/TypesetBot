@@ -64,7 +64,7 @@ TypesetBot.render = (function(obj, $) {
             str: word,
             index: wordIndex
         };
-    }
+    };
 
     /**
      * Apply the found solutions to the element.

@@ -93,7 +93,7 @@ TypesetBot.wordUtils = (function(obj) {
                     fontSize = Number(tag.css('font-size').replace('px', ''));
                 }
 
-                node.fontSize = fontSize
+                node.fontSize = fontSize;
 
                 props.push(node);
             } else if (node.type === 'space') {

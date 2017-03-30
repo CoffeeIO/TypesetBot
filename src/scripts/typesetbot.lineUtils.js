@@ -95,7 +95,7 @@ TypesetBot.lineUtils = (function(obj) {
 
         elem.html(content); // Reset content
         return arr;
-    }
+    };
 
     return obj;
 })(TypesetBot.lineUtils || {});

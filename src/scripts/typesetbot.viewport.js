@@ -23,7 +23,6 @@ TypesetBot.viewport = (function(obj) {
             setTimeout(resizeend, delta);
         } else {
             timeout = false;
-            console.log('change viewport');
             console.time('typesetting');
             $('body').removeClass('typeset-viewport');
 
