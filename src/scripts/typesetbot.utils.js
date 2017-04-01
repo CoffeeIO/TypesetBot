@@ -6,7 +6,7 @@ TypesetBot.utils = (function(obj) {
      * **Modified**
      * @see http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/
      */
-    obj.hashCode = function(str) {
+    obj.getHash = function(str) {
         var hash = 0;
         if (str.length === 0) {
             return hash;
@@ -33,6 +33,56 @@ TypesetBot.utils = (function(obj) {
             return '';
         }
     };
+
+    /**
+     * Take a string array and return array of string length and ignore last element.
+     * Fx: ["hyp", "hen", "ation"] --> [3, 3]
+     */
+    obj.getArrayIndexes = function (arr) {
+        var indexes = [];
+
+        for (var i = 0; i < arr.length - 1; i++) {
+            indexes.push(arr[i].length);
+        }
+
+        return indexes;
+    };
+
+    /**
+     * Take an array of begin tags, reverse them and create their closing tags.
+     *
+     */
+    obj.reverseStack = function (nodes, nodeIndexes) {
+        var arr = [];
+        nodeIndexes.forEach(function (nodeIndex) {
+            var node = nodes[nodeIndex];
+            arr.push(node.str);
+        });
+
+        var newArr = [],
+            tagNameRegex = /<(\w*)/;
+        // Create a copy of array to not reverse original array.
+        [].concat(arr).reverse().forEach(function (elem) {
+            var res = elem.match(tagNameRegex);
+            newArr.push('</' + res[1] + '>');
+        });
+        return newArr;
+    };
+
+    /**
+     * Merge two json objects.
+     *
+     * @param o1 The default json, base
+     * @param o2 The custom json, overwrite existing elements
+     */
+    obj.jsonConcat = function (o1, o2) {
+        for (var key in o2) {
+            if ({}.hasOwnProperty.call(o2, key)) {
+                o1[key] = o2[key];
+            }
+        }
+        return o1;
+    }
 
     return obj;
 })(TypesetBot.utils || {});

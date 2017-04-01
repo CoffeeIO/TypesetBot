@@ -21,11 +21,17 @@ TypesetBot.math = (function(obj) {
         return settings.demerit(badness, penalty, flag, settings);
     };
 
+    /**
+     * Shortcut to getting demerit from basic properties.
+     */
     obj.calcDemerit = function (ratio, penalty, flag, settings) {
         var badness = obj.getBadness(ratio, settings);
         return obj.getDemerit(badness, penalty, flag, settings);
     };
 
+    /**
+     * Get the fitness class from adjustment ratio.
+     */
     obj.getFitness = function(ratio, settings) {
         for (var i = 0; i < settings.fitnessClass.length; i++) {
             if (ratio < settings.fitnessClass[i]) {
@@ -34,7 +40,10 @@ TypesetBot.math = (function(obj) {
         }
     };
 
-    obj.validRatio = function(ratio, settings) {
+    /**
+     * Check if adjustment ratio is valid.
+     */
+    obj.isValidRatio = function(ratio, settings) {
         if (ratio <= settings.maxRatio + settings.loosenessParam && ratio >= settings.minRatio) {
             return true;
         }

@@ -13,7 +13,7 @@ TypesetBot = (function(obj, $) {
      * Typeset selected elements.
      */
     obj.run = function(selector, custom = null) {
-        settings = TypesetBot.settings.validate(custom);
+        settings = TypesetBot.settings.get(custom);
 
         var elem = $(selector);
 
@@ -21,7 +21,7 @@ TypesetBot = (function(obj, $) {
             return false;
         }
 
-        TypesetBot.typeset.typeset(elem, settings);
+        TypesetBot.typeset.element(elem, settings);
     };
 
     /**

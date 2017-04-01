@@ -1,70 +1,135 @@
 TypesetBot.render = (function(obj, $) {
 
-    obj.appendWord = function (vars, lineVars) {
-        var done = false,
-            word = '',
-            wordIndex = [];
-
-        var tempHyphenIndex = lineVars.hyphenIndex;
-
-        while (! done) {
-            var node = vars.nodes[lineVars.nodeIndex];
-            if (node == null) { // Possible final break
-                vars.finalBreaks.push(TypesetBot.node.createBreak(
-                    lineVars.nodeIndex,
-                    null,
-                    lineVars.origin,
-                    lineVars.origin.demerit,
-                    false,
-                    0,
-                    lineVars.line + 1,
-                    lineVars.origin.height + lineVars.lineHeight,
-                    lineVars.lineHeight,
-                    ''
-                ));
-
-                return null;
-            }
-
-            if (node.type === 'word') {
-                if (lineVars.hyphenIndex !== null) {
-                    var cutIndex = node.hyphenIndex[tempHyphenIndex];
-                    var cut = node.str.substr(cutIndex + 1); // Offset by 1, fx: hy[p]-hen
-                    var cutWidth = TypesetBot.hyphen.getSliceWidth(node.hyphenWidth, tempHyphenIndex, node.hyphenRemain);
-
-                    word += cut;
-                    lineVars.curWidth += cutWidth;
-                    lineVars.hyphenIndex = null; // Reset hyphenIndex
-
+    /**
+     * Detach selector from dom and remove typeset elements.
+     */
+    obj.detachSelector = function (selector) {
+        $(selector).each(function () {
+            var elem = $(this);
+            if (elem.prop("tagName") === 'P') {
+                if (elem.hasClass('typeset-paragraph')) {
+                    elem.remove();
+                } else if (elem.hasClass('typeset-hidden')) {
+                    elem.removeClass('typeset-hidden');
                 } else {
-                    word += node.str;
-                    lineVars.curWidth += node.width;
-
+                    elem.find('.typeset-paragraph').remove();
+                    elem.find('.typeset-hidden').removeClass('typeset-hidden');
                 }
+            }
+        });
+    };
 
-                if (lineVars.lineHeight < node.height) { // Update max height for this line
-                    lineVars.lineHeight = node.height;
-                }
-                wordIndex.push(lineVars.nodeIndex);
+    /**
+     * Render nodes and return the array with all relevant properties.
+     */
+    obj.getNodeProperties = function (elem, nodes) {
+
+        var html = elem.html(),
+            props = [],
+            allowSpace = false, // Disallow space as first node
+            content = ''; // Html content, to correct for auto-closing tags when rendering
+
+        elem.html('');
+        nodes.forEach(function (node) {
+            if (node.type === 'word') {
+                // Add the word after, for when we remove typeset-property elem.
+                elem.html(content + '<span class="typeset-property">' + node.str + '</span>' + node.str);
+                content += node.str;
+
+                var word = elem.find('.typeset-property');
+
+                node.width = word.width();
+                node.height = word.height();
+
+                props.push(node);
+
+                elem.find('.typeset-property').remove();
+
+                allowSpace = true;
             } else if (node.type === 'tag') {
-                if (! node.endtag) {
-                    vars.fontSize = node.fontSize; // Update other properties?
+                var fontSize = null;
 
+                content += node.str;
+
+                if (! node.endtag) {
+                    elem.html(content);
+                    var tag = elem.find('*:last');
+                    fontSize = Number(tag.css('font-size').replace('px', ''));
                 }
 
+                node.fontSize = fontSize;
+
+                props.push(node);
             } else if (node.type === 'space') {
-                done = true;
+                // Remove extra spaces, first space takes priority.
+                // Fx: hello_<b>_world</b>
+                // Real ->  |   |   <- Invisible
+                if (allowSpace) {
+                    content += ' ';
+                    elem.html(content);
+
+                    props.push(node);
+                    allowSpace = false;
+                }
             }
 
-            lineVars.nodeIndex++;
-        }
-        lineVars.wordCount++;
+        });
+        elem.html(html); // Put back html
 
-        return {
-            str: word,
-            index: wordIndex
-        };
+        return props;
     };
+
+    obj.hyphenProperties = function (elem, word, vars, settings) {
+        var nodes = vars.nodes,
+            lastWordIndex = word.index[word.index.length - 1];
+
+        // Get nodes between the last rendered node and the latest word node.
+        for (var i = vars.lastRenderNode; i < nodes.length && i <= lastWordIndex; i++) {
+
+            var node = nodes[i];
+            var found = word.index.indexOf(i);
+            if (found === -1) {
+                vars.renderContent += node.str;
+                continue;
+            }
+
+            // Found relevant word node.
+            var lastIndex = 0;
+
+            // Iterate over the word hyphens.
+            node.hyphenIndex.forEach(function (index) {
+
+                var cut = node.str.substring(lastIndex, index + 1);
+                lastIndex = index + 1;
+                elem.html(
+                    vars.renderContent +
+                    '<span class="typeset-word-check">' +
+                        cut +
+                    '</span>' +
+                    '<span class="typeset-hyphen-check">-</span>'
+                );
+
+                // Push render properties.
+                node.hyphenWidth.push(elem.find('.typeset-word-check').width());
+                if (node.dashWidth == null) {
+                    node.dashWidth = elem.find('.typeset-hyphen-check').width();
+                }
+
+            });
+            // Add remaining length.
+            if (node.hyphenIndex.length !== 0 && node.str.length !== lastIndex) {
+                var cut = node.str.substr(lastIndex);
+                elem.html(vars.renderContent + '<span class="typeset-hyphen-check">' + cut + '</span>');
+                node.hyphenRemain = elem.find('.typeset-hyphen-check').width();
+            }
+
+            vars.renderContent += node.str;
+        }
+        elem.html(vars.renderContent);
+        vars.lastRenderNode = lastWordIndex + 1;
+    };
+
+
 
     /**
      * Apply the found solutions to the element.
@@ -165,18 +230,15 @@ TypesetBot.render = (function(obj, $) {
             }
 
             if (tagStack.length > 0) {
-                lineContent += reverseStack(nodes, tagStack).join('');
+                lineContent += TypesetBot.utils.reverseStack(nodes, tagStack).join('');
             }
 
             // Add line to paragraph.
             content +=
-                '<span class="typeset-line" line="' + line.lineNumber + '" style="height:' + line.curHeight + 'px" ratio="' + line.ratio + '" width="'+line.curWidth+'" count="' + line.wordCount + '">'
-                    + lineContent
-                + '</span>';
-            // console.log(lineContent);
+                '<span class="typeset-line" line="' + line.lineNumber + '" style="height:' + line.curHeight + 'px" ratio="' + line.ratio + '">' +
+                    lineContent +
+                '</span>';
         }
-        // console.log(elem[0].outerHTML);
-
 
         elem.html(content);
         var alignmentClass = TypesetBot.utils.getAlignmentClass(settings.alignment);

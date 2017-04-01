@@ -69,28 +69,13 @@ TypesetBot.settings = (function(obj, $) {
     };
 
     /**
-     * Merge two json objects.
-     *
-     * @param o1 The default json, base
-     * @param o2 The custom json, overwrite existing elements
-     */
-    function jsonConcat(o1, o2) {
-        for (var key in o2) {
-            if ({}.hasOwnProperty.call(o2, key)) {
-                o1[key] = o2[key];
-            }
-        }
-        return o1;
-    }
-
-    /**
      * Validate settings and merge with default settings.
      */
-    obj.validate  = function (settings) {
+    obj.get  = function (settings) {
         if (settings == null) {
             return $.extend(true, {}, defaultSettings);
         }
-        settings = jsonConcat($.extend(true, {}, defaultSettings), settings);
+        settings = TypesetBot.utils.jsonConcat($.extend(true, {}, defaultSettings), settings);
 
         return settings;
     };

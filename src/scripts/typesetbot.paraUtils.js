@@ -33,7 +33,7 @@ TypesetBot.paraUtils = (function(obj) {
     /**
      * Wrap free text in paragraph tags, call recusively on children.
      */
-    function recWrap(elem) {
+    function recursiveWrap(elem) {
         var regMarkup = /^[\s\b]*<[\w]+/;
 
         if (elem.html() === undefined) {
@@ -62,7 +62,7 @@ TypesetBot.paraUtils = (function(obj) {
                 html += clone.children(':nth-child(1)').clone().wrap('<div>').parent().html();
                 clone.children(':nth-child(1)').remove();
             }
-            var temp = recWrap(clone.children(':nth-child(1)'));
+            var temp = recursiveWrap(clone.children(':nth-child(1)'));
             if (temp.html() !== undefined) {
                 html += temp.wrap('<div>').parent().html();
             }
@@ -85,7 +85,7 @@ TypesetBot.paraUtils = (function(obj) {
      */
     obj.wrapText  = function (dom) {
         var html = dom.html().replace(/<!--(.*?)-->/g, ""); // Remove all html comments
-        recWrap(dom.html(html));
+        recursiveWrap(dom.html(html));
     };
 
     /**
@@ -93,7 +93,7 @@ TypesetBot.paraUtils = (function(obj) {
      * Modified for custom element and generalizing spaces and newlines.
      * Full credit to 'miketeix' - http://jsfiddle.net/miketeix/2q8ac/
      */
-    obj.breakParaInLines = function (dom) {
+    obj.breakIntoLines = function (dom) {
         dom.html(dom.html().replace( /\n/g, " " ).replace( /\s+/g, " " ));
         var spanInserted = dom.html().split(" ").join(" </span><span>");
         var wrapped = ("<span>").concat(spanInserted, "</span>");
@@ -117,10 +117,10 @@ TypesetBot.paraUtils = (function(obj) {
      * Show adjustment ratios on plain text paragraph.
      * Return array of adjustment ratios.
      */
-    obj.getAdjustmentRatios = function (dom, showRatio = false) {
+    obj.getPlainRatios = function (dom, showRatio = false) {
         var arr = [];
 
-        obj.breakParaInLines(dom);
+        obj.breakIntoLines(dom);
         var idealW = dom.width();
         dom.find('span:last').attr('lastline', '');
         dom.find('span').each(function () {
