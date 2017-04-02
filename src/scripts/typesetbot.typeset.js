@@ -126,8 +126,12 @@ TypesetBot.typeset = (function(obj, $) {
                             );
 
                             if (TypesetBot.math.isValidRatio(hyphenRatio, settings)) {
-                                var hyphenPenalty = settings.alignment === 'justify' ? settings.hyphenPenalty : settings.hyphenPenaltyRagged;
-                                TypesetBot.typesetUtils.generateBreak(vars, lineVars, hyphenRatio, hyphenPenalty, true, wordIndex, key, settings);
+                                var hyphenPenalty = settings.alignment === 'justify' ?
+                                    settings.hyphenPenalty :
+                                    settings.hyphenPenaltyRagged;
+                                TypesetBot.typesetUtils.generateBreak(
+                                    vars, lineVars, hyphenRatio, hyphenPenalty, true, wordIndex, key, settings
+                                );
                             }
 
                         });
@@ -140,7 +144,9 @@ TypesetBot.typeset = (function(obj, $) {
                     }
 
                     // Create break for full word.
-                    TypesetBot.typesetUtils.generateBreak(vars, lineVars, ratio, 0, false, lineVars.nodeIndex, null, settings);
+                    TypesetBot.typesetUtils.generateBreak(
+                        vars, lineVars, ratio, 0, false, lineVars.nodeIndex, null, settings
+                    );
                 }
 
                 // Append space

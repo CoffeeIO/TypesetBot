@@ -80,7 +80,7 @@ TypesetBot.nodeUtils = (function(obj, $) {
             return true;
         }
         return false;
-    }
+    };
 
     /**
      * Break words into word, tag and space nodes.

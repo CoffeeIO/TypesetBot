@@ -235,7 +235,8 @@ TypesetBot.render = (function(obj, $) {
 
             // Add line to paragraph.
             content +=
-                '<span class="typeset-line" line="' + line.lineNumber + '" style="height:' + line.curHeight + 'px" ratio="' + line.ratio + '">' +
+                '<span class="typeset-line" line="' + line.lineNumber + '" style="height:' + line.curHeight + 'px" ' +
+                    'ratio="' + line.ratio + '">' +
                     lineContent +
                 '</span>';
         }

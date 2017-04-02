@@ -82,7 +82,7 @@ TypesetBot.utils = (function(obj) {
             }
         }
         return o1;
-    }
+    };
 
     return obj;
 })(TypesetBot.utils || {});

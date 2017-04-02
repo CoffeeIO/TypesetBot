@@ -30,8 +30,10 @@ TypesetBot.lineUtils = (function(obj) {
      * Basic logic:
      * - We create and element "1 1", and we know it's dimentions.
      * - We add margin on the left side to push the element to the right side.
-     * - When we find the maximum width of the line the element will overflow to next line, "1 " \n "1" and the element will be 2 lines high.
-     * - We find the point were we've still on one line and return the margin we've added to the left side and the width of the element.
+     * - When we find the maximum width of the line the element will overflow to next line, "1 " \n "1" and the element
+     *   will be 2 lines high.
+     * - We find the point were we've still on one line and return the margin we've added to the left side and the
+     *   width of the element.
      *
      * Most cases will be full width, O(1)
      * Other cases will use binary search, O(log n)
