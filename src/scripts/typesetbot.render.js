@@ -141,7 +141,6 @@ TypesetBot.render = (function(obj, $) {
                 bestFit = elem;
             }
         });
-        // console.log(bestFit);
         var index = bestFit.nodeIndex;
 
 

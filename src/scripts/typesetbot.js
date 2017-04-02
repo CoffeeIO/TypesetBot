@@ -70,7 +70,9 @@ TypesetBot = (function(obj, $) {
      */
     obj.runAllAttached = function() {
         for (var key in selectors) {
-            obj.run(selectors[key], settingsStore[key]);
+            if ({}.hasOwnProperty.call(selectors, key)) {
+                obj.run(selectors[key], settingsStore[key]);
+            }
         }
     };
 

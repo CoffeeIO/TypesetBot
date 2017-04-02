@@ -3,7 +3,6 @@ TypesetBot.settings = (function(obj, $) {
     // Default settings the program will use.
     var defaultSettings = {
         // Algorithm.
-        algorithm: 'total-fit', // Other options are 'first-fit' and 'best-fit'
         alignment: 'justify', // Other options are 'ragged-right', 'ragged-left' and 'ragged-center'
 
         hyphenPenalty: 50, // Penalty for line-breaking on a hyphen

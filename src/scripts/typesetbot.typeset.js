@@ -33,7 +33,8 @@ TypesetBot.typeset = (function(obj, $) {
         settings.loosenessParam = 0;
         var hash = TypesetBot.utils.getHash(elem.html());
         if (elem.attr('hashcode') != null) {
-            elem.parent().find('.typeset-paragraph[hashcode="' + hash + '"]').remove(); // Remove related typeset paragraph
+            // Remove related typeset paragraph.
+            elem.parent().find('.typeset-paragraph[hashcode="' + hash + '"]').remove();
             elem.removeClass('typeset-hidden');
         }
 

@@ -108,7 +108,7 @@ TypesetBot.hyphen = (function(obj) {
             width += elem;
         });
         return remain + width;
-    }
+    };
 
 
     return obj;
