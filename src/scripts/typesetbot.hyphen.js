@@ -93,7 +93,7 @@ TypesetBot.hyphen = (function(obj) {
         });
 
         return true;
-    }
+    };
 
 
     /**

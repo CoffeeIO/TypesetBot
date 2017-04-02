@@ -131,12 +131,13 @@ TypesetBot.typesetUtils = (function(obj, $) {
         var hIndex = a.hyphenIndex == null ? -1 : a.hyphenIndex;
         if (vars.shortestPath[line] != null &&
             vars.shortestPath[line][a.nodeIndex] != null &&
-            vars.shortestPath[line][a.nodeIndex][hIndex] < a.demerit) {
+            vars.shortestPath[line][a.nodeIndex][hIndex] < a.demerit
+        ) {
             return true;
         }
 
         return false;
-    }
+    };
 
     /**
      * Update value on specific line, node and hyphen if demerit is smaller.
@@ -148,11 +149,13 @@ TypesetBot.typesetUtils = (function(obj, $) {
         if (hyphenIndex == null) {
             hyphenIndex = -1; // Convert hyphen index null to -1, as 0 is a valid hyphen index.
         }
-        if (vars.shortestPath[lineVars.line][nodeIndex][hyphenIndex] == null || vars.shortestPath[lineVars.line][nodeIndex][hyphenIndex] > breakNode.demerit) {
+        if (vars.shortestPath[lineVars.line][nodeIndex][hyphenIndex] == null ||
+            vars.shortestPath[lineVars.line][nodeIndex][hyphenIndex] > breakNode.demerit
+        ) {
             vars.shortestPath[lineVars.line][nodeIndex][hyphenIndex] = breakNode.demerit;
             vars.activeBreakpoints.enqueue(breakNode); // Only add items to queue if they have better demerit
         }
-    }
+    };
 
     return obj;
 })(TypesetBot.typesetUtils || {}, jQuery);
