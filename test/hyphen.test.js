@@ -1,11 +1,6 @@
 'use strict';
 
 describe('Hyphenation:', function () {
-    beforeEach(function(done) {
-        $('.unittest').remove(); // Remove existing tex documents
-        $('body').append(__html__['fixtures/test1']);
-        done();
-    });
 
     describe('Hyphenate word:', function () {
         it('Normal words', function () {
@@ -25,5 +20,27 @@ describe('Hyphenation:', function () {
             expect(TypesetBot.hyphen.word('hyphenate', settings)).toEqual(null);
         });
     });
+
+    describe('Hyphenation offset:', function () {
+        it('Normal word', function () {
+            var offset = TypesetBot.hyphen.getWordOffset('hyphen');
+            expect(offset.right).toEqual(0);
+            expect(offset.left).toEqual(0);
+        });
+        it('Special character word', function () {
+            var offset = TypesetBot.hyphen.getWordOffset(',|Hello.$.');
+            expect(offset.right).toEqual(3);
+            expect(offset.left).toEqual(2);
+        });
+    });
+
+    describe('Hyphenation end width:', function () {
+        it('Normal word', function () {
+            expect(TypesetBot.hyphen.getEndWidth([3, 4], 0, 7)).toEqual(11);
+            expect(TypesetBot.hyphen.getEndWidth([3, 4], 1, 7)).toEqual(7);
+            expect(TypesetBot.hyphen.getEndWidth([3, 4], 1, 0)).toEqual(0);
+        });
+    });
+
 
 });

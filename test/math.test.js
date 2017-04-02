@@ -72,4 +72,40 @@ describe('Math calculations:', function () {
         });
     });
 
+    describe('Calculate fitness class', function () {
+        it('Good ratio', function () {
+            var settings = TypesetBot.settings.get();
+            expect(TypesetBot.math.getFitness(0, settings)).toEqual(2);
+            // [-1, -0.5, 0.5, 1, Infinity] --> 2
+        });
+        it('Lowest ratio', function () {
+            var settings = TypesetBot.settings.get();
+            expect(TypesetBot.math.getFitness(-Infinity, settings)).toEqual(0);
+            // [-1, -0.5, 0.5, 1, Infinity] --> 0
+        });
+        it('Highest ratio', function () {
+            var settings = TypesetBot.settings.get();
+            expect(TypesetBot.math.getFitness(100, settings)).toEqual(4);
+            expect(TypesetBot.math.getFitness(Infinity, settings)).toEqual(4);
+            // [-1, -0.5, 0.5, 1, Infinity] --> 4
+        });
+    });
+
+    describe('Check valid ratio:', function () {
+        it('Valid', function () {
+            var settings = TypesetBot.settings.get();
+            expect(TypesetBot.math.isValidRatio(0.5, settings)).toEqual(true);
+            expect(TypesetBot.math.isValidRatio(-1, settings)).toEqual(true);
+            expect(TypesetBot.math.isValidRatio(1, settings)).toEqual(true);
+            expect(TypesetBot.math.isValidRatio(2, settings)).toEqual(true);
+        });
+        it('Invalid', function () {
+            var settings = TypesetBot.settings.get();
+            expect(TypesetBot.math.isValidRatio(-Infinity, settings)).toEqual(false);
+            expect(TypesetBot.math.isValidRatio(-1.1, settings)).toEqual(false);
+            expect(TypesetBot.math.isValidRatio(Infinity, settings)).toEqual(false);
+            expect(TypesetBot.math.isValidRatio(2.1, settings)).toEqual(false);
+        });
+    });
+
 });

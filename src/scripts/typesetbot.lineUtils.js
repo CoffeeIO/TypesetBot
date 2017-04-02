@@ -42,7 +42,7 @@ TypesetBot.lineUtils = (function(obj) {
      * Other cases will use binary search, O(log n)
      * Repeating of same line width, O(1)
      */
-    obj.nextLineWidth  = function (dom, idealW, i) {
+    obj.nextLineWidth = function (dom, idealW, i) {
         dom.html(
             '<span class="typeset-block" style="height: ' + i + 'px"></span>' +
             '<span class="typeset-linewidth">1 1</span>'

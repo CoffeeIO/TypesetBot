@@ -38,6 +38,7 @@ TypesetBot.math = (function(obj) {
                 return i;
             }
         }
+        return settings.fitnessClass.length - 1; // Default for infinite ratio
     };
 
     /**

@@ -45,7 +45,7 @@ TypesetBot.typeset = (function(obj, $) {
 
         var breaks = obj.linebreak(workElem, settings);
         if (breaks != null) {
-            TypesetBot.vars['x' + hash] = breaks.nodes;
+            TypesetBot.vars[hash] = breaks.nodes;
             TypesetBot.render.applyBreaks(workElem, breaks.nodes, breaks.solutions);
         }
     };

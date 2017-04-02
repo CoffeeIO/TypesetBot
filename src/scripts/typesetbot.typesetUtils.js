@@ -10,14 +10,14 @@ TypesetBot.typesetUtils = (function(obj, $) {
             width = elem.width(),
             height = elem.height();
 
-        var foundVars = TypesetBot.vars['x' + hash];
+        var foundVars = TypesetBot.vars[hash];
         var props;
 
         if (foundVars == null) {
             var words = TypesetBot.paraUtils.getWords(content),
                 nodes = TypesetBot.nodeUtils.wordsToNodes(words);
             props = TypesetBot.render.getNodeProperties(elem, nodes);
-            TypesetBot.vars['x' + hash] = props;
+            TypesetBot.vars[hash] = props;
 
         } else {
             props = foundVars;
