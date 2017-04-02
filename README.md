@@ -11,3 +11,47 @@ Small project to dynamically typeset text on the web.
 <a href="https://waffle.io/MGApcDev/TypesetBot"><img alt="TypesetBot" src="https://img.shields.io/waffle/label/MGApcDev/TypesetBot.svg"></a>
 <a href="LICENSE"><img alt="TypesetBot" src="https://img.shields.io/aur/license/yaourt.svg"></a>
 </p>
+
+## Installing
+
+```bash
+$ npm install typesetbot
+```
+
+_or_
+
+```bash
+$ git clone https://github.com/MGApcDev/TypesetBot.git
+```
+
+_or_
+
+[Just link it, no download!(see example)](http://codepen.io/MGApcDev/pen/jBdzKG)
+
+## Basic usage
+```html
+<html>
+<head>
+    <link rel="stylesheet" href="/dist/main.min.css">
+    <script type="text/javascript" src="/dist/mainWithPatterns.min.js"></script>
+    <script type="text/javascript">
+        TypesetBot.attach('body');
+    </script>
+</head>
+<body>
+    <p>Lorem ipsum...</p>
+</body>
+```
+
+## Contributions
+1. Fork it!
+2. Create your feature branch: `git checkout -b my-new-feature`
+3. Commit your changes: `git commit -am 'Add some feature'`
+4. Push to the branch: `git push origin my-new-feature`
+5. Submit a pull request :smile:
+
+## Dependencies
+- **jQuery** --> [jQuery write less, do more](https://jquery.com/)
+- **hypher** --> [A fast and small JavaScript hyphenation engine](https://github.com/bramstein/hypher)
+
+Copyright &copy; 2016 Mathias Grundtvig Andreasen (MGApcDev). Licensed under the terms of the [GPLv3 license](LICENSE.md).
