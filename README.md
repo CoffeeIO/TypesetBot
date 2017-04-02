@@ -26,7 +26,7 @@ $ git clone https://github.com/MGApcDev/TypesetBot.git
 
 _or_
 
-[Just link it, no download!(see example)](http://codepen.io/MGApcDev/pen/jBdzKG)
+[Just link it, no download! (see example)](http://codepen.io/MGApcDev/pen/jBdzKG)
 
 ## Basic usage
 ```html
@@ -53,5 +53,6 @@ _or_
 ## Dependencies
 - **jQuery** --> [jQuery write less, do more](https://jquery.com/)
 - **hypher** --> [A fast and small JavaScript hyphenation engine](https://github.com/bramstein/hypher)
+- **hyphenation-patterns** --> [Hyphenation patterns for use with Hypher](https://github.com/bramstein/hyphenation-patterns)
 
 Copyright &copy; 2016 Mathias Grundtvig Andreasen (MGApcDev). Licensed under the terms of the [GPLv3 license](LICENSE.md).
