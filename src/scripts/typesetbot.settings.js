@@ -46,21 +46,22 @@ TypesetBot.settings = (function(obj, $) {
         dynamicWidthIncrement: 5,
 
         // Functions.
-        ratio (idealW, actualW, wordCount, shrink, stretch, settings) {
+
+        ratio (idealW, actualW, wordCount, shrink, stretch, settings) { // Adjustment ratio
             if (actualW < idealW) {
                 return (idealW - actualW) / ((wordCount - 1) * stretch);
             }
 
             return (idealW - actualW) / ((wordCount - 1) * shrink);
         },
-        badness (ratio, settings) { // Params can't be changed
+        badness (ratio, settings) { // Badness calculation
             if (ratio == null || ratio < settings.minRatio) {
                 return Infinity;
             }
 
             return 100 * Math.pow(Math.abs(ratio), 3) + 0.5;
         },
-        demerit (badness, penalty, flag, settings) {
+        demerit (badness, penalty, flag, settings) { // Demerit calculation
             var flagPenalty = flag ? settings.flagPenalty : 0;
             if (penalty >= 0) {
                 return Math.pow(settings.demeritOffset + badness + penalty, 2) + flagPenalty;

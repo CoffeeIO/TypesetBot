@@ -25,9 +25,8 @@ TypesetBot.typeset = (function(obj, $) {
         });
     };
 
-
     /**
-     * Typeset paragraph.
+     * Typeset single paragraph.
      */
     obj.paragraph = function (elem, settings) {
         settings.loosenessParam = 0;
@@ -44,10 +43,7 @@ TypesetBot.typeset = (function(obj, $) {
         elem.after(copy);
         var workElem = elem.next();
 
-        console.time('breaking');
         var breaks = obj.linebreak(workElem, settings);
-        console.timeEnd('breaking');
-
         if (breaks != null) {
             TypesetBot.vars['x' + hash] = breaks.nodes;
             TypesetBot.render.applyBreaks(workElem, breaks.nodes, breaks.solutions);
@@ -62,9 +58,7 @@ TypesetBot.typeset = (function(obj, $) {
         TypesetBot.paraUtils.setSpaceWidth(elem, settings.spaceWidth - settings.spaceShrinkability, settings.spaceUnit);
 
         // Get variables for algorithm.
-        console.time('vars init');
         var vars = TypesetBot.typesetUtils.initVars(elem, settings);
-        console.timeEnd('vars init');
 
         // Queue starting node.
         vars.activeBreakpoints.enqueue(

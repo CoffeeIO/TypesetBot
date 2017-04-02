@@ -1,5 +1,8 @@
 TypesetBot.lineUtils = (function(obj) {
 
+    /**
+     * Width of the last line that wasn't the max line width.
+     */
     obj.lastLineWidth = 0;
 
     /**

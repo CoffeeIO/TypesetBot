@@ -1,11 +1,14 @@
 TypesetBot.viewport = (function(obj) {
 
-    window.load = false;
-
+    // Check if window is loaded.
     $(window).on("load", function () {
-        window.load = true;
+        TypesetBot.load = true;
     });
 
+
+    // Check for when user stops resizing viewport.
+    // **MODIFIED**
+    // http://stackoverflow.com/a/5926068/2741279
     var rtime;
     var timeout = false;
     var delta = 200;

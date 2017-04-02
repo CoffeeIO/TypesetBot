@@ -79,6 +79,9 @@ TypesetBot.render = (function(obj, $) {
         return props;
     };
 
+    /**
+     * Render word hyphens and get relevant properties.
+     */
     obj.hyphenProperties = function (elem, word, vars, settings) {
         var nodes = vars.nodes,
             lastWordIndex = word.index[word.index.length - 1];

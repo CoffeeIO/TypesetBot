@@ -1,11 +1,20 @@
 TypesetBot = (function(obj, $) {
 
+    // Check if window is loaded (this includes fonts, so we can work on UI).
+    obj.load = false;
+
+    // Selector ids.
     id = 0;
+
+    // Id -> String query selectors.
     selectors = {};
+
+    // Id -> settings object.
     settingsStore = {};
 
     /**
-     * Map of paragraph variables.
+     * Map of paragraph hash to array of node objects.
+     * User can get and set this variable as they please
      */
     obj.vars = {};
 
@@ -25,7 +34,7 @@ TypesetBot = (function(obj, $) {
     };
 
     /**
-     * Attach selected elements to be watched and typeset by TypeBot.
+     * Attach selected elements to be watched and typeset by TypesetBot on viewport change.
      */
     obj.attach = function(selector, custom = null) {
         selectors[id] = selector;

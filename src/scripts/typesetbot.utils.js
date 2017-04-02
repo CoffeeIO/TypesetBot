@@ -19,6 +19,9 @@ TypesetBot.utils = (function(obj) {
         return hash;
     };
 
+    /**
+     * Get the css relevant to the alignment given.
+     */
     obj.getAlignmentClass = function (alignment) {
         switch (alignment) {
         case 'justify':
@@ -36,7 +39,7 @@ TypesetBot.utils = (function(obj) {
 
     /**
      * Take a string array and return array of string length and ignore last element.
-     * Fx: ["hyp", "hen", "ation"] --> [3, 3]
+     * Fx: ["hyp", "hen", "ation"] --> [3, 3].
      */
     obj.getArrayIndexes = function (arr) {
         var indexes = [];
@@ -50,7 +53,7 @@ TypesetBot.utils = (function(obj) {
 
     /**
      * Take an array of begin tags, reverse them and create their closing tags.
-     *
+     * Fx: ['<span class="test">', '<b>'] --> ['</b>','</span>'].
      */
     obj.reverseStack = function (nodes, nodeIndexes) {
         var arr = [];
@@ -61,7 +64,7 @@ TypesetBot.utils = (function(obj) {
 
         var newArr = [],
             tagNameRegex = /<(\w*)/;
-        // Create a copy of array to not reverse original array.
+        // Create a copy of array to not reverse reference array.
         [].concat(arr).reverse().forEach(function (elem) {
             var res = elem.match(tagNameRegex);
             newArr.push('</' + res[1] + '>');
@@ -71,7 +74,6 @@ TypesetBot.utils = (function(obj) {
 
     /**
      * Merge two json objects.
-     *
      * @param o1 The default json, base
      * @param o2 The custom json, overwrite existing elements
      */

@@ -1,4 +1,8 @@
 TypesetBot.node = (function(obj, $) {
+
+    /**
+     * Create break object.
+     */
     obj.createBreak = function (
         nodeIndex, hyphenIndex, origin, demerit, flag, fitnessClass, lineNumber, height, curHeight, tagStack
     ) {
@@ -16,6 +20,9 @@ TypesetBot.node = (function(obj, $) {
         };
     };
 
+    /**
+     * Create word node.
+     */
     obj.createWord = function (str) {
         return {
             type: 'word',
@@ -24,6 +31,9 @@ TypesetBot.node = (function(obj, $) {
         };
     };
 
+    /**
+     * Create tag node.
+     */
     obj.createTag = function (str, endTag) {
         return {
             type: 'tag',
@@ -32,10 +42,12 @@ TypesetBot.node = (function(obj, $) {
         };
     };
 
+    /**
+     * Create space node.
+     */
     obj.createSpace = function () {
         return {
-            type: 'space',
-            str: ' '
+            type: 'space'
         };
     };
 
