@@ -50,4 +50,4 @@ _or_
 - **hyphenation-patterns** --> [Hyphenation patterns for use with Hypher](https://github.com/bramstein/hyphenation-patterns)
 - **Queue.js** --> [JavaScript queues](http://code.stephenmorley.org/javascript/queues/)
 
-Copyright &copy; 2016 Mathias Grundtvig Andreasen (MGApcDev). Licensed under the terms of the [GPLv3 license](LICENSE.md).
+Copyright &copy; 2016 Mathias Grundtvig Andreasen (MGApcDev). Licensed under the terms of the [GPLv3 license](LICENSE).
