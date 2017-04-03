@@ -47,5 +47,6 @@ _or_
 - **jQuery** --> [jQuery write less, do more](https://jquery.com/)
 - **hypher** --> [A fast and small JavaScript hyphenation engine](https://github.com/bramstein/hypher)
 - **hyphenation-patterns** --> [Hyphenation patterns for use with Hypher](https://github.com/bramstein/hyphenation-patterns)
+- **Queue.js** --> [JavaScript queues](http://code.stephenmorley.org/javascript/queues/)
 
 Copyright &copy; 2016 Mathias Grundtvig Andreasen (MGApcDev). Licensed under the terms of the [GPLv3 license](LICENSE.md).
