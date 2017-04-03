@@ -22,15 +22,19 @@ TypesetBot = (function(obj, $) {
      * Typeset selected elements.
      */
     obj.run = function(selector, custom = null) {
-        settings = TypesetBot.settings.get(custom);
+        var settings = TypesetBot.settings.get(custom);
+        var timer = setInterval(function () {
+            if (obj.load) {
+                var elem = $(selector);
 
-        var elem = $(selector);
+                if (elem.length === 0) {
+                    return false;
+                }
 
-        if (elem.length === 0) {
-            return false;
-        }
-
-        TypesetBot.typeset.element(elem, settings);
+                TypesetBot.typeset.element(elem, settings);
+                clearInterval(timer);
+            }
+        }, 50);
     };
 
     /**
@@ -39,9 +43,11 @@ TypesetBot = (function(obj, $) {
     obj.attach = function(selector, custom = null) {
         selectors[id] = selector;
         settingsStore[id] = custom;
+        var oldId = id;
+        id++;
         obj.run(selector, custom);
 
-        return id++;
+        return oldId;
     };
 
     /**

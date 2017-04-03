@@ -26,11 +26,8 @@ TypesetBot.viewport = (function(obj) {
             setTimeout(resizeend, delta);
         } else {
             timeout = false;
-            console.time('typesetting');
             $('body').removeClass('typeset-viewport');
-
             TypesetBot.runAllAttached();
-            console.timeEnd('typesetting');
         }
     }
 
