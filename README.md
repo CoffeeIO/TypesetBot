@@ -41,6 +41,7 @@ _or_
 <body>
     <p>Lorem ipsum...</p>
 </body>
+</html>
 ```
 
 ## Dependencies
