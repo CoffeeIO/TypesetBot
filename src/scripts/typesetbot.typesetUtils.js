@@ -33,9 +33,6 @@ TypesetBot.typesetUtils = (function(obj, $) {
             spaceShrink = fontSize * settings.spaceShrinkability,
             spaceStretch = fontSize * settings.spaceStretchability;
 
-        var hyphenContent = '', // Content for checking hyphen dimensions
-            hyphenIndex = 0; // Index for last hyphened word
-
         return {
             fontSize,
             spaceWidth,
@@ -61,9 +58,6 @@ TypesetBot.typesetUtils = (function(obj, $) {
     obj.initLineVars = function (elem, settings, vars, a) {
         var line = a.lineNumber;
 
-        if (vars.shortestPath[line] == null) { // Add line object
-            vars.shortestPath[line] = {};
-        }
         var done = obj.checkShortestPath(vars, line - 1, a);
         if (done) {
             return {
@@ -143,6 +137,10 @@ TypesetBot.typesetUtils = (function(obj, $) {
      * Update value on specific line, node and hyphen if demerit is smaller.
      */
     obj.updateShortestPath = function (vars, lineVars, nodeIndex, hyphenIndex, breakNode) {
+        if (vars.shortestPath[lineVars.line] == null) { // Add line object
+            vars.shortestPath[lineVars.line] = {};
+        }
+
         if (vars.shortestPath[lineVars.line][nodeIndex] == null) {
             vars.shortestPath[lineVars.line][nodeIndex] = {};
         }
