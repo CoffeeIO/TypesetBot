@@ -16,9 +16,9 @@ describe('Typesetting utilities:', function () {
             vars.activeBreakpoints = new Queue();
             lineVars.line = 1;
 
-            TypesetBot.typesetUtils.updateShortestPath(vars, lineVars, 5, null, { demerit: 123 });
-            TypesetBot.typesetUtils.updateShortestPath(vars, lineVars, 5, 0, { demerit: 256 });
-            TypesetBot.typesetUtils.updateShortestPath(vars, lineVars, 6, 2, { demerit: 266 });
+            TypesetBot.typesetUtils.updateShortestPath(vars, lineVars, 5, null, {demerit: 123});
+            TypesetBot.typesetUtils.updateShortestPath(vars, lineVars, 5, 0, {demerit: 256});
+            TypesetBot.typesetUtils.updateShortestPath(vars, lineVars, 6, 2, {demerit: 266});
 
             expect(vars.shortestPath[1][5][-1]).toEqual(123);
             expect(vars.shortestPath[1][5][0]).toEqual(256);
@@ -33,9 +33,9 @@ describe('Typesetting utilities:', function () {
             vars.activeBreakpoints = new Queue();
             lineVars.line = 1;
 
-            TypesetBot.typesetUtils.updateShortestPath(vars, lineVars, 5, null, { demerit: 123 });
-            TypesetBot.typesetUtils.updateShortestPath(vars, lineVars, 5, null, { demerit: 50 });
-            TypesetBot.typesetUtils.updateShortestPath(vars, lineVars, 5, null, { demerit: 256 });
+            TypesetBot.typesetUtils.updateShortestPath(vars, lineVars, 5, null, {demerit: 123});
+            TypesetBot.typesetUtils.updateShortestPath(vars, lineVars, 5, null, {demerit: 50});
+            TypesetBot.typesetUtils.updateShortestPath(vars, lineVars, 5, null, {demerit: 256});
 
             expect(vars.shortestPath[1][5][-1]).toEqual(50);
         });
@@ -49,7 +49,7 @@ describe('Typesetting utilities:', function () {
             vars.shortestPath = {};
             vars.activeBreakpoints = new Queue();
             lineVars.line = 1;
-            var a = { demerit: 123 };
+            var a = {demerit: 123};
             TypesetBot.typesetUtils.updateShortestPath(vars, lineVars, 5, null, a);
 
             expect(TypesetBot.typesetUtils.checkShortestPath(vars, 1, a)).toEqual(false);
@@ -61,8 +61,8 @@ describe('Typesetting utilities:', function () {
             vars.shortestPath = {};
             vars.activeBreakpoints = new Queue();
             lineVars.line = 1;
-            var a = { demerit: 123 };
-            var b = { demerit: 124, nodeIndex: 5, hyphenIndex: null };
+            var a = {demerit: 123};
+            var b = {demerit: 124, nodeIndex: 5, hyphenIndex: null};
             TypesetBot.typesetUtils.updateShortestPath(vars, lineVars, 5, null, a);
 
             expect(TypesetBot.typesetUtils.checkShortestPath(vars, 1, b)).toEqual(true);
@@ -96,7 +96,7 @@ describe('Typesetting utilities:', function () {
         });
         it('No linewidths', function () {
             var elem = $('.plain');
-            var settings = TypesetBot.settings.get({ dynamicWidth: false });
+            var settings = TypesetBot.settings.get({dynamicWidth: false});
             var vars = TypesetBot.typesetUtils.initVars(elem, settings);
 
             expect(vars).not.toEqual(null);
@@ -154,10 +154,10 @@ describe('Typesetting utilities:', function () {
                 demerit: 125 // Higher demerit
             };
 
-            TypesetBot.typesetUtils.updateShortestPath(vars, { line: 1 }, 5, 1, { demerit: 123 });
+            TypesetBot.typesetUtils.updateShortestPath(vars, {line: 1}, 5, 1, {demerit: 123});
 
             var lineVars = TypesetBot.typesetUtils.initLineVars(elem, settings, vars, a);
-            expect(lineVars.done).toEqual(true)
+            expect(lineVars.done).toEqual(true);
         });
     });
 });
