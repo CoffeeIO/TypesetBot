@@ -1,5 +1,8 @@
 TypesetBot.lineUtils = (function(obj) {
 
+    /**
+     * Width of the last line that wasn't the max line width.
+     */
     obj.lastLineWidth = 0;
 
     /**
@@ -27,12 +30,27 @@ TypesetBot.lineUtils = (function(obj) {
     /**
      * Get the ideal line with of the following line, assuming we're on a newline.
      *
+     * Basic logic:
+     * - We create and element "1 1", and we know it's dimentions.
+     * - We add margin on the left side to push the element to the right side.
+     * - When we find the maximum width of the line the element will overflow to next line, "1 " \n "1" and the element
+     *   will be 2 lines high.
+     * - We find the point were we've still on one line and return the margin we've added to the left side and the
+     *   width of the element.
+     *
      * Most cases will be full width, O(1)
      * Other cases will use binary search, O(log n)
      * Repeating of same line width, O(1)
      */
-    obj.nextLineWidth  = function (dom, idealW) {
-        dom.append('<span class="typeset-linewidth">1 1</span>'); // Assuming all lines are longer than '1 1'
+    obj.nextLineWidth = function (dom, idealW, i) {
+        dom.html(
+            '<span class="typeset-block" style="height: ' + i + 'px"></span>' +
+            '<span class="typeset-linewidth">1 1</span>'
+        );
+
+        // The vertical scrollbar might dissapear when we remove the original content, giving more horizontal space,
+        // so we need to offset the returned result for this.
+        var scrollbarOffset = dom.width() - idealW;
 
         var pointer = dom.find('.typeset-linewidth'),
             yPos = pointer.position().top,
@@ -57,7 +75,7 @@ TypesetBot.lineUtils = (function(obj) {
 
             if (lowT && highT) {
                 pointer.remove();
-                return obj.lastLineWidth;
+                return obj.lastLineWidth - scrollbarOffset;
             }
         }
 
@@ -75,7 +93,23 @@ TypesetBot.lineUtils = (function(obj) {
             baseW,
             baseH,
             yPos
-        });
+        }) - scrollbarOffset;
+    };
+
+    /**
+     * Get ideal linewidths within a range.
+     */
+    obj.getAllLinewidths = function (elem, width, maxheight, settings) {
+        var arr = [],
+            content = elem.html();
+
+        arr.push(TypesetBot.lineUtils.nextLineWidth(elem, width, 0));
+        for (var i = 1; i <= maxheight + settings.dynamicWidthIncrement; i += settings.dynamicWidthIncrement) {
+            arr.push(TypesetBot.lineUtils.nextLineWidth(elem, width, i));
+        }
+
+        elem.html(content); // Reset content
+        return arr;
     };
 
     return obj;

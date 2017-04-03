@@ -1,0 +1,13 @@
+.typeset-hidden {
+    display: none;
+    text-align: justify;
+}
+
+.typeset-viewport { // Added when dragging viewport
+    .typeset-hidden {
+        display: block;
+    }
+    .typeset-paragraph {
+        display: none;
+    }
+}

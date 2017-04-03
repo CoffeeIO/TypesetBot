@@ -1,0 +1,25 @@
+.typeset-justify {
+    text-align: justify;
+
+    .typeset-line {
+        &:after {
+            content: "";
+            display: inline-block;
+            width: 100%;
+        }
+        &:last-of-type {
+            &:after {
+                display: none;
+            }
+        }
+    }
+}
+.typeset-right .typeset-line {
+    text-align: right;
+}
+.typeset-left .typeset-line {
+    text-align: left;
+}
+.typeset-center .typeset-line {
+    text-align: center;
+}
