@@ -17,7 +17,6 @@ TypesetBot.paraUtils = (function(obj) {
      * Set specific word spacing, adjusting for the font's default size of a space.
      */
     obj.setSpaceWidth  = function (dom, value, unit) {
-        // console.log(value);
         var defaultWidth = obj.getDefaultSpaceWidth(dom);
         dom.css('word-spacing', 'calc(1' + unit + '*(' + value + ') - ' + defaultWidth + 'px)');
     };

@@ -137,7 +137,7 @@ TypesetBot.render = (function(obj, $) {
     /**
      * Apply the found solutions to the element.
      */
-    obj.applyBreaks = function(elem, nodes, breaks) {
+    obj.applyBreaks = function(elem, nodes, breaks, settings) {
         var bestFit = null;
         breaks.forEach(function (elem) {
             if (bestFit == null || elem.demerit < bestFit.demerit) {
