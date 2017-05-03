@@ -47,17 +47,7 @@ TypesetBot.render = (function(obj, $) {
 
                 allowSpace = true;
             } else if (node.type === 'tag') {
-                var fontSize = null;
-
                 content += node.str;
-
-                if (! node.endtag) {
-                    elem.html(content);
-                    var tag = elem.find('*:last');
-                    fontSize = Number(tag.css('font-size').replace('px', ''));
-                }
-
-                node.fontSize = fontSize;
 
                 props.push(node);
             } else if (node.type === 'space') {
@@ -66,7 +56,6 @@ TypesetBot.render = (function(obj, $) {
                 // Real ->  |   |   <- Invisible
                 if (allowSpace) {
                     content += ' ';
-                    elem.html(content);
 
                     props.push(node);
                     allowSpace = false;
