@@ -3,8 +3,8 @@ TypesetBot = (function(obj, $) {
     // Check if window is loaded (this includes fonts, so we can work on UI).
     obj.load = false;
 
-    // Selector ids.
-    id = 0;
+    // Current selector id.
+    var id = 0;
 
     // Id -> String query selectors.
     selectors = {};
@@ -13,15 +13,17 @@ TypesetBot = (function(obj, $) {
     settingsStore = {};
 
     /**
-     * Map of paragraph hash to array of node objects.
-     * User can get and set this variable as they please
+     * Map of paragraph hash to array of nodes.
+     * Variable is exposed so the user can get and set this variable as they please.
      */
     obj.vars = {};
 
     /**
      * Typeset selected elements.
+     * @param {string} selector Query selector for the elements to typeset
+     * @param {object} custom   The settings to use
      */
-    obj.run = function(selector, custom = null) {
+    obj.run = function(selector, custom = null, callback) {
         var settings = TypesetBot.settings.get(custom);
         var timer = setInterval(function () {
             if (obj.load) {
@@ -33,12 +35,17 @@ TypesetBot = (function(obj, $) {
 
                 TypesetBot.typeset.element(elem, settings);
                 clearInterval(timer);
+                if (callback != null) {
+                    callback();
+                }
             }
         }, 50);
     };
 
     /**
      * Attach selected elements to be watched and typeset by TypesetBot on viewport change.
+     * @param {string} selector Query selector for the elements to typeset
+     * @param {object} custom   The settings to use
      */
     obj.attach = function(selector, custom = null) {
         selectors[id] = selector;
@@ -59,6 +66,8 @@ TypesetBot = (function(obj, $) {
 
     /**
      * Unwatch selected specific id.
+     * @param  {int} id The id of the attached selector to detach
+     * @return {bool}   Return true if selector was detached, otherwise return false
      */
     obj.detach = function(id) {
         if (selectors[id] != null) {
@@ -75,6 +84,7 @@ TypesetBot = (function(obj, $) {
 
     /**
      * Return ids of attached elements.
+     * @return {array} Int array of selector ids
      */
     obj.getAttached = function() {
         return Object.keys(selectors);

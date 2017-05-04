@@ -8,12 +8,12 @@ TypesetBot.render = (function(obj, $) {
             var elem = $(this);
             if (elem.prop("tagName") === 'P') {
                 if (elem.hasClass('typeset-paragraph')) {
-                    elem.remove();
+                    elem.remove(); // Remove typeset element
                 } else if (elem.hasClass('typeset-hidden')) {
-                    elem.removeClass('typeset-hidden');
+                    elem.removeClass('typeset-hidden'); // Show original text
                 } else {
-                    elem.find('.typeset-paragraph').remove();
-                    elem.find('.typeset-hidden').removeClass('typeset-hidden');
+                    elem.find('.typeset-paragraph').remove(); // Remove typeset element
+                    elem.find('.typeset-hidden').removeClass('typeset-hidden'); // Show original text
                 }
             }
         });
@@ -47,17 +47,7 @@ TypesetBot.render = (function(obj, $) {
 
                 allowSpace = true;
             } else if (node.type === 'tag') {
-                var fontSize = null;
-
                 content += node.str;
-
-                if (! node.endtag) {
-                    elem.html(content);
-                    var tag = elem.find('*:last');
-                    fontSize = Number(tag.css('font-size').replace('px', ''));
-                }
-
-                node.fontSize = fontSize;
 
                 props.push(node);
             } else if (node.type === 'space') {
@@ -66,13 +56,11 @@ TypesetBot.render = (function(obj, $) {
                 // Real ->  |   |   <- Invisible
                 if (allowSpace) {
                     content += ' ';
-                    elem.html(content);
 
                     props.push(node);
                     allowSpace = false;
                 }
             }
-
         });
         elem.html(html); // Put back html
 
@@ -132,8 +120,6 @@ TypesetBot.render = (function(obj, $) {
         vars.lastRenderNode = lastWordIndex + 1;
     };
 
-
-
     /**
      * Apply the found solutions to the element.
      */
@@ -159,13 +145,14 @@ TypesetBot.render = (function(obj, $) {
             bestFit = bestFit.origin;
         }
 
-        var done = false,
-            content = '',
+        var content = '',
             lastIndex = 0,
             cutIndex = 0,
             lastHyphen = null,
             lastHeight = bestFit.curHeight,
             tagStack = [];
+
+        done = false;
 
         // Construct the content from first line to last.
         while (! done) {

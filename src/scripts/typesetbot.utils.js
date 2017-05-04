@@ -69,6 +69,7 @@ TypesetBot.utils = (function(obj) {
             var res = elem.match(tagNameRegex);
             newArr.push('</' + res[1] + '>');
         });
+
         return newArr;
     };
 
@@ -83,6 +84,7 @@ TypesetBot.utils = (function(obj) {
                 o1[key] = o2[key];
             }
         }
+
         return o1;
     };
 

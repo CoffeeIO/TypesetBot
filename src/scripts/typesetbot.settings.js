@@ -46,7 +46,6 @@ TypesetBot.settings = (function(obj, $) {
         dynamicWidthIncrement: 5,
 
         // Functions.
-
         ratio (idealW, actualW, wordCount, shrink, stretch, settings) { // Adjustment ratio
             if (actualW < idealW) {
                 return (idealW - actualW) / ((wordCount - 1) * stretch);

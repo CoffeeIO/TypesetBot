@@ -5,7 +5,6 @@ TypesetBot.viewport = (function(obj) {
         TypesetBot.load = true;
     });
 
-
     // Check for when user stops resizing viewport.
     // **MODIFIED**
     // http://stackoverflow.com/a/5926068/2741279
