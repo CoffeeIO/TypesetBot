@@ -3,8 +3,8 @@ TypesetBot = (function(obj, $) {
     // Check if window is loaded (this includes fonts, so we can work on UI).
     obj.load = false;
 
-    // Selector ids.
-    id = 0;
+    // Current selector id.
+    var id = 0;
 
     // Id -> String query selectors.
     selectors = {};
@@ -13,8 +13,8 @@ TypesetBot = (function(obj, $) {
     settingsStore = {};
 
     /**
-     * Map of paragraph hash to array of node objects.
-     * User can get and set this variable as they please
+     * Map of paragraph hash to array of nodes.
+     * Variable is exposed so the user can get and set this variable as they please.
      */
     obj.vars = {};
 

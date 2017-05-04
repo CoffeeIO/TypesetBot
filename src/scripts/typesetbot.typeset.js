@@ -131,8 +131,8 @@ TypesetBot.typeset = (function(obj, $) {
 
                         });
                     });
-                        // Check the ratio is still valid.
 
+                    // Check the ratio is still valid.
                     if (ratio < settings.minRatio) {
                         lineVars.done = true;
                         continue; // Don't add the last node.

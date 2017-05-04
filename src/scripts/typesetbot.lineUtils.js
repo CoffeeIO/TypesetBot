@@ -3,7 +3,7 @@ TypesetBot.lineUtils = (function(obj) {
     /**
      * Width of the last line that wasn't the max line width.
      */
-    obj.lastLineWidth = 0;
+    var lastLineWidth = 0;
 
     /**
      * Binary search for ideal line width.
@@ -23,7 +23,7 @@ TypesetBot.lineUtils = (function(obj) {
 
         // Found width.
         p.elem.remove();
-        obj.lastLineWidth = search;
+        lastLineWidth = search;
         return search;
     }
 
@@ -59,23 +59,23 @@ TypesetBot.lineUtils = (function(obj) {
             accuracy = 0.001 * idealW; // Search width, 0.1% accuracy
 
         // Check if ideal width is the same as the last line.
-        if (obj.lastLineWidth !== 0) {
+        if (lastLineWidth !== 0) {
             var lowT = false,
                 highT = false;
 
-            pointer.css('margin-left', (obj.lastLineWidth - baseW) + 'px');
+            pointer.css('margin-left', (lastLineWidth - baseW) + 'px');
             if (pointer.position().top === yPos && pointer.height() === baseH) { // Height unchanged
                 lowT = true;
             }
 
-            pointer.css('margin-left', (obj.lastLineWidth - baseW + accuracy) + 'px');
+            pointer.css('margin-left', (lastLineWidth - baseW + accuracy) + 'px');
             if (pointer.position().top === yPos && pointer.height() !== baseH) { // Height changed
                 highT = true;
             }
 
             if (lowT && highT) {
                 pointer.remove();
-                return obj.lastLineWidth - scrollbarOffset;
+                return lastLineWidth - scrollbarOffset;
             }
         }
 
@@ -84,7 +84,7 @@ TypesetBot.lineUtils = (function(obj) {
         pointer.css('margin-left', (idealW - baseW) + 'px');
         if (pointer.position().top === yPos && pointer.height() === baseH) {
             pointer.remove();
-            obj.lastLineWidth = 0; // Reset last binary search
+            lastLineWidth = 0; // Reset last binary search
             return idealW;
         }
 

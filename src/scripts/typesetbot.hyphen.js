@@ -40,7 +40,6 @@ TypesetBot.hyphen = (function(obj) {
         return window['Hypher']['languages'][settings.hyphenLanguage].hyphenate(word);
     };
 
-
     /**
      * Update certain nodes with hyphen properties.
      * Return true if we added properties and need to render them to get dimensions otherwise return false.
@@ -95,7 +94,6 @@ TypesetBot.hyphen = (function(obj) {
         return true;
     };
 
-
     /**
      * Get the width from hyphen index to end of word.
      * Fx: hyp-{hen-ation}   from first hyphen
@@ -107,9 +105,9 @@ TypesetBot.hyphen = (function(obj) {
         arr.forEach(function (elem) {
             width += elem;
         });
+
         return remain + width;
     };
-
 
     return obj;
 })(TypesetBot.hyphen || {});

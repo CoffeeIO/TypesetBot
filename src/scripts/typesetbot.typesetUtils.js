@@ -122,6 +122,7 @@ TypesetBot.typesetUtils = (function(obj, $) {
      * Check if node is the smallest demerit to a point.
      */
     obj.checkShortestPath = function (vars, line, a) {
+        // Convert hyphen index null to -1, as 0 is a valid hyphen index.
         var hIndex = a.hyphenIndex == null ? -1 : a.hyphenIndex;
         if (vars.shortestPath[line] != null &&
             vars.shortestPath[line][a.nodeIndex] != null &&
@@ -145,7 +146,7 @@ TypesetBot.typesetUtils = (function(obj, $) {
             vars.shortestPath[lineVars.line][nodeIndex] = {};
         }
         if (hyphenIndex == null) {
-            hyphenIndex = -1; // Convert hyphen index null to -1, as 0 is a valid hyphen index.
+            hyphenIndex = -1; // Convert hyphen index null to -1, as 0 is a valid hyphen index
         }
         if (vars.shortestPath[lineVars.line][nodeIndex][hyphenIndex] == null ||
             vars.shortestPath[lineVars.line][nodeIndex][hyphenIndex] > breakNode.demerit
