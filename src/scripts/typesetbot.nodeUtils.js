@@ -26,8 +26,7 @@ TypesetBot.nodeUtils = (function(obj, $) {
                     0,
                     lineVars.line + 1,
                     lineVars.origin.height + lineVars.lineHeight,
-                    lineVars.lineHeight,
-                    ''
+                    lineVars.lineHeight
                 ));
 
                 return null;
