@@ -77,7 +77,6 @@ describe('Typesetting utilities:', function () {
 
             expect(vars).not.toEqual(null);
             expect(vars.activeBreakpoints).not.toEqual(null);
-            expect(vars.breakpoints.length).toEqual(0);
             expect(vars.nodes.length).toEqual(257);
             expect(vars.finalBreaks.length).toEqual(0);
             expect(vars.linewidths.length).not.toBeLessThan(10);
