@@ -47,7 +47,6 @@ TypesetBot.typesetUtils = (function(obj, $) {
             renderContent: '',
             content,
             activeBreakpoints: new Queue(),
-            breakpoints: [],
             finalBreaks: []
         };
     };
@@ -114,7 +113,6 @@ TypesetBot.typesetUtils = (function(obj, $) {
         breakNode.ratio = ratio;
 
         obj.updateShortestPath(vars, lineVars, wordIndex, hyphenIndex, breakNode);
-        vars.breakpoints.push(breakNode);
     };
 
     /**
