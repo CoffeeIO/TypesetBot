@@ -62,7 +62,7 @@ TypesetBot.typeset = (function(obj, $) {
 
         // Queue starting node.
         vars.activeBreakpoints.enqueue(
-            TypesetBot.node.createBreak(0, null, null, 0, false, null, 0, 0, 0, '')
+            TypesetBot.node.createBreak(0, null, null, 0, false, null, 0, 0, 0)
         );
 
         elem.html('');

@@ -4,7 +4,7 @@ TypesetBot.node = (function(obj, $) {
      * Create break object.
      */
     obj.createBreak = function (
-        nodeIndex, hyphenIndex, origin, demerit, flag, fitnessClass, lineNumber, height, curHeight, tagStack
+        nodeIndex, hyphenIndex, origin, demerit, flag, fitnessClass, lineNumber, height, curHeight
     ) {
         return {
             nodeIndex,
@@ -15,8 +15,7 @@ TypesetBot.node = (function(obj, $) {
             fitnessClass,
             lineNumber,
             height,
-            curHeight,
-            tagStack
+            curHeight
         };
     };
 

@@ -108,8 +108,7 @@ TypesetBot.typesetUtils = (function(obj, $) {
             fitnessClass,
             lineVars.line + 1,
             lineVars.origin.height + lineVars.lineHeight,
-            lineVars.lineHeight,
-            ''
+            lineVars.lineHeight
         );
 
         breakNode.ratio = ratio;
