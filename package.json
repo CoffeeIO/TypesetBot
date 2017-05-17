@@ -1,7 +1,7 @@
 {
   "name": "typesetbot",
-  "version": "0.1.0",
-  "description": "Small project to dynamically typeset text on the web.",
+  "version": "0.1.2",
+  "description": "Small project to dynamically typeset text on the web",
   "author": "Mathias Grundtvig Andreasen (MGApcDev)",
   "license": "GPL-3.0",
   "dependencies": {
