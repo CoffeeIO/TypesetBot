@@ -1,6 +1,6 @@
 <h1 align="center">TypesetBot</h1>
 <p align="center">
-    <img alt="Rax" src="http://i.imgur.com/E0WUums.gif" width="300">
+    <img alt="Rax" src="logo.png" width="300">
 </p>
 <p align="center">
 Small project to dynamically typeset text on the web.
