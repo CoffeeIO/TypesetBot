@@ -15,7 +15,13 @@ Small project to dynamically typeset text on the web.
 <a href="https://www.npmjs.com/package/typesetbot"><img alt="typesetbot" src="https://img.shields.io/npm/dm/typesetbot.svg"></a>
 </p>
 
-## Installing
+## Description
+
+## Table of contents
+- [Install](#install)
+
+
+## Install
 
 ```bash
 $ npm install typesetbot
