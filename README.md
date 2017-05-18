@@ -38,8 +38,15 @@ Typeset html... TeX inspired... genereic... designed for web...
 ### NPM
 
 ```bash
+// Install
 $ npm install typesetbot
+// Create distribution with language all languages (creates typesetbot.js)
+$ typesetbot build
+// or
+$ typesetbot build en-us
 ```
+
+
 
 ### CDN
 
@@ -59,6 +66,8 @@ If you want to use TypesetBot to develop commercial sites, themes, projects, and
 If you are creating an open source application under a license compatible with the [GNU GPL license v3](https://www.gnu.org/licenses/gpl-3.0.html), you may use TypesetBot under the terms of the GPLv3.
 
 ## Basic usage
+
+
 ```html
 <html>
 <head>
@@ -74,9 +83,30 @@ If you are creating an open source application under a license compatible with t
 </html>
 ```
 
+
+
 ## Features
+### Line breaking
+
+### Hyphenation
+
+### Tag support
 
 ## Performance
+
+### Quality
+
+#### 900px wide
+
+#### 500px wide
+
+#### 200px wide
+
+### Execution time
+
+#### First run
+
+#### Second run
 
 ## Dependencies
 - **jQuery** --> [jQuery write less, do more](https://jquery.com/)
