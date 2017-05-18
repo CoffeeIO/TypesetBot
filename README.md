@@ -17,7 +17,7 @@ Small project to dynamically typeset text on the web.
 
 Typeset html... TeX inspired... genereic... designed for web...
 <p align="center">
-    <img alt="Quick Example" src="" width="300">
+    <img alt="Quick Example" src="http://i.imgur.com/LTlGqgp.png" width="500">
 </p>
 
 ## Table of contents
