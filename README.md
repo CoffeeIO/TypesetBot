@@ -29,7 +29,13 @@ Typeset html... TeX inspired... genereic... designed for web...
     - [Open source license](#open-source-license)
 - [Basic Usage](#basic-usage)
 - [Features](#features)
+    - [Line breaking](#line-breaking)
+    - [Hyphenation](#hyphenation)
+    - [Viewport](#viewport)
+    - [Tag support](#tag-support)
 - [Performance](#performance)
+    - [Quality](#quality)
+    - [Execution time](#execution-time)
 - [Dependencies](#dependencies)
 
  
