@@ -57,7 +57,7 @@ $ typesetbot build en-us
 ### CDN
 
 ```html
-<link rel="stylesheet" href="https://rawgit.com/MGApcDev/TypesetBot/master/dist/main.min.css">
+<link rel="stylesheet" href="https://rawgit.com/MGApcDev/TypesetBot/master/dist/typesetbot.min.css">
 <script type="text/javascript" src="https://rawgit.com/MGApcDev/TypesetBot/master/dist/typesetbot.js"></script>
 ```
 
