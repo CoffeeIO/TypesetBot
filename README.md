@@ -65,7 +65,7 @@ $ typesetbot build en-us
 
 ### Commercial license
 
-If you want to use TypesetBot to develop commercial sites, themes, projects, and applications, the Commercial license is the appropriate license. With this option, your source code is kept proprietary. If you want to purchase an TypesetBot Commercial License contact: mgapcdev@gmail.com
+If you want to use TypesetBot to develop commercial sites, themes, projects, and applications, the Commercial license is the appropriate license. With this option, your source code is kept proprietary. If you want to purchase a TypesetBot Commercial License contact: mgapcdev@gmail.com
 
 ### Open source license
 
