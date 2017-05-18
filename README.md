@@ -15,27 +15,48 @@ Small project to dynamically typeset text on the web.
 <a href="https://www.npmjs.com/package/typesetbot"><img alt="typesetbot" src="https://img.shields.io/npm/dm/typesetbot.svg"></a>
 </p>
 
-## Description
+Typeset html... TeX inspired... genereic... designed for web...
+<p align="center">
+    <img alt="Quick Example" src="" width="300">
+</p>
 
 ## Table of contents
 - [Install](#install)
+    - [NPM](#npm)
+    - [CDN](#cdn)
+- [License](#license)
+    - [Commercial license](#commercial-license)
+    - [Open source license](#open-source-license)
+- [Basic Usage](#basic-usage)
+- [Features](#features)
+- [Performance](#performance)
+- [Dependencies](#dependencies)
 
-
+ 
 ## Install
+
+### NPM
 
 ```bash
 $ npm install typesetbot
 ```
 
-_or_
+### CDN
 
-```bash
-$ git clone https://github.com/MGApcDev/TypesetBot.git
+```html
+<link rel="stylesheet" href="https://rawgit.com/MGApcDev/TypesetBot/master/dist/main.min.css">
+<script type="text/javascript" src="https://rawgit.com/MGApcDev/TypesetBot/master/dist/typesetbot.js"></script>
 ```
 
-_or_
+## License
 
-[Just link it, no download! (see example)](http://codepen.io/MGApcDev/pen/jBdzKG)
+### Commercial license
+
+If you want to use TypesetBot to develop commercial sites, themes, projects, and applications, the Commercial license is the appropriate license. With this option, your source code is kept proprietary. If you want to purchase an TypesetBot Commercial License contact: mgapcdev@gmail.com
+
+### Open source license
+
+If you are creating an open source application under a license compatible with the [GNU GPL license v3](https://www.gnu.org/licenses/gpl-3.0.html), you may use TypesetBot under the terms of the GPLv3.
 
 ## Basic usage
 ```html
@@ -53,12 +74,16 @@ _or_
 </html>
 ```
 
+## Features
+
+## Performance
+
 ## Dependencies
 - **jQuery** --> [jQuery write less, do more](https://jquery.com/)
 - **hypher** --> [A fast and small JavaScript hyphenation engine](https://github.com/bramstein/hypher)
 - **hyphenation-patterns** --> [Hyphenation patterns for use with Hypher](https://github.com/bramstein/hyphenation-patterns)
 - **Queue.js** --> [JavaScript queues](http://code.stephenmorley.org/javascript/queues/)
 
-Copyright &copy; 2017 Mathias Grundtvig Andreasen (MGApcDev).
+---
 
-<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>
+Copyright &copy; 2017 Mathias Grundtvig Andreasen (MGApcDev).
