@@ -44,15 +44,13 @@ Typeset html... TeX inspired... genereic... designed for web...
 ### NPM
 
 ```bash
-// Install
+# Install
 $ npm install typesetbot
-// Create distribution with language all languages (creates typesetbot.js)
+# Create distribution with language all languages (creates typesetbot.js)
 $ typesetbot build
-// or
+# or
 $ typesetbot build en-us
 ```
-
-
 
 ### CDN
 
@@ -94,17 +92,26 @@ See more in --> [examples](examples)
 
 ## Features
 ### Line breaking
+The line breaking algorithm implemented, is inspired by TeX's implementation of the total-fit algorithm. The algorithm was detailed in the [Digital Typography by Donald Knuth](https://www.amazon.com/Digital-Typography-Lecture-Notes-Donald-ebook/dp/B01MQGA5KF/ref=mt_kindle?_encoding=UTF8&me=).
+The implementation was modified to make better sense in the web domain. This required some rethinking some fundamentatal elements of the algorithm we get: use of query selectors,  html inline-tag support, handle viewport changes and feeding preprocessed data. 
+
+### Query selectors
+TypesetBot can only work on paragraph elements (```<p>```). TypesetBot doesn't have to change your entire website, using query selectors like found in jQuery to select a single paragraph or a bigger selector to typeset multiple paragraphs.
+Using 'body' you can typeset all paragraphs on a page or '.content' to find all paragraphs within the content class.
 
 ### Hyphenation
+TypesetBot uses the open source TeX hyphenation patterns and can hyphenate text in various languages. 
 
 ### Viewport
 
 ### Tag support
 
+### Settings
+
 ## Performance
 
 ### Quality
-
+Reference: [here](http://codepen.io/MGApcDev/pen/dWZZed)
 #### 900px wide
 
 #### 500px wide
@@ -112,7 +119,7 @@ See more in --> [examples](examples)
 #### 200px wide
 
 ### Execution time
-
+Reference: [here](http://codepen.io/MGApcDev/pen/QvOpeq)
 #### First run
 
 #### Second run
