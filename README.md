@@ -185,6 +185,10 @@ TypesetBot has been made to be very adjustable as there is no perfect settings. 
 ## Performance
 
 ### Quality
+The easiest way to compare quality of the typesetting is to look at the adjustment ratios that indecates how tight or loose a line is. Ideally we this value to be zero so the word-spacing is exactly 1/3 em, plain HTML can only increase word-spacing is necesarry, while TypesetBot can both increase and decrease it. The point is to degrace visual impact, so we strongly prefer to have 2 ratios of value 1, over having 1 ratio of 2 and 1 ratio of 0. TypesetBot even tries to minizing the jump between a loose line and tight line.
+
+Normal HTML has an easier time line breaking on wider lines, but on smaller viewports it starts to fall apart, so we can see how this is affected as multiple viewports. 
+
 Reference: [here](http://codepen.io/MGApcDev/pen/dWZZed)
 #### 900px wide
 
