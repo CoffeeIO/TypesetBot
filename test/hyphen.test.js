@@ -17,7 +17,7 @@ describe('Hyphenation:', function () {
         });
         it('Language not found', function () {
             var settings = TypesetBot.settings.get({hyphenLanguage: 'gg'});
-            expect(TypesetBot.hyphen.word('hyphenate', settings)).toEqual(null);
+            expect(TypesetBot.hyphen.word('hyphenate', settings)).toEqual(['hyphenate']);
         });
     });
 
