@@ -31,7 +31,7 @@ Typeset html... TeX inspired... genereic... designed for web...
 - [Features](#features)
     - [Line breaking](#line-breaking)
     - [Hyphenation](#hyphenation)
-    - [Viewport](#viewport-changes)
+    - [Viewport changes](#viewport-changes)
     - [Tag support](#tag-support)
 - [Performance](#performance)
     - [Quality](#quality)
