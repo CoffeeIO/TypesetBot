@@ -31,7 +31,7 @@ Typeset html... TeX inspired... genereic... designed for web...
 - [Features](#features)
     - [Line breaking](#line-breaking)
     - [Hyphenation](#hyphenation)
-    - [Viewport](#viewport)
+    - [Viewport](#viewport-changes)
     - [Tag support](#tag-support)
 - [Performance](#performance)
     - [Quality](#quality)
@@ -46,10 +46,10 @@ Typeset html... TeX inspired... genereic... designed for web...
 ```bash
 # Install
 $ npm install typesetbot
-# Create distribution with language all languages (creates typesetbot.js)
-$ typesetbot build
-# or
-$ typesetbot build en-us
+# Download hyphenation library and patterns, for example US english
+$ npm install hypher hyphenation.en-us
+# Move distribution files to root
+$ ./node_modules/.bin/typesetbot en-us
 ```
 
 ### CDN
@@ -57,7 +57,15 @@ $ typesetbot build en-us
 ```html
 <link rel="stylesheet" href="https://rawgit.com/MGApcDev/TypesetBot/master/dist/typesetbot.min.css">
 <script type="text/javascript" src="https://rawgit.com/MGApcDev/TypesetBot/master/dist/typesetbot.js"></script>
+
+<!-- (optional) -->
+<!-- hyphenation library -->
+<script type="text/javascript" src="https://cdn.rawgit.com/bramstein/hypher/v0.2.5/dist/jquery.hypher.js"></script>
+<!-- hyphenation pattern for US english -->
+<script type="text/javascript" src="https://cdn.rawgit.com/bramstein/hyphenation-patterns/dc01d58a/dist/browser/en-us.js"></script>
 ```
+
+Full list of hyphenation patterns: https://github.com/bramstein/hyphenation-patterns/tree/master/dist/browser
 
 ## License
 
@@ -74,8 +82,10 @@ If you are creating an open source application under a license compatible with t
 ```html
 <html>
 <head>
-    <link rel="stylesheet" href="/dist/main.min.css">
-    <script type="text/javascript" src="/dist/mainWithPatterns.min.js"></script>
+    <link rel="stylesheet" href="https://rawgit.com/MGApcDev/TypesetBot/master/dist/typesetbot.min.css">
+    <script type="text/javascript" src="https://rawgit.com/MGApcDev/TypesetBot/master/dist/typesetbot.js"></script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/bramstein/hypher/v0.2.5/dist/jquery.hypher.js"></script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/bramstein/hyphenation-patterns/dc01d58a/dist/browser/en-us.js"></script>
     <script type="text/javascript">
         TypesetBot.attach('body');
     </script>
@@ -101,7 +111,7 @@ Using 'body' you can typeset all paragraphs on a page or '.content' to find all 
 ### Hyphenation
 TypesetBot uses the open source TeX hyphenation patterns and can hyphenate text in various languages. Languages supported can be found in [hyphenation-patterns by bramstein](https://github.com/bramstein/hyphenation-patterns/tree/master/dist/browser)
 
-### Viewport
+### Viewport changes
 With responsive design being a important thing on the web, I think it only made sense to consider that the user might change the viewport size by dragging the browser or going from portrait to landscape on mobile. When using the _TypesetBot.attach()_ we recalculate the line breaking every time the viewport changes and with some clever CSS the transition is hard to notice.
 
 ### Tag support
@@ -191,10 +201,15 @@ Normal HTML has an easier time line breaking on wider lines, but on smaller view
 
 Reference: [here](http://codepen.io/MGApcDev/pen/dWZZed)
 #### 900px wide
+<p align="center">
+    <img alt="Quick Example" src="http://i.imgur.com/HHBbtmF.gif">
+</p>
 
 #### 500px wide
 
+
 #### 200px wide
+
 
 ### Execution time
 Reference: [here](http://codepen.io/MGApcDev/pen/QvOpeq)
