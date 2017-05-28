@@ -206,10 +206,14 @@ Reference: [here](http://codepen.io/MGApcDev/pen/dWZZed)
 </p>
 
 #### 500px wide
-
+<p align="center">
+    <img alt="Quick Example" src="http://i.imgur.com/GTyyZ1a.gif">
+</p>
 
 #### 200px wide
-
+<p align="center">
+    <img alt="Quick Example" src="http://i.imgur.com/SUpnELJ.gif">
+</p>
 
 ### Execution time
 Reference: [here](http://codepen.io/MGApcDev/pen/QvOpeq)
