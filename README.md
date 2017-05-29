@@ -112,7 +112,7 @@ TypesetBot can only work on paragraph elements (```<p>```). TypesetBot doesn't h
 Using 'body' you can typeset all paragraphs on a page or '.content' to find all paragraphs within the content class.
 
 ### Hyphenation
-TypesetBot uses the open source TeX hyphenation patterns and can hyphenate text in various languages. Languages supported can be found in [hyphenation-patterns by bramstein](https://github.com/bramstein/hyphenation-patterns/tree/master/dist/browser)
+TypesetBot don't require the use of hyphenation libraries, but hyphenation of words can be used to greatly improve the line breaking quality. Hyphenation is done with [hypher](https://github.com/bramstein/hypher) and uses the open source TeX hyphenation patterns and can hyphenate text in various languages. Languages supported can be found in [hyphenation-patterns by bramstein](https://github.com/bramstein/hyphenation-patterns/tree/master/dist/browser)
 
 ### Viewport changes
 With responsive design being a important thing on the web, I think it only made sense to consider that the user might change the viewport size by dragging the browser or going from portrait to landscape on mobile. When using the _TypesetBot.attach()_ we recalculate the line breaking every time the viewport changes and with some clever CSS the transition is hard to notice.
@@ -236,9 +236,12 @@ Reference: [here](http://codepen.io/MGApcDev/pen/QvOpeq)
 
 ## Dependencies
 - **jQuery** --> [jQuery write less, do more](https://jquery.com/)
+- **Queue.js** --> [JavaScript queues](http://code.stephenmorley.org/javascript/queues/)
+
+(optional)
 - **hypher** --> [A fast and small JavaScript hyphenation engine](https://github.com/bramstein/hypher)
 - **hyphenation-patterns** --> [Hyphenation patterns for use with Hypher](https://github.com/bramstein/hyphenation-patterns)
-- **Queue.js** --> [JavaScript queues](http://code.stephenmorley.org/javascript/queues/)
+
 
 ---
 
