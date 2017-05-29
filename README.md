@@ -15,7 +15,10 @@ Small project to dynamically typeset text on the web.
 <a href="https://www.npmjs.com/package/typesetbot"><img alt="typesetbot" src="https://img.shields.io/npm/dm/typesetbot.svg"></a>
 </p>
 
-Typeset html... TeX inspired... genereic... designed for web...
+Your browser uses a very simple line breaking algorithm to arrange the text on your screen, TypesetBot changes this arrangement using am algorithm inspired by TeX's total-fit algorithm. TypesetBot looks at all the lines in your paragraph and finds the best line breaks for all of them. This process reduces whitespace between words and applies hyphenations only when necessary, so the text becomes more readable.
+
+TypesetBot is designed with the web in mind: written in JavaScript for wide support, query selector to only typeset the correct elements, recalculates the typesetting when the viewport size changes, support for inline tags, easy installs with CDN and NPM, hyphenation for 39 languages. 
+
 <p align="center">
     <img alt="Quick Example" src="http://i.imgur.com/LTlGqgp.png" width="500">
 </p>
