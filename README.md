@@ -35,7 +35,7 @@ Typeset html... TeX inspired... genereic... designed for web...
     - [Tag support](#tag-support)
 - [Performance](#performance)
     - [Quality](#quality)
-    - [Execution time](#performance-examples)
+    - [Performance examples](#performance-examples)
 - [Dependencies](#dependencies)
 
  
