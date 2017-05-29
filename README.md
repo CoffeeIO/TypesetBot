@@ -227,6 +227,8 @@ Reference: [here](http://codepen.io/MGApcDev/pen/QvOpeq)
 - 1 paragraph, 882 words, w/o. hyphenation - 770ms(1st), 130ms(2nd)
 - 2 paragraph, 441 words, w. hyphenation - 3330ms(1st), 140ms(2nd)
 - 2 paragraph, 441 words, w/o. hyphenation - 580ms(1st), 110ms(2nd)
+- 1 paragraph, 441 words, w. hyphenation, w/o. dynamic width - 1700ms(1st), 20ms(2nd)
+
 
 
 ## Dependencies
