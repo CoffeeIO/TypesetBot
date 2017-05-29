@@ -35,7 +35,7 @@ Typeset html... TeX inspired... genereic... designed for web...
     - [Tag support](#tag-support)
 - [Performance](#performance)
     - [Quality](#quality)
-    - [Execution time](#execution-time)
+    - [Execution time](#performance-examples)
 - [Dependencies](#dependencies)
 
  
@@ -216,10 +216,18 @@ Reference: [here](http://codepen.io/MGApcDev/pen/dWZZed)
 </p>
 
 ### Execution time
-Reference: [here](http://codepen.io/MGApcDev/pen/QvOpeq)
-#### First run
+TypesetBot constructs a list of objects for each paragraph, the list contains information for every word and hyphenation in the paragraph, so it's an expensive task, but only occurs on a new page load: 1st run.
+The second run (2nd) occurs when the users adjusts the viewport and all the linebreaking and additional hyphenations needs to be calculated. 
 
-#### Second run
+Reference: [here](http://codepen.io/MGApcDev/pen/QvOpeq)
+#### Performance examples
+- 1 paragraph, 441 words, w. hyphenation - 1700ms(1st), 70ms(2nd)
+- 1 paragraph, 441 words, w/o. hyphenation - 280ms(1st), 80ms(2nd)
+- 1 paragraph, 882 words, w. hyphenation - 6400ms(1st), 190ms(2nd)
+- 1 paragraph, 882 words, w/o. hyphenation - 770ms(1st), 130ms(2nd)
+- 2 paragraph, 441 words, w. hyphenation - 3330ms(1st), 140ms(2nd)
+- 2 paragraph, 441 words, w/o. hyphenation - 580ms(1st), 110ms(2nd)
+
 
 ## Dependencies
 - **jQuery** --> [jQuery write less, do more](https://jquery.com/)
