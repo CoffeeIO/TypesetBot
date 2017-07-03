@@ -60,6 +60,27 @@ TypesetBot.typeset = (function(obj, $) {
         // Get variables for algorithm.
         var vars = TypesetBot.typesetUtils.initVars(elem, settings);
 
+        // Preprocess hyphens.
+        var lineObj = {
+            nodeIndex: 0,
+            hyphenIndex: null
+        }
+
+        while (true) {
+          var w = TypesetBot.nodeUtils.appendWord(vars, lineObj, true);
+          if (w == null) {
+            break;
+          }
+          if (TypesetBot.hyphen.updateNodes(w, vars.nodes, settings)) {
+              TypesetBot.render.hyphenProperties(elem, w, vars, settings);
+          }
+        }
+
+        console.log(w);
+        console.log(vars.nodes[0]);
+
+
+
         // Queue starting node.
         vars.activeBreakpoints.enqueue(
             TypesetBot.node.createBreak(0, null, null, 0, false, null, 0, 0, 0)
@@ -82,6 +103,7 @@ TypesetBot.typeset = (function(obj, $) {
             while (! lineVars.done) {
 
                 var oldWidth = lineVars.curWidth;
+                // console.log(lineVars);
                 var word = TypesetBot.nodeUtils.appendWord(vars, lineVars);
 
                 var ratio = TypesetBot.math.getAdjustmentRatio(

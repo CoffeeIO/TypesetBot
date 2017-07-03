@@ -7,7 +7,7 @@ TypesetBot.nodeUtils = (function(obj, $) {
      * - A word can have any number of tags nodes and tags don't have to end.
      * - A word ends after a space node.
      */
-    obj.appendWord = function (vars, lineVars) {
+    obj.appendWord = function (vars, lineVars, isPreprocess = false) {
         var done = false,
             word = '',
             wordIndex = [];
@@ -17,17 +17,19 @@ TypesetBot.nodeUtils = (function(obj, $) {
         while (! done) {
             var node = vars.nodes[lineVars.nodeIndex];
             if (node == null) { // Possible final break
-                vars.finalBreaks.push(TypesetBot.node.createBreak(
-                    lineVars.nodeIndex,
-                    null,
-                    lineVars.origin,
-                    lineVars.origin.demerit,
-                    false,
-                    0,
-                    lineVars.line + 1,
-                    lineVars.origin.height + lineVars.lineHeight,
-                    lineVars.lineHeight
-                ));
+                if (! isPreprocess) {
+                  vars.finalBreaks.push(TypesetBot.node.createBreak(
+                      lineVars.nodeIndex,
+                      null,
+                      lineVars.origin,
+                      lineVars.origin.demerit,
+                      false,
+                      0,
+                      lineVars.line + 1,
+                      lineVars.origin.height + lineVars.lineHeight,
+                      lineVars.lineHeight
+                  ));
+                }
 
                 return null;
             }
