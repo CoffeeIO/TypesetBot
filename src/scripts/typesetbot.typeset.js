@@ -72,7 +72,7 @@ TypesetBot.typeset = (function(obj, $) {
         var lineObj = {
             nodeIndex: 0,
             hyphenIndex: null
-        }
+        };
 
         var timeHyphenInit = performance.now(); // debug values
         while (true) {
