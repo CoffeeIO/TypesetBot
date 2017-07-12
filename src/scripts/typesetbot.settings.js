@@ -69,7 +69,8 @@ TypesetBot.settings = (function(obj, $) {
             } else {
                 return Math.pow(settings.demeritOffset + badness, 2) - Math.pow(penalty, 2) + flagPenalty;
             }
-        }
+        },
+        debug: false
     };
 
     /**

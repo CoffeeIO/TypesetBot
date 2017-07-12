@@ -96,6 +96,8 @@ TypesetBot.hyphen = (function(obj) {
             node.hyphenIndex.push(hyphenIndex);
         });
 
+        nodes[word.index[0]].toRendered = true; //
+
         return true;
     };
 

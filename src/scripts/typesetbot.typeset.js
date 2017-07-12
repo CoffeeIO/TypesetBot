@@ -46,7 +46,11 @@ TypesetBot.typeset = (function(obj, $) {
         var breaks = obj.linebreak(workElem, settings);
         if (breaks != null) {
             TypesetBot.vars[hash] = breaks.nodes;
+            var timeApply = performance.now(); // debug values
             TypesetBot.render.applyBreaks(workElem, breaks.nodes, breaks.solutions, settings);
+            if (settings.debug) {
+                TypesetBot.debugVars.apply = (performance.now() - timeApply).toFixed(2); // debug values
+            }
         }
     };
 
@@ -57,8 +61,12 @@ TypesetBot.typeset = (function(obj, $) {
         // Set wordspacing.
         TypesetBot.paraUtils.setSpaceWidth(elem, settings.spaceWidth - settings.spaceShrinkability, settings.spaceUnit);
 
+        var timeVarInit = performance.now(); // debug values
         // Get variables for algorithm.
         var vars = TypesetBot.typesetUtils.initVars(elem, settings);
+        if (settings.debug) {
+            TypesetBot.debugVars.varinit = (performance.now() - timeVarInit).toFixed(2); // debug values
+        }
 
         // Preprocess hyphens.
         var lineObj = {
@@ -66,21 +74,21 @@ TypesetBot.typeset = (function(obj, $) {
             hyphenIndex: null
         }
 
+        var timeHyphenInit = performance.now(); // debug values
         while (true) {
-          var w = TypesetBot.nodeUtils.appendWord(vars, lineObj, true);
-          if (w == null) {
-            break;
-          }
-          if (TypesetBot.hyphen.updateNodes(w, vars.nodes, settings)) {
-              TypesetBot.render.hyphenProperties(elem, w, vars, settings);
-          }
+            var w = TypesetBot.nodeUtils.appendWord(vars, lineObj, true);
+            if (w == null) {
+                break;
+            }
+            if (TypesetBot.hyphen.updateNodes(w, vars.nodes, settings)) {
+                TypesetBot.render.hyphenProperties(elem, w, vars, settings);
+            }
+        }
+        if (settings.debug) {
+            TypesetBot.debugVars.hypheninit = (performance.now() - timeHyphenInit).toFixed(2); // debug values
         }
 
-        console.log(w);
-        console.log(vars.nodes[0]);
-
-
-
+        var timeLinebreak = performance.now(); // debug values
         // Queue starting node.
         vars.activeBreakpoints.enqueue(
             TypesetBot.node.createBreak(0, null, null, 0, false, null, 0, 0, 0)
@@ -180,6 +188,10 @@ TypesetBot.typeset = (function(obj, $) {
             }
             settings.loosenessParam += 1;
             return obj.linebreak(elem, settings);
+        }
+
+        if (settings.debug) {
+            TypesetBot.debugVars.linebreak = (performance.now() - timeLinebreak).toFixed(2); // debug values
         }
 
         // Return nodes and found solutions.

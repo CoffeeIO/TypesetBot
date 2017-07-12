@@ -10,6 +10,12 @@ TypesetBot.typesetUtils = (function(obj, $) {
             width = elem.width(),
             height = elem.height();
 
+        if (settings.debug) {
+
+        }
+        var timeNodeVars = performance.now(); // debug values
+        var timeNodeVars = performance.now(); // debug values
+
         var foundVars = TypesetBot.vars[hash];
         var props;
 
@@ -22,10 +28,18 @@ TypesetBot.typesetUtils = (function(obj, $) {
         } else {
             props = foundVars;
         }
+        if (settings.debug) {
+            TypesetBot.debugVars.nodeinit = (performance.now() - timeNodeVars).toFixed(2); // debug values
+        }
+
+        var timeDynamicWidth = performance.now(); // debug values
 
         var linewidths = null;
         if (settings.dynamicWidth) {
             linewidths = TypesetBot.lineUtils.getAllLinewidths(elem, width, height, settings);
+        }
+        if (settings.debug) {
+            TypesetBot.debugVars.dynamicwidth = (performance.now() - timeDynamicWidth).toFixed(2); // debug values
         }
 
         var fontSize = Number(elem.css('font-size').replace('px', '')),

@@ -94,9 +94,34 @@ TypesetBot.nodeUtils = (function(obj, $) {
             }
             nodes.push(TypesetBot.node.createSpace());
         });
-        nodes.pop(); // Remove last space
-        return nodes;
+
+        return cleanupNodes(nodes);
     };
+
+    function cleanupNodes(nodes) {
+        var newNodes = [];
+        var allowSpace = false; // Disallow space as first node
+        for (var i = 0; i < nodes.length; i++) {
+            var node = nodes[i];
+            if (node.type === 'word') {
+                allowSpace = true;
+                newNodes.push(node);
+            } else if (node.type === 'tag') {
+                newNodes.push(node);
+            } else if (node.type === 'space') {
+                // Remove extra spaces, first space takes priority.
+                // Fx: hello_<b>_world</b>
+                // Real ->  |   |   <- Invisible
+                if (allowSpace) {
+                    newNodes.push(node);
+                    allowSpace = false;
+                }
+            }
+        }
+        newNodes.pop(); // Remove last space node
+
+        return newNodes;
+    }
 
     /**
      * Create nodes word and break word into word nodes and tag nodes.
@@ -129,6 +154,8 @@ TypesetBot.nodeUtils = (function(obj, $) {
 
         return word;
     }
+
+
 
     return obj;
 })(TypesetBot.nodeUtils || {}, jQuery);

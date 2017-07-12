@@ -24,47 +24,36 @@ TypesetBot.render = (function(obj, $) {
      */
     obj.getNodeProperties = function (elem, nodes) {
 
-        var html = elem.html(),
-            props = [],
-            allowSpace = false, // Disallow space as first node
-            content = ''; // Html content, to correct for auto-closing tags when rendering
+        var html = elem.html(), // Copy the html content
+            content = '', // Html content, to correct for auto-closing tags when rendering
+            wordIndexes = []; // Indexes of word nodes
 
-        elem.html('');
-        nodes.forEach(function (node) {
+        for (var i = 0; i < nodes.length; i++) {
+            var node = nodes[i];
+
             if (node.type === 'word') {
-                // Add the word after, for when we remove typeset-property elem.
-                elem.html(content + '<span class="typeset-property">' + node.str + '</span>' + node.str);
-                content += node.str;
-
-                var word = elem.find('.typeset-property');
-
-                node.width = word.width();
-                node.height = word.height();
-
-                props.push(node);
-
-                elem.find('.typeset-property').remove();
-
-                allowSpace = true;
+                wordIndexes.push(i);
+                content += '<span class="typeset-word-node">' + node.str + '</span>';
             } else if (node.type === 'tag') {
                 content += node.str;
-
-                props.push(node);
             } else if (node.type === 'space') {
-                // Remove extra spaces, first space takes priority.
-                // Fx: hello_<b>_world</b>
-                // Real ->  |   |   <- Invisible
-                if (allowSpace) {
-                    content += ' ';
-
-                    props.push(node);
-                    allowSpace = false;
-                }
+                content += ' ';
             }
-        });
+        }
+
+        elem.html(content);
+        var words = document.getElementsByClassName('typeset-word-node');
+        for (var i = 0; i < words.length; i++) {
+            var word = words[i];
+            var wordIndex = wordIndexes[i];
+
+            nodes[wordIndex].height = word.getBoundingClientRect().height;
+            nodes[wordIndex].width = word.getBoundingClientRect().width;
+
+        }
         elem.html(html); // Put back html
 
-        return props;
+        return nodes;
     };
 
     /**
@@ -94,16 +83,17 @@ TypesetBot.render = (function(obj, $) {
                 lastIndex = index + 1;
                 elem.html(
                     vars.renderContent +
-                    '<span class="typeset-word-check">' +
+                    '<span class="typeset-word-check" id="typeset-word-check">' +
                         cut +
                     '</span>' +
-                    '<span class="typeset-hyphen-check">-</span>'
+                    '<span class="typeset-hyphen-check" id="typeset-hyphen-check">-</span>'
                 );
 
                 // Push render properties.
-                node.hyphenWidth.push(elem.find('.typeset-word-check').width());
+                node.hyphenWidth.push(document.getElementById('typeset-word-check').getBoundingClientRect().width);
+
                 if (node.dashWidth == null) {
-                    node.dashWidth = elem.find('.typeset-hyphen-check').width();
+                    node.dashWidth = document.getElementById('typeset-hyphen-check').getBoundingClientRect().width;
                 }
 
             });
