@@ -59,39 +59,19 @@ TypesetBot.render = (function(obj, $) {
     /**
      * Render word hyphens and get relevant properties.
      */
-    obj.hyphenProperties = function (elem, wordsToRender, vars, settings) {
-        // console.log(wordsToRender);
+    obj.hyphenProperties = function (elem, vars, settings) {
         var nodes = vars.nodes,
             content = '',
-            wtrIndex = 0,
-            html = elem.html();
-
-        // // Loops through the 'words' to render.
-        // for (var i = 0; i < wordsToRender.length; i++) {
-        //     var word = wordsToRender[i];
-        //
-        //     // For each 'word' loops through it's 'word nodes' (ignoring tag and space nodes).
-        //     for (var j = 0; j < word.index.length; j++) {
-        //         var node = nodes[word.index[j]];
-        //
-        //         console.log(node);
-        //     }
-        //
-        // }
-
-        var renderRequest = [];
-
-        // console.log('Node count ' + nodes.length);
-        // console.log(nodes);
+            html = elem.html(), // Store copy
+            // Requests of what node index and what type is being checked in the order they where added to the dom
+            renderRequest = [];
 
         // Loops through all nodes to construct content.
         for (var i = 0; i < nodes.length; i++) {
             var node = nodes[i];
 
             if (node.toRender) { // Only happens on word nodes
-                // Queue hyphen pieces
-                // console.log('Rendering hyphen');
-
+                // Queue hyphen pieces, fx 'hy'.
                 var lastIndex = 0;
                 for (var j = 0; j < node.hyphenIndex.length; j++) {
                     var index = node.hyphenIndex[j],
@@ -101,19 +81,19 @@ TypesetBot.render = (function(obj, $) {
                     renderRequest.push({nodeIndex: i, type: 'hyphen'});
                 }
 
-                // Queue remain (if any)
+                // Queue remain (if any), fx 'phen'.
                 if (node.hyphenIndex.length !== 0 && node.str.length !== lastIndex) {
                     var cut = node.str.substr(lastIndex);
                     content += '<span class="typeset-hyphen-check">' + cut + '</span>';
                     renderRequest.push({nodeIndex: i, type: 'remain'});
                 }
 
-                // Queue dash
+                // Queue dash, '-'.
                 content += '<span class="typeset-hyphen-check">-</span>';
                 renderRequest.push({nodeIndex: i, type: 'dash'});
 
                 node.toRender = false; // Unset the toRender
-            } else { // Just add to content, nothing special
+            } else { // Just add to content, so tags are properly accounted for
                 if (node.type === 'tag' || node.type === 'word') {
                     content += node.str;
                 } else if (node.type === 'space') {
@@ -126,7 +106,7 @@ TypesetBot.render = (function(obj, $) {
         elem.html(content);
         var index = 0;
 
-        var hyphens = document.getElementsByClassName('typeset-hyphen-check');
+        var hyphens = document.getElementsByClassName('typeset-hyphen-check'); // Find all properties to check
         for (var i = 0; i < hyphens.length; i++) {
             var hyphen = hyphens[i];
 

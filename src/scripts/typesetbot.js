@@ -21,13 +21,14 @@ TypesetBot = (function(obj, $) {
     obj.debugVars = {};
     function printDebug(settings) {
         if (settings.debug) {
-            console.log('Total execution %sms', obj.debugVars.run);
-            console.log('-- Init variables %sms', obj.debugVars.varinit);
-            console.log('---- Node construction %s ms', obj.debugVars.nodeinit);
-            console.log('---- Checking dynamic width %sms', obj.debugVars.dynamicwidth);
-            console.log('-- Hyphen init %sms', obj.debugVars.hypheninit);
-            console.log('-- Linebreaking %sms', obj.debugVars.linebreak);
-            console.log('-- Apply linebreak %sms', obj.debugVars.apply);
+            console.log('Total execution %s', obj.debugVars.run);
+            console.log('-- Init variables %s', obj.debugVars.varinit);
+            console.log('---- Node construction %s', obj.debugVars.nodeinit);
+            console.log('---- Checking dynamic width %s', obj.debugVars.dynamicwidth);
+            console.log('-- Hyphen init %s', obj.debugVars.hypheninit);
+            console.log('-- Linebreaking %s', obj.debugVars.linebreak);
+            console.log('-- Apply linebreak %s', obj.debugVars.apply);
+            console.log('');
         }
     }
 
@@ -45,11 +46,10 @@ TypesetBot = (function(obj, $) {
                 if (elem.length === 0) {
                     return false;
                 }
-                var timeRun = performance.now();
+                var timeRun = TypesetBot.utils.startTime();
                 TypesetBot.typeset.element(elem, settings);
-                if (settings.debug) {
-                    TypesetBot.debugVars.run = (performance.now() - timeRun).toFixed(2); // debug values
-                }
+                TypesetBot.debugVars.run = settings.debug ? TypesetBot.utils.endTime(timeRun) : 0; // debug values
+
                 printDebug(settings)
 
                 clearInterval(timer);

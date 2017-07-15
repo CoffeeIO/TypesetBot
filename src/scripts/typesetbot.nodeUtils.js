@@ -98,6 +98,9 @@ TypesetBot.nodeUtils = (function(obj, $) {
         return cleanupNodes(nodes);
     };
 
+    /**
+     * Remove additional space nodes that won't be displayed.
+     */
     function cleanupNodes(nodes) {
         var newNodes = [];
         var allowSpace = false; // Disallow space as first node
@@ -154,8 +157,6 @@ TypesetBot.nodeUtils = (function(obj, $) {
 
         return word;
     }
-
-
 
     return obj;
 })(TypesetBot.nodeUtils || {}, jQuery);

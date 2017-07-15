@@ -88,5 +88,13 @@ TypesetBot.utils = (function(obj) {
         return o1;
     };
 
+    obj.startTime = function () {
+        return performance.now();
+    };
+
+    obj.endTime = function (start) {
+        return (performance.now() - start).toFixed(2) + 'ms';
+    };
+
     return obj;
 })(TypesetBot.utils || {});

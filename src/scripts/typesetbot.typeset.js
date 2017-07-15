@@ -46,11 +46,9 @@ TypesetBot.typeset = (function(obj, $) {
         var breaks = obj.linebreak(workElem, settings);
         if (breaks != null) {
             TypesetBot.vars[hash] = breaks.nodes;
-            var timeApply = performance.now(); // debug values
+            var timeApply = TypesetBot.utils.startTime(); // debug values
             TypesetBot.render.applyBreaks(workElem, breaks.nodes, breaks.solutions, settings);
-            if (settings.debug) {
-                TypesetBot.debugVars.apply = (performance.now() - timeApply).toFixed(2); // debug values
-            }
+            TypesetBot.debugVars.apply = settings.debug ? TypesetBot.utils.endTime(timeApply) : 0; // debug values
         }
     };
 
@@ -61,41 +59,17 @@ TypesetBot.typeset = (function(obj, $) {
         // Set wordspacing.
         TypesetBot.paraUtils.setSpaceWidth(elem, settings.spaceWidth - settings.spaceShrinkability, settings.spaceUnit);
 
-        var timeVarInit = performance.now(); // debug values
+        var timeVarInit = TypesetBot.utils.startTime(); // debug values
         // Get variables for algorithm.
         var vars = TypesetBot.typesetUtils.initVars(elem, settings);
-        if (settings.debug) {
-            TypesetBot.debugVars.varinit = (performance.now() - timeVarInit).toFixed(2); // debug values
-        }
+        TypesetBot.debugVars.varinit = settings.debug ? TypesetBot.utils.endTime(timeVarInit) : 0; // debug values
 
         // Preprocess hyphens.
-        var lineObj = {
-            nodeIndex: 0,
-            hyphenIndex: null
-        };
+        var timeHyphenInit = TypesetBot.utils.startTime(); // debug values
+        TypesetBot.typesetUtils.preprocessHyphens(elem, vars, settings); // Preprocess all hyphens and dimensions
+        TypesetBot.debugVars.hypheninit = settings.debug ? TypesetBot.utils.endTime(timeHyphenInit) : 0; // debug values
 
-        var wordsToRender = [];
-
-        var timeHyphenInit = performance.now(); // debug values
-        while (true) {
-            var w = TypesetBot.nodeUtils.appendWord(vars, lineObj, true);
-            if (w == null) {
-                break;
-            }
-            // console.log(w);
-            if (TypesetBot.hyphen.updateNodes(w, vars.nodes, settings)) {
-                wordsToRender.push(w);
-            }
-        }
-
-        TypesetBot.render.hyphenProperties(elem, wordsToRender, vars, settings);
-
-
-        if (settings.debug) {
-            TypesetBot.debugVars.hypheninit = (performance.now() - timeHyphenInit).toFixed(2); // debug values
-        }
-
-        var timeLinebreak = performance.now(); // debug values
+        var timeLinebreak = TypesetBot.utils.startTime(); // debug values
         // Queue starting node.
         vars.activeBreakpoints.enqueue(
             TypesetBot.node.createBreak(0, null, null, 0, false, null, 0, 0, 0)
@@ -118,7 +92,7 @@ TypesetBot.typeset = (function(obj, $) {
             while (! lineVars.done) {
 
                 var oldWidth = lineVars.curWidth;
-                // console.log(lineVars);
+
                 var word = TypesetBot.nodeUtils.appendWord(vars, lineVars);
 
                 var ratio = TypesetBot.math.getAdjustmentRatio(
@@ -136,10 +110,6 @@ TypesetBot.typeset = (function(obj, $) {
                 }
 
                 if (ratio <= settings.maxRatio + settings.loosenessParam) { // Valid breakpoint
-
-                    // if (TypesetBot.hyphen.updateNodes(word, vars.nodes, settings)) {
-                    //     TypesetBot.render.hyphenProperties(elem, word, vars, settings);
-                    // }
 
                     // Create breaks for hyphens.
                     word.index.forEach(function (wordIndex) {
@@ -197,9 +167,7 @@ TypesetBot.typeset = (function(obj, $) {
             return obj.linebreak(elem, settings);
         }
 
-        if (settings.debug) {
-            TypesetBot.debugVars.linebreak = (performance.now() - timeLinebreak).toFixed(2); // debug values
-        }
+        TypesetBot.debugVars.linebreak = settings.debug ? TypesetBot.utils.endTime(timeLinebreak) : 0; // debug values
 
         // Return nodes and found solutions.
         return {
