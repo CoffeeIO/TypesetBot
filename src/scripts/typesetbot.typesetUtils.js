@@ -10,10 +10,7 @@ TypesetBot.typesetUtils = (function(obj, $) {
             width = elem.width(),
             height = elem.height();
 
-        if (settings.debug) {
 
-        }
-        var timeNodeVars = performance.now(); // debug values
         var timeNodeVars = performance.now(); // debug values
 
         var foundVars = TypesetBot.vars[hash];

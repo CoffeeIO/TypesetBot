@@ -59,55 +59,95 @@ TypesetBot.render = (function(obj, $) {
     /**
      * Render word hyphens and get relevant properties.
      */
-    obj.hyphenProperties = function (elem, word, vars, settings) {
+    obj.hyphenProperties = function (elem, wordsToRender, vars, settings) {
+        // console.log(wordsToRender);
         var nodes = vars.nodes,
-            lastWordIndex = word.index[word.index.length - 1];
+            content = '',
+            wtrIndex = 0,
+            html = elem.html();
 
-        // Get nodes between the last rendered node and the latest word node.
-        for (var i = vars.lastRenderNode; i < nodes.length && i <= lastWordIndex; i++) {
+        // // Loops through the 'words' to render.
+        // for (var i = 0; i < wordsToRender.length; i++) {
+        //     var word = wordsToRender[i];
+        //
+        //     // For each 'word' loops through it's 'word nodes' (ignoring tag and space nodes).
+        //     for (var j = 0; j < word.index.length; j++) {
+        //         var node = nodes[word.index[j]];
+        //
+        //         console.log(node);
+        //     }
+        //
+        // }
 
+        var renderRequest = [];
+
+        // console.log('Node count ' + nodes.length);
+        // console.log(nodes);
+
+        // Loops through all nodes to construct content.
+        for (var i = 0; i < nodes.length; i++) {
             var node = nodes[i];
-            var found = word.index.indexOf(i);
-            if (found === -1) {
-                vars.renderContent += node.str;
-                continue;
-            }
 
-            // Found relevant word node.
-            var lastIndex = 0;
+            if (node.toRender) { // Only happens on word nodes
+                // Queue hyphen pieces
+                // console.log('Rendering hyphen');
 
-            // Iterate over the word hyphens.
-            node.hyphenIndex.forEach(function (index) {
-
-                var cut = node.str.substring(lastIndex, index + 1);
-                lastIndex = index + 1;
-                elem.html(
-                    vars.renderContent +
-                    '<span class="typeset-word-check" id="typeset-word-check">' +
-                        cut +
-                    '</span>' +
-                    '<span class="typeset-hyphen-check" id="typeset-hyphen-check">-</span>'
-                );
-
-                // Push render properties.
-                node.hyphenWidth.push(document.getElementById('typeset-word-check').getBoundingClientRect().width);
-
-                if (node.dashWidth == null) {
-                    node.dashWidth = document.getElementById('typeset-hyphen-check').getBoundingClientRect().width;
+                var lastIndex = 0;
+                for (var j = 0; j < node.hyphenIndex.length; j++) {
+                    var index = node.hyphenIndex[j],
+                        cut = node.str.substring(lastIndex, index + 1);
+                    lastIndex = index + 1;
+                    content += '<span class="typeset-hyphen-check">' + cut + '</span>';
+                    renderRequest.push({nodeIndex: i, type: 'hyphen'});
                 }
 
-            });
-            // Add remaining length.
-            if (node.hyphenIndex.length !== 0 && node.str.length !== lastIndex) {
-                var cut = node.str.substr(lastIndex);
-                elem.html(vars.renderContent + '<span class="typeset-hyphen-check">' + cut + '</span>');
-                node.hyphenRemain = elem.find('.typeset-hyphen-check').width();
-            }
+                // Queue remain (if any)
+                if (node.hyphenIndex.length !== 0 && node.str.length !== lastIndex) {
+                    var cut = node.str.substr(lastIndex);
+                    content += '<span class="typeset-hyphen-check">' + cut + '</span>';
+                    renderRequest.push({nodeIndex: i, type: 'remain'});
+                }
 
-            vars.renderContent += node.str;
+                // Queue dash
+                content += '<span class="typeset-hyphen-check">-</span>';
+                renderRequest.push({nodeIndex: i, type: 'dash'});
+
+                node.toRender = false; // Unset the toRender
+            } else { // Just add to content, nothing special
+                if (node.type === 'tag' || node.type === 'word') {
+                    content += node.str;
+                } else if (node.type === 'space') {
+                    content += ' ';
+                }
+            }
         }
-        elem.html(vars.renderContent);
-        vars.lastRenderNode = lastWordIndex + 1;
+
+        // Check dimentions.
+        elem.html(content);
+        var index = 0;
+
+        var hyphens = document.getElementsByClassName('typeset-hyphen-check');
+        for (var i = 0; i < hyphens.length; i++) {
+            var hyphen = hyphens[i];
+
+            var request = renderRequest[index++];
+            var width = hyphen.getBoundingClientRect().width;
+            var node = nodes[request.nodeIndex];
+            if (request.type === 'hyphen') {
+                node.hyphenWidth.push(width);
+            } else if (request.type === 'remain') {
+                node.hyphenRemain = width;
+            } else if (request.type === 'dash') {
+                node.dashWidth = width;
+            }
+        }
+
+        elem.html(html);
+
+        // console.log(content);
+        // console.log(renderRequest);
+        // console.log('DONE DONE DONE');
+
     };
 
     /**

@@ -74,16 +74,23 @@ TypesetBot.typeset = (function(obj, $) {
             hyphenIndex: null
         };
 
+        var wordsToRender = [];
+
         var timeHyphenInit = performance.now(); // debug values
         while (true) {
             var w = TypesetBot.nodeUtils.appendWord(vars, lineObj, true);
             if (w == null) {
                 break;
             }
+            // console.log(w);
             if (TypesetBot.hyphen.updateNodes(w, vars.nodes, settings)) {
-                TypesetBot.render.hyphenProperties(elem, w, vars, settings);
+                wordsToRender.push(w);
             }
         }
+
+        TypesetBot.render.hyphenProperties(elem, wordsToRender, vars, settings);
+
+
         if (settings.debug) {
             TypesetBot.debugVars.hypheninit = (performance.now() - timeHyphenInit).toFixed(2); // debug values
         }
@@ -130,9 +137,9 @@ TypesetBot.typeset = (function(obj, $) {
 
                 if (ratio <= settings.maxRatio + settings.loosenessParam) { // Valid breakpoint
 
-                    if (TypesetBot.hyphen.updateNodes(word, vars.nodes, settings)) {
-                        TypesetBot.render.hyphenProperties(elem, word, vars, settings);
-                    }
+                    // if (TypesetBot.hyphen.updateNodes(word, vars.nodes, settings)) {
+                    //     TypesetBot.render.hyphenProperties(elem, word, vars, settings);
+                    // }
 
                     // Create breaks for hyphens.
                     word.index.forEach(function (wordIndex) {
