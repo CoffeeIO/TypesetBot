@@ -11,7 +11,7 @@ TypesetBot.typesetUtils = (function(obj, $) {
             height = elem.height();
 
 
-        var timeNodeVars = TypesetBot.utils.startTime(); // debug values
+        var timeNodeVars = TypesetBot.utils.startTime();
 
         var foundVars = TypesetBot.vars[hash];
         var props;
@@ -25,15 +25,15 @@ TypesetBot.typesetUtils = (function(obj, $) {
         } else {
             props = foundVars;
         }
-        TypesetBot.debugVars.nodeinit = settings.debug ? TypesetBot.utils.endTime(timeNodeVars) : 0; // debug values
+        TypesetBot.debugVars.nodeinit = settings.debug ? TypesetBot.utils.endTime(timeNodeVars) : 0;
 
-        var timeDynamicWidth = TypesetBot.utils.startTime(); // debug values
+        var timeDynamicWidth = TypesetBot.utils.startTime();
 
         var linewidths = null;
         if (settings.dynamicWidth) {
             linewidths = TypesetBot.lineUtils.getAllLinewidths(elem, width, height, settings);
         }
-        TypesetBot.debugVars.dynamicwidth = settings.debug ? TypesetBot.utils.endTime(timeDynamicWidth) : 0; // debug values
+        TypesetBot.debugVars.dynamicwidth = settings.debug ? TypesetBot.utils.endTime(timeDynamicWidth) : 0;
 
         var fontSize = Number(elem.css('font-size').replace('px', '')),
             spaceWidth = fontSize * settings.spaceWidth,

@@ -48,9 +48,9 @@ TypesetBot = (function(obj, $) {
                 }
                 var timeRun = TypesetBot.utils.startTime();
                 TypesetBot.typeset.element(elem, settings);
-                TypesetBot.debugVars.run = settings.debug ? TypesetBot.utils.endTime(timeRun) : 0; // debug values
+                TypesetBot.debugVars.run = settings.debug ? TypesetBot.utils.endTime(timeRun) : 0;
 
-                printDebug(settings)
+                printDebug(settings);
 
                 clearInterval(timer);
                 if (callback != null) {
