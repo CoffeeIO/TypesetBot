@@ -101,7 +101,7 @@ TypesetBot.render = (function(obj, $) {
             }
         }
 
-        // Check dimentions.
+        // Check dimensions.
         elem.html(content);
         var index = 0;
 

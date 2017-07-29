@@ -179,7 +179,7 @@ TypesetBot.typesetUtils = (function(obj, $) {
             }
         }
 
-        // Get rendering dimentions of hyphens.
+        // Get rendering dimensions of hyphens.
         if (renderHyphens) {
             TypesetBot.render.hyphenProperties(elem, vars, settings);
         }
