@@ -9,7 +9,7 @@ describe('Math calculations:', function () {
         it('Loose fit', function () {
             var settings = TypesetBot.settings.get();
             expect(TypesetBot.math.getAdjustmentRatio(500, 480, 10, 16 / 9, 16 / 6, settings))
-            .not.toBeLessThan(0);
+                .not.toBeLessThan(0);
         });
         it('Tight fit', function () {
             var settings = TypesetBot.settings.get();
