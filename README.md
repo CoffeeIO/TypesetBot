@@ -52,6 +52,7 @@ $ npm install typesetbot
 # Download hyphenation library and patterns, for example US english
 $ npm install hypher hyphenation.en-us
 # Move distribution files to root
+$ mv node_modules/typesetbot/dist/* ./
 $ mv node_modules/hyphenation.en-us/lib/en-us.js ./
 $ mv node_modules/hypher/dist/jquery.hypher.js ./
 ```
