@@ -59,8 +59,8 @@ TypesetBot.typeset = (function(obj, $) {
         // Set wordspacing.
         TypesetBot.paraUtils.setSpaceWidth(elem, settings.spaceWidth - settings.spaceShrinkability, settings.spaceUnit);
 
-        var timeVarInit = TypesetBot.utils.startTime();
         // Get variables for algorithm.
+        var timeVarInit = TypesetBot.utils.startTime();
         var vars = TypesetBot.typesetUtils.initVars(elem, settings);
         TypesetBot.debugVars.varinit = settings.debug ? TypesetBot.utils.endTime(timeVarInit) : 0;
 
@@ -90,10 +90,8 @@ TypesetBot.typeset = (function(obj, $) {
 
             // Find breakpoints on line.
             while (! lineVars.done) {
-
-                var oldWidth = lineVars.curWidth;
-
-                var word = TypesetBot.nodeUtils.appendWord(vars, lineVars);
+                var oldWidth = lineVars.curWidth,
+                    word = TypesetBot.nodeUtils.appendWord(vars, lineVars);
 
                 var ratio = TypesetBot.math.getAdjustmentRatio(
                     lineVars.idealWidth,
@@ -135,7 +133,6 @@ TypesetBot.typeset = (function(obj, $) {
                                     vars, lineVars, hyphenRatio, hyphenPenalty, true, wordIndex, key, settings
                                 );
                             }
-
                         });
                     });
 
@@ -166,7 +163,6 @@ TypesetBot.typeset = (function(obj, $) {
             settings.loosenessParam += 1;
             return obj.linebreak(elem, settings);
         }
-
         TypesetBot.debugVars.linebreak = settings.debug ? TypesetBot.utils.endTime(timeLinebreak) : 0;
 
         // Return nodes and found solutions.

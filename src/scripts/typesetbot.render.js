@@ -49,7 +49,6 @@ TypesetBot.render = (function(obj, $) {
 
             nodes[wordIndex].height = word.getBoundingClientRect().height;
             nodes[wordIndex].width = word.getBoundingClientRect().width;
-
         }
         elem.html(html); // Put back html
 
@@ -123,11 +122,6 @@ TypesetBot.render = (function(obj, $) {
         }
 
         elem.html(html);
-
-        // console.log(content);
-        // console.log(renderRequest);
-        // console.log('DONE DONE DONE');
-
     };
 
     /**

@@ -4,29 +4,27 @@ TypesetBot.typesetUtils = (function(obj, $) {
      * Initialize variables relevant for each paragraph being typeset.
      */
     obj.initVars = function (elem, settings) {
-
         var hash = elem.attr('hashcode'),
             content = elem.html(), // Save for later
             width = elem.width(),
             height = elem.height();
 
-
+        // Init node variables.
         var timeNodeVars = TypesetBot.utils.startTime();
-
-        var foundVars = TypesetBot.vars[hash];
-        var props;
+        var foundVars = TypesetBot.vars[hash],
+            props = null;
 
         if (foundVars == null) {
             var words = TypesetBot.paraUtils.getWords(content),
                 nodes = TypesetBot.nodeUtils.wordsToNodes(words);
             props = TypesetBot.render.getNodeProperties(elem, nodes);
             TypesetBot.vars[hash] = props;
-
         } else {
             props = foundVars;
         }
         TypesetBot.debugVars.nodeinit = settings.debug ? TypesetBot.utils.endTime(timeNodeVars) : 0;
 
+        // Check dynamic width.
         var timeDynamicWidth = TypesetBot.utils.startTime();
 
         var linewidths = null;
