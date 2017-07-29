@@ -21,14 +21,14 @@ TypesetBot = (function(obj, $) {
     obj.debugVars = {};
     function printDebug(settings) {
         if (settings.debug) {
-            console.log('Total execution %s', obj.debugVars.run);
-            console.log('-- Init variables %s', obj.debugVars.varinit);
-            console.log('---- Node construction %s', obj.debugVars.nodeinit);
-            console.log('---- Checking dynamic width %s', obj.debugVars.dynamicwidth);
-            console.log('-- Hyphen init %s', obj.debugVars.hypheninit);
-            console.log('-- Linebreaking %s', obj.debugVars.linebreak);
-            console.log('-- Apply linebreak %s', obj.debugVars.apply);
-            console.log('');
+            console.info('Total execution %s', obj.debugVars.run);
+            console.info('-- Init variables %s', obj.debugVars.varinit);
+            console.info('---- Node construction %s', obj.debugVars.nodeinit);
+            console.info('---- Checking dynamic width %s', obj.debugVars.dynamicwidth);
+            console.info('-- Hyphen init %s', obj.debugVars.hypheninit);
+            console.info('-- Linebreaking %s', obj.debugVars.linebreak);
+            console.info('-- Apply linebreak %s', obj.debugVars.apply);
+            console.info('');
         }
     }
 
