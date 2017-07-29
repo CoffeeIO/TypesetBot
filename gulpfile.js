@@ -88,6 +88,9 @@ gulp.task('uglify', function() {
 });
 
 gulp.task('watch', function() {
+    gulp.run('sass');
+    gulp.run('uglify');
+    gulp.run('uglifyLang');
     return watch('src/**/*', function () {
         gulp.run('sass');
         gulp.run('uglify');

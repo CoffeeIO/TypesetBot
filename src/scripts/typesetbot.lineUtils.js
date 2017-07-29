@@ -31,7 +31,7 @@ TypesetBot.lineUtils = (function(obj) {
      * Get the ideal line with of the following line, assuming we're on a newline.
      *
      * Basic logic:
-     * - We create and element "1 1", and we know it's dimentions.
+     * - We create and element "1 1", and we know it's dimensions.
      * - We add margin on the left side to push the element to the right side.
      * - When we find the maximum width of the line the element will overflow to next line, "1 " \n "1" and the element
      *   will be 2 lines high.

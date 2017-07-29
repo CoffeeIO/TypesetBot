@@ -94,6 +94,7 @@ TypesetBot.hyphen = (function(obj) {
 
             var hyphenIndex = curHyphen - prevLen - 1; // 1 for index offset
             node.hyphenIndex.push(hyphenIndex);
+            node.toRender = true; // Need to check node for rendering dimensions
         });
 
         return true;

@@ -88,5 +88,19 @@ TypesetBot.utils = (function(obj) {
         return o1;
     };
 
+    /**
+     * Return new timestamp.
+     */
+    obj.startTime = function () {
+        return performance.now();
+    };
+
+    /**
+     * Return str of 'start' to new timestamp.
+     */
+    obj.endTime = function (start) {
+        return (performance.now() - start).toFixed(2) + 'ms';
+    };
+
     return obj;
 })(TypesetBot.utils || {});

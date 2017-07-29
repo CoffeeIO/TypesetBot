@@ -4,29 +4,34 @@ TypesetBot.typesetUtils = (function(obj, $) {
      * Initialize variables relevant for each paragraph being typeset.
      */
     obj.initVars = function (elem, settings) {
-
         var hash = elem.attr('hashcode'),
             content = elem.html(), // Save for later
             width = elem.width(),
             height = elem.height();
 
-        var foundVars = TypesetBot.vars[hash];
-        var props;
+        // Init node variables.
+        var timeNodeVars = TypesetBot.utils.startTime();
+        var foundVars = TypesetBot.vars[hash],
+            props = null;
 
         if (foundVars == null) {
             var words = TypesetBot.paraUtils.getWords(content),
                 nodes = TypesetBot.nodeUtils.wordsToNodes(words);
             props = TypesetBot.render.getNodeProperties(elem, nodes);
             TypesetBot.vars[hash] = props;
-
         } else {
             props = foundVars;
         }
+        TypesetBot.debugVars.nodeinit = settings.debug ? TypesetBot.utils.endTime(timeNodeVars) : 0;
+
+        // Check dynamic width.
+        var timeDynamicWidth = TypesetBot.utils.startTime();
 
         var linewidths = null;
         if (settings.dynamicWidth) {
             linewidths = TypesetBot.lineUtils.getAllLinewidths(elem, width, height, settings);
         }
+        TypesetBot.debugVars.dynamicwidth = settings.debug ? TypesetBot.utils.endTime(timeDynamicWidth) : 0;
 
         var fontSize = Number(elem.css('font-size').replace('px', '')),
             spaceWidth = fontSize * settings.spaceWidth,
@@ -150,6 +155,33 @@ TypesetBot.typesetUtils = (function(obj, $) {
         ) {
             vars.shortestPath[lineVars.line][nodeIndex][hyphenIndex] = breakNode.demerit;
             vars.activeBreakpoints.enqueue(breakNode); // Only add items to queue if they have better demerit
+        }
+    };
+
+    /**
+     * Find word hyphens and rendering dimensions.
+     */
+    obj.preprocessHyphens = function (elem, vars, settings) {
+        var lineObj = {
+            nodeIndex: 0,
+            hyphenIndex: null
+        };
+        var renderHyphens = false; // Only render hyphens if we need to
+
+        while (true) {
+            var word = TypesetBot.nodeUtils.appendWord(vars, lineObj, true);
+            if (word == null) {
+                break;
+            }
+            // Find hyphens in 'word'.
+            if (TypesetBot.hyphen.updateNodes(word, vars.nodes, settings)) {
+                renderHyphens = true;
+            }
+        }
+
+        // Get rendering dimensions of hyphens.
+        if (renderHyphens) {
+            TypesetBot.render.hyphenProperties(elem, vars, settings);
         }
     };
 

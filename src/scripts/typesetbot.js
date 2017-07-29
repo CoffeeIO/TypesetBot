@@ -18,6 +18,20 @@ TypesetBot = (function(obj, $) {
      */
     obj.vars = {};
 
+    obj.debugVars = {};
+    function printDebug(settings) {
+        if (settings.debug) {
+            console.info('Total execution %s', obj.debugVars.run);
+            console.info('-- Init variables %s', obj.debugVars.varinit);
+            console.info('---- Node construction %s', obj.debugVars.nodeinit);
+            console.info('---- Checking dynamic width %s', obj.debugVars.dynamicwidth);
+            console.info('-- Hyphen init %s', obj.debugVars.hypheninit);
+            console.info('-- Linebreaking %s', obj.debugVars.linebreak);
+            console.info('-- Apply linebreak %s', obj.debugVars.apply);
+            console.info('');
+        }
+    }
+
     /**
      * Typeset selected elements.
      * @param {string} selector Query selector for the elements to typeset
@@ -32,8 +46,12 @@ TypesetBot = (function(obj, $) {
                 if (elem.length === 0) {
                     return false;
                 }
-
+                var timeRun = TypesetBot.utils.startTime();
                 TypesetBot.typeset.element(elem, settings);
+                TypesetBot.debugVars.run = settings.debug ? TypesetBot.utils.endTime(timeRun) : 0;
+
+                printDebug(settings);
+
                 clearInterval(timer);
                 if (callback != null) {
                     callback();
