@@ -28,9 +28,10 @@ TypesetBot.typesetUtils = (function(obj, $) {
         var timeDynamicWidth = TypesetBot.utils.startTime();
 
         var linewidths = null;
-        if (settings.dynamicWidth) {
-            linewidths = TypesetBot.lineUtils.getAllLinewidths(elem, width, height, settings);
-        }
+        TypesetBot.lineUtils.widthStore = {}; // Reset dynamic width checks
+        // if (settings.dynamicWidth) {
+        //     linewidths = TypesetBot.lineUtils.getAllLinewidths(elem, width, height, settings);
+        // }
         TypesetBot.debugVars.dynamicwidth = settings.debug ? TypesetBot.utils.endTime(timeDynamicWidth) : 0;
 
         var fontSize = Number(elem.css('font-size').replace('px', '')),
@@ -74,7 +75,8 @@ TypesetBot.typesetUtils = (function(obj, $) {
             idealWidth = vars.width;
 
         if (settings.dynamicWidth) {
-            idealWidth = vars.linewidths[Math.ceil(a.height / settings.dynamicWidthIncrement)];
+            idealWidth = TypesetBot.lineUtils.nextLineWidthStore(elem, vars.width, a.height);
+            // idealWidth = vars.linewidths[Math.ceil(a.height / settings.dynamicWidthIncrement)];
         }
 
         return {

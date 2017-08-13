@@ -27,6 +27,25 @@ TypesetBot.lineUtils = (function(obj) {
         return search;
     }
 
+
+    obj.widthStore = {};
+
+    var ns = 0;
+    var os = 0;
+
+    obj.nextLineWidthStore = function (dom, idealW, i) {
+        console.warn('new %s, old %s', ns, os);
+        // Try to find already defined width.
+        if (obj.widthStore[i] != null) {
+            os++;
+            return obj.widthStore[i];
+        }
+        ns++;
+        var width = obj.nextLineWidth(dom, idealW, i);
+        obj.widthStore[i] = width;
+        return width;
+    }
+
     /**
      * Get the ideal line with of the following line, assuming we're on a newline.
      *
