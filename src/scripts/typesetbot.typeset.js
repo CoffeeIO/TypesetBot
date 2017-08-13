@@ -29,6 +29,13 @@ TypesetBot.typeset = (function(obj, $) {
      * Typeset single paragraph.
      */
     obj.paragraph = function (elem, settings) {
+        // Clean element
+        TypesetBot.paraUtils.removeBreak(elem);
+        TypesetBot.paraUtils.removeImage(elem);
+        if (! TypesetBot.paraUtils.isVisible(elem)) {
+            return; // Don't typeset invisible elements
+        }
+
         settings.loosenessParam = 0;
         var hash = TypesetBot.utils.getHash(elem.html());
         if (elem.attr('hashcode') != null) {
