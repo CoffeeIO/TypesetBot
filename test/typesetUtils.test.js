@@ -79,7 +79,6 @@ describe('Typesetting utilities:', function () {
             expect(vars.activeBreakpoints).not.toEqual(null);
             expect(vars.nodes.length).toEqual(257);
             expect(vars.finalBreaks.length).toEqual(0);
-            expect(vars.linewidths.length).not.toBeLessThan(10);
 
             expect(vars.spaceStretch).not.toBeLessThan(0);
             expect(vars.spaceShrink).not.toBeLessThan(0);
@@ -99,7 +98,6 @@ describe('Typesetting utilities:', function () {
             var vars = TypesetBot.typesetUtils.initVars(elem, settings);
 
             expect(vars).not.toEqual(null);
-            expect(vars.linewidths).toEqual(null);
         });
         it('Existing nodes', function () {
             var elem = $('.plain');
@@ -138,9 +136,8 @@ describe('Typesetting utilities:', function () {
             expect(lineVars.nodeIndex).toEqual(5);
             expect(lineVars.origin).toEqual(a);
             expect(lineVars.wordCount).toEqual(0);
-
-            expect(lineVars.idealWidth).toEqual(vars.linewidths[0]);
         });
+
         it('Skip node', function () {
             var elem = $('.plain');
             var settings = TypesetBot.settings.get();
