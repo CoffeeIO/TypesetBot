@@ -24,14 +24,7 @@ TypesetBot.typesetUtils = (function(obj, $) {
         }
         TypesetBot.debugVars.nodeinit = settings.debug ? TypesetBot.utils.endTime(timeNodeVars) : 0;
 
-        // Check dynamic width.
-        var timeDynamicWidth = TypesetBot.utils.startTime();
-
-        var linewidths = null;
-        if (settings.dynamicWidth) {
-            linewidths = TypesetBot.lineUtils.getAllLinewidths(elem, width, height, settings);
-        }
-        TypesetBot.debugVars.dynamicwidth = settings.debug ? TypesetBot.utils.endTime(timeDynamicWidth) : 0;
+        TypesetBot.lineUtils.widthStore = {}; // Reset dynamic width checks
 
         var fontSize = Number(elem.css('font-size').replace('px', '')),
             spaceWidth = fontSize * settings.spaceWidth,
@@ -44,7 +37,6 @@ TypesetBot.typesetUtils = (function(obj, $) {
             spaceShrink,
             spaceStretch,
             nodes: props,
-            linewidths,
             width,
             shortestPath: {}, // Smallest demerit for each breakpoint on each line.
             done: false,
@@ -74,7 +66,7 @@ TypesetBot.typesetUtils = (function(obj, $) {
             idealWidth = vars.width;
 
         if (settings.dynamicWidth) {
-            idealWidth = vars.linewidths[Math.ceil(a.height / settings.dynamicWidthIncrement)];
+            idealWidth = TypesetBot.lineUtils.nextLineWidthStore(elem, vars.width, a.height);
         }
 
         return {
