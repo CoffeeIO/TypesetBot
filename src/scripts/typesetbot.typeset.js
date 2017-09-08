@@ -29,6 +29,13 @@ TypesetBot.typeset = (function(obj, $) {
      * Typeset single paragraph.
      */
     obj.paragraph = function (elem, settings) {
+        // Clean element
+        TypesetBot.paraUtils.removeBreak(elem);
+        TypesetBot.paraUtils.removeImage(elem);
+        if (! TypesetBot.paraUtils.isVisible(elem)) {
+            return; // Don't typeset invisible elements
+        }
+
         settings.loosenessParam = 0;
         var hash = TypesetBot.utils.getHash(elem.html());
         if (elem.attr('hashcode') != null) {
@@ -46,7 +53,9 @@ TypesetBot.typeset = (function(obj, $) {
         var breaks = obj.linebreak(workElem, settings);
         if (breaks != null) {
             TypesetBot.vars[hash] = breaks.nodes;
+            var timeApply = TypesetBot.utils.startTime();
             TypesetBot.render.applyBreaks(workElem, breaks.nodes, breaks.solutions, settings);
+            TypesetBot.debugVars.apply = settings.debug ? TypesetBot.utils.endTime(timeApply) : 0;
         }
     };
 
@@ -58,8 +67,16 @@ TypesetBot.typeset = (function(obj, $) {
         TypesetBot.paraUtils.setSpaceWidth(elem, settings.spaceWidth - settings.spaceShrinkability, settings.spaceUnit);
 
         // Get variables for algorithm.
+        var timeVarInit = TypesetBot.utils.startTime();
         var vars = TypesetBot.typesetUtils.initVars(elem, settings);
+        TypesetBot.debugVars.varinit = settings.debug ? TypesetBot.utils.endTime(timeVarInit) : 0;
 
+        // Preprocess hyphens.
+        var timeHyphenInit = TypesetBot.utils.startTime();
+        TypesetBot.typesetUtils.preprocessHyphens(elem, vars, settings); // Preprocess all hyphens and dimensions
+        TypesetBot.debugVars.hypheninit = settings.debug ? TypesetBot.utils.endTime(timeHyphenInit) : 0;
+
+        var timeLinebreak = TypesetBot.utils.startTime();
         // Queue starting node.
         vars.activeBreakpoints.enqueue(
             TypesetBot.node.createBreak(0, null, null, 0, false, null, 0, 0, 0)
@@ -80,9 +97,8 @@ TypesetBot.typeset = (function(obj, $) {
 
             // Find breakpoints on line.
             while (! lineVars.done) {
-
-                var oldWidth = lineVars.curWidth;
-                var word = TypesetBot.nodeUtils.appendWord(vars, lineVars);
+                var oldWidth = lineVars.curWidth,
+                    word = TypesetBot.nodeUtils.appendWord(vars, lineVars);
 
                 var ratio = TypesetBot.math.getAdjustmentRatio(
                     lineVars.idealWidth,
@@ -99,10 +115,6 @@ TypesetBot.typeset = (function(obj, $) {
                 }
 
                 if (ratio <= settings.maxRatio + settings.loosenessParam) { // Valid breakpoint
-
-                    if (TypesetBot.hyphen.updateNodes(word, vars.nodes, settings)) {
-                        TypesetBot.render.hyphenProperties(elem, word, vars, settings);
-                    }
 
                     // Create breaks for hyphens.
                     word.index.forEach(function (wordIndex) {
@@ -128,7 +140,6 @@ TypesetBot.typeset = (function(obj, $) {
                                     vars, lineVars, hyphenRatio, hyphenPenalty, true, wordIndex, key, settings
                                 );
                             }
-
                         });
                     });
 
@@ -159,6 +170,7 @@ TypesetBot.typeset = (function(obj, $) {
             settings.loosenessParam += 1;
             return obj.linebreak(elem, settings);
         }
+        TypesetBot.debugVars.linebreak = settings.debug ? TypesetBot.utils.endTime(timeLinebreak) : 0;
 
         // Return nodes and found solutions.
         return {

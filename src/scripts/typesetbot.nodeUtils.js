@@ -7,7 +7,7 @@ TypesetBot.nodeUtils = (function(obj, $) {
      * - A word can have any number of tags nodes and tags don't have to end.
      * - A word ends after a space node.
      */
-    obj.appendWord = function (vars, lineVars) {
+    obj.appendWord = function (vars, lineVars, isPreprocess = false) {
         var done = false,
             word = '',
             wordIndex = [];
@@ -17,17 +17,19 @@ TypesetBot.nodeUtils = (function(obj, $) {
         while (! done) {
             var node = vars.nodes[lineVars.nodeIndex];
             if (node == null) { // Possible final break
-                vars.finalBreaks.push(TypesetBot.node.createBreak(
-                    lineVars.nodeIndex,
-                    null,
-                    lineVars.origin,
-                    lineVars.origin.demerit,
-                    false,
-                    0,
-                    lineVars.line + 1,
-                    lineVars.origin.height + lineVars.lineHeight,
-                    lineVars.lineHeight
-                ));
+                if (! isPreprocess) {
+                    vars.finalBreaks.push(TypesetBot.node.createBreak(
+                        lineVars.nodeIndex,
+                        null,
+                        lineVars.origin,
+                        lineVars.origin.demerit,
+                        false,
+                        0,
+                        lineVars.line + 1,
+                        lineVars.origin.height + lineVars.lineHeight,
+                        lineVars.lineHeight
+                    ));
+                }
 
                 return null;
             }
@@ -92,9 +94,37 @@ TypesetBot.nodeUtils = (function(obj, $) {
             }
             nodes.push(TypesetBot.node.createSpace());
         });
-        nodes.pop(); // Remove last space
-        return nodes;
+
+        return cleanupNodes(nodes);
     };
+
+    /**
+     * Remove additional space nodes that won't be displayed.
+     */
+    function cleanupNodes(nodes) {
+        var newNodes = [];
+        var allowSpace = false; // Disallow space as first node
+        for (var i = 0; i < nodes.length; i++) {
+            var node = nodes[i];
+            if (node.type === 'word') {
+                allowSpace = true;
+                newNodes.push(node);
+            } else if (node.type === 'tag') {
+                newNodes.push(node);
+            } else if (node.type === 'space') {
+                // Remove extra spaces, first space takes priority.
+                // Fx: hello_<b>_world</b>
+                // Real ->  |   |   <- Invisible
+                if (allowSpace) {
+                    newNodes.push(node);
+                    allowSpace = false;
+                }
+            }
+        }
+        newNodes.pop(); // Remove last space node
+
+        return newNodes;
+    }
 
     /**
      * Create nodes word and break word into word nodes and tag nodes.

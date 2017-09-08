@@ -40,4 +40,15 @@ describe('Line utilities:', function () {
             expect(timeR).toBeLessThan(timeT / 2); // Expect at least twice as fast
         });
     });
+
+    describe('Get line width from store:', function () {
+        it('Normal', function () {
+            TypesetBot.lineUtils.widthStore = {};
+            expect(TypesetBot.lineUtils.nextLineWidthStore($('.plain'), $('.plain').width(), 0)).toEqual(500);
+        });
+        it('Modified store', function () {
+            TypesetBot.lineUtils.widthStore = {0: 350};
+            expect(TypesetBot.lineUtils.nextLineWidthStore($('.plain'), $('.plain').width(), 0)).toEqual(350);
+        });
+    });
 });

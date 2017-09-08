@@ -32,11 +32,16 @@ TypesetBot.hyphen = (function(obj) {
      * Fx: hyphenation --> ["hyp", "hen", "ation"]
      */
     obj.word = function (word, settings, left = 0, right = 0) {
-        if (window['Hypher']['languages'][settings.hyphenLanguage] == null) {
-            return null;
+        if (settings.hyphenLanguage.trim() === '') {
+            return [word];
+        }
+        if (window['Hypher']['languages'][settings.hyphenLanguage] == null) { // Language not found
+            console.warn("Hyphenation language '%s' not found", settings.hyphenLanguage);
+            return [word];
         }
         window['Hypher']['languages'][settings.hyphenLanguage].leftMin = settings.hyphenLeftMin + left;
         window['Hypher']['languages'][settings.hyphenLanguage].rightMin = settings.hyphenRightMin + right;
+
         return window['Hypher']['languages'][settings.hyphenLanguage].hyphenate(word);
     };
 
@@ -89,6 +94,7 @@ TypesetBot.hyphen = (function(obj) {
 
             var hyphenIndex = curHyphen - prevLen - 1; // 1 for index offset
             node.hyphenIndex.push(hyphenIndex);
+            node.toRender = true; // Need to check node for rendering dimensions
         });
 
         return true;

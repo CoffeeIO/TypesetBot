@@ -48,7 +48,6 @@ describe('Settings testing:', function () {
         dynamicWidthIncrement: 5,
 
         // Functions.
-
         ratio (idealW, actualW, wordCount, shrink, stretch, settings) { // Adjustment ratio
             if (actualW < idealW) {
                 return (idealW - actualW) / ((wordCount - 1) * stretch);
@@ -72,7 +71,8 @@ describe('Settings testing:', function () {
             } else {
                 return Math.pow(settings.demeritOffset + badness, 2) - Math.pow(penalty, 2) + flagPenalty;
             }
-        }
+        },
+        debug: false
     };
 
     beforeEach(function(done) {

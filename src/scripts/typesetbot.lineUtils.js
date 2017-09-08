@@ -27,11 +27,27 @@ TypesetBot.lineUtils = (function(obj) {
         return search;
     }
 
+    // Store of linewidths.
+    obj.widthStore = {};
+
+    /**
+     * Get next line width of a certain height, using stored widths.
+     */
+    obj.nextLineWidthStore = function (dom, idealW, i) {
+        // Try to find already defined width.
+        if (obj.widthStore[i] != null) {
+            return obj.widthStore[i];
+        }
+        var width = obj.nextLineWidth(dom, idealW, i);
+        obj.widthStore[i] = width;
+        return width;
+    };
+
     /**
      * Get the ideal line with of the following line, assuming we're on a newline.
      *
      * Basic logic:
-     * - We create and element "1 1", and we know it's dimentions.
+     * - We create and element "1 1", and we know it's dimensions.
      * - We add margin on the left side to push the element to the right side.
      * - When we find the maximum width of the line the element will overflow to next line, "1 " \n "1" and the element
      *   will be 2 lines high.
