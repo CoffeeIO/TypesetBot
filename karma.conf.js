@@ -16,7 +16,9 @@ module.exports = function(config) {
         // list of files / patterns to load in the browser.
         files: [
             // Source files.
-            {pattern: 'dist/mainWithPatterns.min.js', watched: true, included: true, served: true},
+            {pattern: 'dist/typesetbot.js', watched: true, included: true, served: true},
+            {pattern: 'node_modules/hypher/dist/jquery.hypher.js', watched: true, included: true, served: true},
+            {pattern: 'node_modules/hyphenation.en-us/lib/en-us.js', watched: true, included: true, served: true},
 
             {pattern: 'fixtures/**/*.html'},
 

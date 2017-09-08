@@ -4,10 +4,8 @@
   "description": "Small project to dynamically typeset text on the web",
   "author": "Mathias Grundtvig Andreasen (MGApcDev)",
   "license": "GPL-3.0",
-  "dependencies": {
-    "jquery": "~3.1.1"
-  },
   "devDependencies": {
+    "jquery": "~3.1.1",
     "gulp": "~3.9.1",
     "gulp-watch": "~4.3.11",
     "gulp-uglify": "~2.0.1",
@@ -19,7 +17,9 @@
     "karma-chrome-launcher": "~2.0.0",
     "karma-jasmine": "~1.1.0",
     "karma-html2js-preprocessor": "~1.1.0",
-    "gulp-sass": "~3.1.0"
+    "gulp-sass": "~3.1.0",
+    "hyphenation.en-us": "~0.2.1",
+    "hypher": "~0.2.5"
   },
   "scripts": {
     "start": "python -m SimpleHTTPServer",
