@@ -32,10 +32,25 @@ TypesetBot.hyphen = (function(obj) {
      * Fx: hyphenation --> ["hyp", "hen", "ation"]
      */
     obj.word = function (word, settings, left = 0, right = 0) {
+
+
         if (settings.hyphenLanguage.trim() === '') {
             return [word];
         }
         if (window['Hypher']['languages'][settings.hyphenLanguage] == null) { // Language not found
+            var h = new window['Hypher'](module.exports);
+
+            if (typeof module.exports.id === 'string') {
+                module.exports.id = [module.exports.id];
+            }
+
+            for (var i = 0; i < module.exports.id.length; i += 1) {
+                window['Hypher']['languages'][module.exports.id[i]] = h;
+            }
+            if (window['Hypher']['languages'][settings.hyphenLanguage] != null) {
+                return obj.word(word, settings, left, right);
+            }
+
             console.warn("Hyphenation language '%s' not found", settings.hyphenLanguage);
             return [word];
         }
