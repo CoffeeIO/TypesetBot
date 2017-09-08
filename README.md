@@ -49,12 +49,9 @@ TypesetBot is designed with the web in mind: written in JavaScript for wide supp
 ```bash
 # Install
 $ npm install typesetbot
-# Download hyphenation library and patterns, for example US english
+
+# (optional) Download hyphenation library and patterns, for example US english
 $ npm install hypher hyphenation.en-us
-# Move distribution files to root
-$ mv node_modules/typesetbot/dist/* ./
-$ mv node_modules/hyphenation.en-us/lib/en-us.js ./
-$ mv node_modules/hypher/dist/jquery.hypher.js ./
 ```
 
 ### CDN
@@ -87,10 +84,11 @@ If you are creating an open source application under a license compatible with t
 ```html
 <html>
 <head>
-    <link rel="stylesheet" href="https://rawgit.com/MGApcDev/TypesetBot/master/dist/typesetbot.min.css">
-    <script type="text/javascript" src="https://rawgit.com/MGApcDev/TypesetBot/master/dist/typesetbot.js"></script>
-    <script type="text/javascript" src="https://cdn.rawgit.com/bramstein/hypher/v0.2.5/dist/jquery.hypher.js"></script>
-    <script type="text/javascript" src="https://cdn.rawgit.com/bramstein/hyphenation-patterns/dc01d58a/dist/browser/en-us.js"></script>
+    <link rel="stylesheet" href="node_modules/typesetbot/dist/typesetbot.min.css">
+    <script type="text/javascript" src="node_modules/typesetbot/dist/typesetbot.js"></script>
+    
+    <script type="text/javascript" src="node_modules/hypher/dist/jquery.hypher.js"></script>
+    <script type="text/javascript" src="node_modules/hyphenation.en-us/lib/en-us.js"></script>
     <script type="text/javascript">
         TypesetBot.attach('body');
     </script>
