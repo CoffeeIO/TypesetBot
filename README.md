@@ -203,7 +203,7 @@ The easiest way to compare quality of the typesetting is to look at the adjustme
 
 Normal HTML has an easier time line breaking on wider lines, but on smaller viewports it starts to fall apart, so we can see how this is affected as multiple viewports. 
 
-Reference: [here](http://codepen.io/MGApcDev/pen/dWZZed)
+Reference: [here](https://codepen.io/MGApcDev/pen/YxoaWe)
 #### 900px wide
 <p align="center">
     <img alt="Quick Example" src="http://i.imgur.com/HHBbtmF.gif">
