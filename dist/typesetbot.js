@@ -929,8 +929,6 @@ TypesetBot.hyphen = (function(obj) {
      * Fx: hyphenation --> ["hyp", "hen", "ation"]
      */
     obj.word = function (word, settings, left = 0, right = 0) {
-
-
         if (settings.hyphenLanguage.trim() === '') {
             return [word];
         }
