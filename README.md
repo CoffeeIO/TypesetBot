@@ -228,13 +228,13 @@ Reference: [here](http://codepen.io/MGApcDev/pen/QvOpeq)
 
 | Description | First run | Second run |
 | --- | --- | --- |
-| 1 paragraph, 441 words, w. hyphenation | 1700ms | 70ms |
-| 1 paragraph, 441 words, w/o. hyphenation | 280ms | 80ms |
-| 1 paragraph, 882 words, w. hyphenation | 6400ms | 190ms |
-| 1 paragraph, 882 words, w/o. hyphenation | 770ms | 130ms |
-| 2 paragraph, 441 words, w. hyphenation | 3330ms | 140ms |
-| 2 paragraph, 441 words, w/o. hyphenation | 580ms | 110ms |
-| 1 paragraph, 441 words, w. hyphenation, w/o. dynamic width | 1700ms | 20ms |
+| 1 paragraph, 441 words, w. hyphenation | 143ms | 137ms |
+| 1 paragraph, 441 words, w/o. hyphenation | 109ms | 74ms |
+| 1 paragraph, 882 words, w. hyphenation | 270ms | 209ms |
+| 1 paragraph, 882 words, w/o. hyphenation | 170ms | 123ms |
+| 2 paragraph, 441 words, w. hyphenation | 275ms | 147ms |
+| 2 paragraph, 441 words, w/o. hyphenation | 130ms | 111ms |
+| 1 paragraph, 441 words, w. hyphenation, w/o. dynamic width | 53ms | 51ms |
 
 
 
