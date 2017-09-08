@@ -9,11 +9,11 @@ describe('Hyphenation:', function () {
             expect(TypesetBot.hyphen.word('test', settings)).toEqual(['test']);
         });
         it('Adjusting hyphen settings', function () {
-            var settings = TypesetBot.settings.get({hyphenLanguage: 'da'});
-            expect(TypesetBot.hyphen.word('hyphenate', settings)).toEqual(['hyp', 'he', 'na', 'te']);
+            var settings = TypesetBot.settings.get({hyphenLanguage: 'en-us'});
+            expect(TypesetBot.hyphen.word('hyphenate', settings)).toEqual(['hy', 'phen', 'ate']);
 
-            settings = TypesetBot.settings.get({hyphenLanguage: 'da', hyphenRightMin: 3, hyphenLeftMin: 4});
-            expect(TypesetBot.hyphen.word('hyphenate', settings)).toEqual(['hyphe', 'nate']);
+            settings = TypesetBot.settings.get({hyphenLanguage: 'en-us', hyphenRightMin: 3, hyphenLeftMin: 4});
+            expect(TypesetBot.hyphen.word('hyphenate', settings)).toEqual(['hyphen', 'ate']);
         });
         it('Language not found', function () {
             var settings = TypesetBot.settings.get({hyphenLanguage: 'gg'});
