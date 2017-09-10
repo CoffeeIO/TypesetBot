@@ -736,6 +736,22 @@ TypesetBot.typesetUtils = (function(obj, $) {
         }
     };
 
+    /**
+     * 
+     */
+    obj.getWorkElem = function(elem, hash) {
+        var tempElem = $('p[hashcode="' + hash + '"]');
+        if (tempElem.length > 0) {
+            return tempElem;
+        }
+
+        var copy = elem[0].outerHTML;
+        elem.after(copy);
+        var workElem = elem.next();
+
+        return workElem;
+    };
+
     return obj;
 })(TypesetBot.typesetUtils || {}, jQuery);
 
@@ -784,7 +800,11 @@ TypesetBot.typeset = (function(obj, $) {
         }
 
         elem.attr('hashcode', hash);
-        var workElem = $('p[hashcode="' + hash + '"]');
+
+        var workElem = TypesetBot.typesetUtils.getWorkElem(elem, hash);
+        if (workElem.length === 0) {
+
+        }
 
         var copy = elem[0].outerHTML;
         elem.addClass('typeset-hidden');

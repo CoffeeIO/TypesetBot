@@ -43,7 +43,11 @@ TypesetBot.typeset = (function(obj, $) {
         }
 
         elem.attr('hashcode', hash);
-        var workElem = $('p[hashcode="' + hash + '"]');
+
+        var workElem = TypesetBot.typesetUtils.getWorkElem(elem, hash);
+        if (workElem.length === 0) {
+
+        }
 
         var copy = elem[0].outerHTML;
         elem.addClass('typeset-hidden');
