@@ -16,7 +16,6 @@ TypesetBot.typeset = (function(obj, $) {
                     if (innerElem.hasClass('typeset-hidden')) {
                         innerElem.removeClass('typeset-hidden');
                         obj.paragraph(innerElem, settings);
-
                     } else {
                         obj.paragraph(innerElem, settings);
                     }
@@ -37,14 +36,15 @@ TypesetBot.typeset = (function(obj, $) {
         }
 
         settings.loosenessParam = 0;
-        var hash = TypesetBot.utils.getHash(elem.html());
+        var hash = TypesetBot.utils.getHash(TypesetBot.utils.getCssString(elem) + elem.html());
+
         if (elem.attr('hashcode') != null) {
-            // Remove related typeset paragraph.
-            elem.parent().find('.typeset-paragraph[hashcode="' + hash + '"]').remove();
-            elem.removeClass('typeset-hidden');
+
         }
 
         elem.attr('hashcode', hash);
+        var workElem = $('p[hashcode="' + hash + '"]');
+
         var copy = elem[0].outerHTML;
         elem.addClass('typeset-hidden');
         elem.after(copy);

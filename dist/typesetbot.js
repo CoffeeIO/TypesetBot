@@ -14,6 +14,34 @@ var module = {
 
 TypesetBot.utils = (function(obj) {
 
+    /**
+     * Return a string of font/text relevant css properties.
+     */
+    obj.getCssString = function(elem) {
+        var cssProps = elem.css([
+            // Font properties.
+            'font',
+            'font-size',
+            'font-family',
+            'font-style',
+            'font-weight',
+            'font-variant',
+            // Text properties.
+            'text-align',
+            'text-decoration',
+            'text-transform',
+            'text-indent',
+            'text-shadow',
+            'text-overflow',
+            'vertical-align',
+            // Other properties.
+            'word-spacing',
+            'letter-spacing',
+            'line-height',
+            'direction',
+        ]);
+        return JSON.stringify(cssProps);
+    };
 
     /**
      * Javascript implementation of Java’s String.hashCode() method.
@@ -729,7 +757,6 @@ TypesetBot.typeset = (function(obj, $) {
                     if (innerElem.hasClass('typeset-hidden')) {
                         innerElem.removeClass('typeset-hidden');
                         obj.paragraph(innerElem, settings);
-
                     } else {
                         obj.paragraph(innerElem, settings);
                     }
@@ -750,14 +777,15 @@ TypesetBot.typeset = (function(obj, $) {
         }
 
         settings.loosenessParam = 0;
-        var hash = TypesetBot.utils.getHash(elem.html());
+        var hash = TypesetBot.utils.getHash(TypesetBot.utils.getCssString(elem) + elem.html());
+
         if (elem.attr('hashcode') != null) {
-            // Remove related typeset paragraph.
-            elem.parent().find('.typeset-paragraph[hashcode="' + hash + '"]').remove();
-            elem.removeClass('typeset-hidden');
+
         }
 
         elem.attr('hashcode', hash);
+        var workElem = $('p[hashcode="' + hash + '"]');
+
         var copy = elem[0].outerHTML;
         elem.addClass('typeset-hidden');
         elem.after(copy);
