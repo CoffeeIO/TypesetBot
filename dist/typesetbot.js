@@ -737,19 +737,23 @@ TypesetBot.typesetUtils = (function(obj, $) {
     };
 
     /**
-     * 
+     * Retreive working element of paragraph, create one if it doesn't exist.
      */
     obj.getWorkElem = function(elem, hash) {
-        var tempElem = $('p[hashcode="' + hash + '"]');
+        var tempElem = $('p.typeset-paragraph[hashcode="' + hash + '"]');
         if (tempElem.length > 0) {
+            console.log('Found work elem');
             return tempElem;
         }
 
         var copy = elem[0].outerHTML;
         elem.after(copy);
-        var workElem = elem.next();
 
-        return workElem;
+        return elem.next();
+    };
+
+    obj.deleteElem = function(hash) {
+        $('p.typeset-paragraph[hashcode="' + hash + '"]').remove();
     };
 
     return obj;
@@ -794,22 +798,19 @@ TypesetBot.typeset = (function(obj, $) {
 
         settings.loosenessParam = 0;
         var hash = TypesetBot.utils.getHash(TypesetBot.utils.getCssString(elem) + elem.html());
+        var oldHash = elem.attr('hashcode');
 
-        if (elem.attr('hashcode') != null) {
-
+        if (oldHash != null && oldHash != hash) {
+            // Delete any old element.
+            TypesetBot.typesetUtils.deleteElem(oldHash);
         }
 
+        // Update hash of element.
         elem.attr('hashcode', hash);
-
+        // Retreive working element (create one if it doesn't exist).
         var workElem = TypesetBot.typesetUtils.getWorkElem(elem, hash);
-        if (workElem.length === 0) {
 
-        }
-
-        var copy = elem[0].outerHTML;
         elem.addClass('typeset-hidden');
-        elem.after(copy);
-        var workElem = elem.next();
 
         var breaks = obj.linebreak(workElem, settings);
         if (breaks != null) {

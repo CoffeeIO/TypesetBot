@@ -37,22 +37,19 @@ TypesetBot.typeset = (function(obj, $) {
 
         settings.loosenessParam = 0;
         var hash = TypesetBot.utils.getHash(TypesetBot.utils.getCssString(elem) + elem.html());
+        var oldHash = elem.attr('hashcode');
 
-        if (elem.attr('hashcode') != null) {
-
+        if (oldHash != null && oldHash != hash) {
+            // Delete any old element.
+            TypesetBot.typesetUtils.deleteElem(oldHash);
         }
 
+        // Update hash of element.
         elem.attr('hashcode', hash);
-
+        // Retreive working element (create one if it doesn't exist).
         var workElem = TypesetBot.typesetUtils.getWorkElem(elem, hash);
-        if (workElem.length === 0) {
 
-        }
-
-        var copy = elem[0].outerHTML;
         elem.addClass('typeset-hidden');
-        elem.after(copy);
-        var workElem = elem.next();
 
         var breaks = obj.linebreak(workElem, settings);
         if (breaks != null) {

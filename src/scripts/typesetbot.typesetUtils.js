@@ -178,19 +178,23 @@ TypesetBot.typesetUtils = (function(obj, $) {
     };
 
     /**
-     * 
+     * Retreive working element of paragraph, create one if it doesn't exist.
      */
     obj.getWorkElem = function(elem, hash) {
-        var tempElem = $('p[hashcode="' + hash + '"]');
+        var tempElem = $('p.typeset-paragraph[hashcode="' + hash + '"]');
         if (tempElem.length > 0) {
+            console.log('Found work elem');
             return tempElem;
         }
 
         var copy = elem[0].outerHTML;
         elem.after(copy);
-        var workElem = elem.next();
 
-        return workElem;
+        return elem.next();
+    };
+
+    obj.deleteElem = function(hash) {
+        $('p.typeset-paragraph[hashcode="' + hash + '"]').remove();
     };
 
     return obj;
