@@ -39,7 +39,7 @@ TypesetBot.typeset = (function(obj, $) {
         var hash = TypesetBot.utils.getHash(TypesetBot.utils.getCssString(elem) + elem.html());
         var oldHash = elem.attr('hashcode');
 
-        if (oldHash != null && oldHash != hash) {
+        if (oldHash != null && oldHash !== hash) {
             // Delete any old element.
             TypesetBot.typesetUtils.deleteElem(oldHash);
         }

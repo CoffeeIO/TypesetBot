@@ -183,7 +183,6 @@ TypesetBot.typesetUtils = (function(obj, $) {
     obj.getWorkElem = function(elem, hash) {
         var tempElem = $('p.typeset-paragraph[hashcode="' + hash + '"]');
         if (tempElem.length > 0) {
-            console.log('Found work elem');
             return tempElem;
         }
 

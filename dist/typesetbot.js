@@ -195,10 +195,10 @@ TypesetBot.paraUtils = (function(obj) {
         var html = dom.html().replace(/<img[\/]?>/g, '');
         dom.html(html);
     };
+
     /**
      * Remove breaks from paragraph.
      */
-
     obj.isVisible = function (dom) {
         return dom.is(':visible');
     };
@@ -742,7 +742,6 @@ TypesetBot.typesetUtils = (function(obj, $) {
     obj.getWorkElem = function(elem, hash) {
         var tempElem = $('p.typeset-paragraph[hashcode="' + hash + '"]');
         if (tempElem.length > 0) {
-            console.log('Found work elem');
             return tempElem;
         }
 
@@ -800,7 +799,7 @@ TypesetBot.typeset = (function(obj, $) {
         var hash = TypesetBot.utils.getHash(TypesetBot.utils.getCssString(elem) + elem.html());
         var oldHash = elem.attr('hashcode');
 
-        if (oldHash != null && oldHash != hash) {
+        if (oldHash != null && oldHash !== hash) {
             // Delete any old element.
             TypesetBot.typesetUtils.deleteElem(oldHash);
         }

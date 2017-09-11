@@ -46,10 +46,10 @@ TypesetBot.paraUtils = (function(obj) {
         var html = dom.html().replace(/<img[\/]?>/g, '');
         dom.html(html);
     };
+
     /**
      * Remove breaks from paragraph.
      */
-
     obj.isVisible = function (dom) {
         return dom.is(':visible');
     };
