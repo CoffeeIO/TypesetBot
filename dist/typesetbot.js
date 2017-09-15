@@ -805,20 +805,17 @@ TypesetBot.typeset = (function(obj, $) {
         var hash = TypesetBot.utils.getHash(TypesetBot.utils.getCssString(elem) + elem.html()),
             oldHash = elem.attr('hashcode');
 
-        // Update hash of element.
-        elem.attr('hashcode', hash);
         if (oldHash != null && oldHash !== hash) {
             // Delete any elements with the old hash.
             TypesetBot.typesetUtils.deleteWorkElem(oldHash);
         }
-
         // Retreive working element.
         var workElem = TypesetBot.typesetUtils.getWorkElem(elem, hash);
 
         elem.addClass('typeset-hidden'); // Hide original paragraph
 
         var breaks = obj.linebreak(workElem, settings);
-        if (breaks != null) {
+        if (breaks != null) { // Solution was found
             TypesetBot.vars[hash] = breaks.nodes;
             var timeApply = TypesetBot.utils.startTime();
             TypesetBot.render.applyBreaks(workElem, breaks.nodes, breaks.solutions, settings);
