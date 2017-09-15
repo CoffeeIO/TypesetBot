@@ -99,9 +99,6 @@ If you are creating an open source application under a license compatible with t
 </html>
 ```
 
-See more examples of using the API functions and customizations in --> [examples](examples)
-
-
 ## Features
 ### Line breaking
 The line breaking algorithm implemented, is inspired by TeX's implementation of the total-fit algorithm. The algorithm was detailed in the [Digital Typography by Donald Knuth](https://www.amazon.com/Digital-Typography-Lecture-Notes-Donald-ebook/dp/B01MQGA5KF/ref=mt_kindle?_encoding=UTF8&me=).
