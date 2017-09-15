@@ -36,20 +36,20 @@ TypesetBot.typeset = (function(obj, $) {
         }
 
         settings.loosenessParam = 0;
-        var hash = TypesetBot.utils.getHash(TypesetBot.utils.getCssString(elem) + elem.html());
-        var oldHash = elem.attr('hashcode');
-
-        if (oldHash != null && oldHash !== hash) {
-            // Delete any old element.
-            TypesetBot.typesetUtils.deleteElem(oldHash);
-        }
+        var hash = TypesetBot.utils.getHash(TypesetBot.utils.getCssString(elem) + elem.html()),
+            oldHash = elem.attr('hashcode');
 
         // Update hash of element.
         elem.attr('hashcode', hash);
-        // Retreive working element (create one if it doesn't exist).
+        if (oldHash != null && oldHash !== hash) {
+            // Delete any elements with the old hash.
+            TypesetBot.typesetUtils.deleteWorkElem(oldHash);
+        }
+
+        // Retreive working element.
         var workElem = TypesetBot.typesetUtils.getWorkElem(elem, hash);
 
-        elem.addClass('typeset-hidden');
+        elem.addClass('typeset-hidden'); // Hide original paragraph
 
         var breaks = obj.linebreak(workElem, settings);
         if (breaks != null) {

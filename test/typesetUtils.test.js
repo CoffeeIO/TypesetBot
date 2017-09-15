@@ -156,4 +156,37 @@ describe('Typesetting utilities:', function () {
             expect(lineVars.done).toEqual(true);
         });
     });
+
+    describe('Get work elem:', function () {
+        it('Create new elem', function () {
+            var elem = $('.plain');
+            TypesetBot.typesetUtils.getWorkElem(elem, 'test123');
+            expect($('p[hashcode="test123"]').length).toEqual(2);
+        });
+
+        it('Retreive existing elem', function () {
+            var elem = $('.plain');
+            var work = TypesetBot.typesetUtils.getWorkElem(elem, 'test123');
+            work.addClass('typeset-paragraph');
+
+            TypesetBot.typesetUtils.getWorkElem(elem, 'test123');
+            expect($('p[hashcode="test123"]').length).toEqual(2);
+        });
+    });
+
+    describe('Delete work elem:', function () {
+        it('Remove multiple elem', function () {
+            var elem1 = $('.plain');
+            var elem2 = $('.space');
+            var work1 = TypesetBot.typesetUtils.getWorkElem(elem1, 'test123');
+            var work2 = TypesetBot.typesetUtils.getWorkElem(elem2, 'test123');
+            work1.addClass('typeset-paragraph');
+            work2.addClass('typeset-paragraph');
+
+            TypesetBot.typesetUtils.deleteWorkElem('test123');
+
+            expect($('.plain').length).toEqual(1);
+            expect($('.space').length).toEqual(1);
+        });
+    });
 });

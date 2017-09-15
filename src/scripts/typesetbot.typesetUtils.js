@@ -181,6 +181,9 @@ TypesetBot.typesetUtils = (function(obj, $) {
      * Retreive working element of paragraph, create one if it doesn't exist.
      */
     obj.getWorkElem = function(elem, hash) {
+        // Update hash of element.
+        elem.attr('hashcode', hash);
+
         var tempElem = $('p.typeset-paragraph[hashcode="' + hash + '"]');
         if (tempElem.length > 0) {
             return tempElem;
@@ -192,7 +195,10 @@ TypesetBot.typesetUtils = (function(obj, $) {
         return elem.next();
     };
 
-    obj.deleteElem = function(hash) {
+    /**
+     * Delete a paragraph with a certain hashcode attribute.
+     */
+    obj.deleteWorkElem = function(hash) {
         $('p.typeset-paragraph[hashcode="' + hash + '"]').remove();
     };
 
