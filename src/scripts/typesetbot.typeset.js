@@ -36,7 +36,7 @@ TypesetBot.typeset = (function(obj, $) {
         }
 
         settings.loosenessParam = 0;
-        var hash = TypesetBot.utils.getHash(TypesetBot.utils.getCssString(elem) + elem.html()),
+        var hash = TypesetBot.utils.hashElem(elem),
             oldHash = elem.attr('hashcode');
 
         if (oldHash != null && oldHash !== hash) {

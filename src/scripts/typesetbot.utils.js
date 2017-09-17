@@ -1,35 +1,6 @@
 TypesetBot.utils = (function(obj) {
 
     /**
-     * Return a string of font/text relevant css properties.
-     */
-    obj.getCssString = function(elem) {
-        var cssProps = elem.css([
-            // Font properties.
-            'font',
-            'font-size',
-            'font-family',
-            'font-style',
-            'font-weight',
-            'font-variant',
-            // Text properties.
-            'text-align',
-            'text-decoration',
-            'text-transform',
-            'text-indent',
-            'text-shadow',
-            'text-overflow',
-            'vertical-align',
-            // Other properties.
-            'word-spacing',
-            'letter-spacing',
-            'line-height',
-            'direction',
-        ]);
-        return JSON.stringify(cssProps);
-    };
-
-    /**
      * Javascript implementation of Java’s String.hashCode() method.
      * **Modified**
      * @see http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/
