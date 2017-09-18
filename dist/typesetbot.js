@@ -758,7 +758,7 @@ TypesetBot.typesetUtils = (function(obj, $) {
      * Get a relatively unique hash of an elem.
      */
     obj.hashElem = function(elem) {
-        return TypesetBot.utils.getHash(obj.getCssString(elem) + elem.html())
+        return TypesetBot.utils.getHash(obj.getCssString(elem) + elem.html());
     };
 
     /**
