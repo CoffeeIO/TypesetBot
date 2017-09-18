@@ -201,7 +201,8 @@ describe('Typesetting utilities:', function () {
             var elem1 = $('.plain');
             var elem2 = $('.big-font');
 
-            expect(TypesetBot.typesetUtils.getCssString(elem1)).not.toEqual(TypesetBot.typesetUtils.getCssString(elem2));
+            expect(TypesetBot.typesetUtils.getCssString(elem1))
+                .not.toEqual(TypesetBot.typesetUtils.getCssString(elem2));
         });
     });
 
