@@ -90,16 +90,41 @@ TypesetBot.utils = (function(obj) {
     /**
      * Return new timestamp.
      */
-    obj.startTime = function () {
-        return performance.now();
+    obj.startTime = function (name, settings) {
+        if (settings.debug) {
+            if (TypesetBot.debugVars[name] == null) {
+                TypesetBot.debugVars[name] = {};
+                TypesetBot.debugVars[name].start = [];
+                TypesetBot.debugVars[name].end = [];
+            }
+            TypesetBot.debugVars[name].start.push(performance.now());
+        }
     };
 
     /**
      * Return str of 'start' to new timestamp.
      */
-    obj.endTime = function (start) {
-        return (performance.now() - start).toFixed(2) + 'ms';
+    obj.endTime = function (name, settings) {
+        if (settings.debug) {
+            if (TypesetBot.debugVars[name] == null) {
+                TypesetBot.debugVars[name] = {};
+                TypesetBot.debugVars[name].start = [];
+                TypesetBot.debugVars[name].end = [];
+            }
+            TypesetBot.debugVars[name].end.push(performance.now());
+        }
     };
+
+    obj.diffTime = function (time) {
+        var startTotal = 0,
+            endTotal = 0;
+        for (var i = 0; i < time.start.length; i++) {
+            startTotal += time.start[i];
+            endTotal += time.end[i];
+        }
+        return (endTotal - startTotal).toFixed(2) + 'ms --- (calls: '+ time.start.length +')';
+    };
+
 
     return obj;
 })(TypesetBot.utils || {});

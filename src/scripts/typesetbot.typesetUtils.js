@@ -10,7 +10,7 @@ TypesetBot.typesetUtils = (function(obj, $) {
             height = elem.height();
 
         // Init node variables.
-        var timeNodeVars = TypesetBot.utils.startTime();
+        TypesetBot.utils.startTime('nodeinit', settings);
         var foundVars = TypesetBot.vars[hash],
             props = null;
 
@@ -22,7 +22,7 @@ TypesetBot.typesetUtils = (function(obj, $) {
         } else {
             props = foundVars;
         }
-        TypesetBot.debugVars.nodeinit = settings.debug ? TypesetBot.utils.endTime(timeNodeVars) : 0;
+        TypesetBot.utils.endTime('nodeinit', settings);
 
         TypesetBot.lineUtils.widthStore = {}; // Reset dynamic width checks
 
@@ -66,7 +66,7 @@ TypesetBot.typesetUtils = (function(obj, $) {
             idealWidth = vars.width;
 
         if (settings.dynamicWidth) {
-            idealWidth = TypesetBot.lineUtils.nextLineWidthStore(elem, vars.width, a.height);
+            idealWidth = TypesetBot.lineUtils.nextLineWidthStore(elem, vars.width, a.height, settings);
         }
 
         return {

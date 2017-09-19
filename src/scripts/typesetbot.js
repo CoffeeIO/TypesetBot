@@ -21,12 +21,17 @@ TypesetBot = (function(obj, $) {
     obj.debugVars = {};
     function printDebug(settings) {
         if (settings.debug) {
-            console.info('Total execution %s', obj.debugVars.run);
-            console.info('-- Init variables %s', obj.debugVars.varinit);
-            console.info('---- Node construction %s', obj.debugVars.nodeinit);
-            console.info('-- Hyphen init %s', obj.debugVars.hypheninit);
-            console.info('-- Linebreaking %s', obj.debugVars.linebreak);
-            console.info('-- Apply linebreak %s', obj.debugVars.apply);
+            console.info('Total execution %s', TypesetBot.utils.diffTime(obj.debugVars.run));
+            console.info('-- Proprocess elems %s', TypesetBot.utils.diffTime(obj.debugVars.preprocesselem));
+            console.info('-- Total linebreak %s', TypesetBot.utils.diffTime(obj.debugVars.totallinebreak));
+            console.info('---- Set word spacing %s', TypesetBot.utils.diffTime(obj.debugVars.setspacing));
+            console.info('---- Init variables %s', TypesetBot.utils.diffTime(obj.debugVars.varinit));
+            console.info('------ Node construction %s', TypesetBot.utils.diffTime(obj.debugVars.nodeinit));
+            console.info('---- Hyphen init %s', TypesetBot.utils.diffTime(obj.debugVars.hypheninit));
+            console.info('---- Linebreaking %s', TypesetBot.utils.diffTime(obj.debugVars.linebreak));
+            console.info('------ Line vars %s', TypesetBot.utils.diffTime(obj.debugVars.linevars));
+            console.info('-------- Line widths %s', TypesetBot.utils.diffTime(obj.debugVars.linewidth));
+            console.info('---- Apply linebreak %s', TypesetBot.utils.diffTime(obj.debugVars.apply));
             console.info('');
         }
     }
@@ -37,6 +42,7 @@ TypesetBot = (function(obj, $) {
      * @param {object} custom   The settings to use
      */
     obj.run = function(selector, custom = null, callback) {
+        obj.debugVars = {}; // Reset debug vars
         var settings = TypesetBot.settings.get(custom);
         var timer = setInterval(function () {
             if (obj.load) {
@@ -45,9 +51,9 @@ TypesetBot = (function(obj, $) {
                 if (elem.length === 0) {
                     return false;
                 }
-                var timeRun = TypesetBot.utils.startTime();
+                TypesetBot.utils.startTime('run', settings);
                 TypesetBot.typeset.element(elem, settings);
-                TypesetBot.debugVars.run = settings.debug ? TypesetBot.utils.endTime(timeRun) : 0;
+                TypesetBot.utils.endTime('run', settings);
 
                 printDebug(settings);
 

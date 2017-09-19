@@ -41,10 +41,13 @@ TypesetBot.paraUtils = (function(obj) {
      * Remove breaks from paragraph.
      */
     obj.removeImage = function (dom) {
-        console.warn('Found image inside paragraph');
-
-        var html = dom.html().replace(/<img[\/]?>/g, '');
+        var oldHtml = dom.html(),
+            html = oldHtml.replace(/<img[\/]?>/g, '');
+        if (html != oldHtml) {
+            console.warn('Found image inside paragraph');
+        }
         dom.html(html);
+
     };
 
     /**
