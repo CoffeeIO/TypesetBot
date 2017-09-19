@@ -105,7 +105,7 @@ TypesetBot.utils = (function(obj) {
      * Return new timestamp.
      */
     obj.startTime = function (name, settings) {
-        if (settings.debug) {
+        if (settings && settings.debug) {
             if (TypesetBot.debugVars[name] == null) {
                 TypesetBot.debugVars[name] = {};
                 TypesetBot.debugVars[name].start = [];
@@ -119,7 +119,7 @@ TypesetBot.utils = (function(obj) {
      * Return str of 'start' to new timestamp.
      */
     obj.endTime = function (name, settings) {
-        if (settings.debug) {
+        if (settings && settings.debug) {
             if (TypesetBot.debugVars[name] == null) {
                 TypesetBot.debugVars[name] = {};
                 TypesetBot.debugVars[name].start = [];
@@ -240,7 +240,7 @@ TypesetBot.lineUtils = (function(obj) {
     /**
      * Get next line width of a certain height, using stored widths.
      */
-    obj.nextLineWidthStore = function (dom, idealW, i, settings) {
+    obj.nextLineWidthStore = function (dom, idealW, i, settings = null) {
         // Try to find already defined width.
         if (obj.widthStore[i] != null) {
             return obj.widthStore[i];

@@ -33,7 +33,7 @@ TypesetBot.lineUtils = (function(obj) {
     /**
      * Get next line width of a certain height, using stored widths.
      */
-    obj.nextLineWidthStore = function (dom, idealW, i, settings) {
+    obj.nextLineWidthStore = function (dom, idealW, i, settings = null) {
         // Try to find already defined width.
         if (obj.widthStore[i] != null) {
             return obj.widthStore[i];

@@ -91,7 +91,7 @@ TypesetBot.utils = (function(obj) {
      * Return new timestamp.
      */
     obj.startTime = function (name, settings) {
-        if (settings.debug) {
+        if (settings && settings.debug) {
             if (TypesetBot.debugVars[name] == null) {
                 TypesetBot.debugVars[name] = {};
                 TypesetBot.debugVars[name].start = [];
@@ -105,7 +105,7 @@ TypesetBot.utils = (function(obj) {
      * Return str of 'start' to new timestamp.
      */
     obj.endTime = function (name, settings) {
-        if (settings.debug) {
+        if (settings && settings.debug) {
             if (TypesetBot.debugVars[name] == null) {
                 TypesetBot.debugVars[name] = {};
                 TypesetBot.debugVars[name].start = [];
