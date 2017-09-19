@@ -156,4 +156,64 @@ describe('Typesetting utilities:', function () {
             expect(lineVars.done).toEqual(true);
         });
     });
+
+    describe('Get work elem:', function () {
+        it('Create new elem', function () {
+            var elem = $('.plain');
+            TypesetBot.typesetUtils.getWorkElem(elem, 'test123');
+            expect($('p[hashcode="test123"]').length).toEqual(2);
+        });
+
+        it('Retreive existing elem', function () {
+            var elem = $('.plain');
+            var work = TypesetBot.typesetUtils.getWorkElem(elem, 'test123');
+            work.addClass('typeset-paragraph');
+
+            TypesetBot.typesetUtils.getWorkElem(elem, 'test123');
+            expect($('p[hashcode="test123"]').length).toEqual(2);
+        });
+    });
+
+    describe('Delete work elem:', function () {
+        it('Remove multiple elem', function () {
+            var elem1 = $('.plain');
+            var elem2 = $('.space');
+            var work1 = TypesetBot.typesetUtils.getWorkElem(elem1, 'test123');
+            var work2 = TypesetBot.typesetUtils.getWorkElem(elem2, 'test123');
+            work1.addClass('typeset-paragraph');
+            work2.addClass('typeset-paragraph');
+
+            TypesetBot.typesetUtils.deleteWorkElem('test123');
+
+            expect($('.plain').length).toEqual(1);
+            expect($('.space').length).toEqual(1);
+        });
+    });
+
+    describe('Element css', function () {
+        it('Same style', function () {
+            var elem1 = $('.plain');
+            var elem2 = $('.space');
+
+            expect(TypesetBot.typesetUtils.getCssString(elem1)).toEqual(TypesetBot.typesetUtils.getCssString(elem2));
+        });
+        it('Different style', function () {
+            var elem1 = $('.plain');
+            var elem2 = $('.big-font');
+
+            expect(TypesetBot.typesetUtils.getCssString(elem1))
+                .not.toEqual(TypesetBot.typesetUtils.getCssString(elem2));
+        });
+    });
+
+
+    describe('Element hashing', function () {
+        it('Same content different style', function () {
+            var elem1 = $('.plain');
+            var elem2 = $('.big-font');
+
+            expect(TypesetBot.utils.getHash(elem1.html())).toEqual(TypesetBot.utils.getHash(elem2.html()));
+            expect(TypesetBot.typesetUtils.hashElem(elem1)).not.toEqual(TypesetBot.typesetUtils.hashElem(elem2));
+        });
+    });
 });

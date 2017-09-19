@@ -16,7 +16,6 @@ TypesetBot.typeset = (function(obj, $) {
                     if (innerElem.hasClass('typeset-hidden')) {
                         innerElem.removeClass('typeset-hidden');
                         obj.paragraph(innerElem, settings);
-
                     } else {
                         obj.paragraph(innerElem, settings);
                     }
@@ -37,21 +36,20 @@ TypesetBot.typeset = (function(obj, $) {
         }
 
         settings.loosenessParam = 0;
-        var hash = TypesetBot.utils.getHash(elem.html());
-        if (elem.attr('hashcode') != null) {
-            // Remove related typeset paragraph.
-            elem.parent().find('.typeset-paragraph[hashcode="' + hash + '"]').remove();
-            elem.removeClass('typeset-hidden');
-        }
+        var hash = TypesetBot.utils.hashElem(elem),
+            oldHash = elem.attr('hashcode');
 
-        elem.attr('hashcode', hash);
-        var copy = elem[0].outerHTML;
-        elem.addClass('typeset-hidden');
-        elem.after(copy);
-        var workElem = elem.next();
+        if (oldHash != null && oldHash !== hash) {
+            // Delete any elements with the old hash.
+            TypesetBot.typesetUtils.deleteWorkElem(oldHash);
+        }
+        // Retreive working element.
+        var workElem = TypesetBot.typesetUtils.getWorkElem(elem, hash);
+
+        elem.addClass('typeset-hidden'); // Hide original paragraph
 
         var breaks = obj.linebreak(workElem, settings);
-        if (breaks != null) {
+        if (breaks != null) { // Solution was found
             TypesetBot.vars[hash] = breaks.nodes;
             var timeApply = TypesetBot.utils.startTime();
             TypesetBot.render.applyBreaks(workElem, breaks.nodes, breaks.solutions, settings);

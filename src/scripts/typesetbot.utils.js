@@ -1,6 +1,5 @@
 TypesetBot.utils = (function(obj) {
 
-
     /**
      * Javascript implementation of Java’s String.hashCode() method.
      * **Modified**

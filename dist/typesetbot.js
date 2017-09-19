@@ -14,7 +14,6 @@ var module = {
 
 TypesetBot.utils = (function(obj) {
 
-
     /**
      * Javascript implementation of Java’s String.hashCode() method.
      * **Modified**
@@ -167,10 +166,10 @@ TypesetBot.paraUtils = (function(obj) {
         var html = dom.html().replace(/<img[\/]?>/g, '');
         dom.html(html);
     };
+
     /**
      * Remove breaks from paragraph.
      */
-
     obj.isVisible = function (dom) {
         return dom.is(':visible');
     };
@@ -708,6 +707,67 @@ TypesetBot.typesetUtils = (function(obj, $) {
         }
     };
 
+    /**
+     * Retreive working element of paragraph, create one if it doesn't exist.
+     */
+    obj.getWorkElem = function(elem, hash) {
+        // Update hash of element.
+        elem.attr('hashcode', hash);
+
+        var tempElem = $('p.typeset-paragraph[hashcode="' + hash + '"]');
+        if (tempElem.length > 0) {
+            return tempElem;
+        }
+
+        var copy = elem[0].outerHTML;
+        elem.after(copy);
+
+        return elem.next();
+    };
+
+    /**
+     * Return a string of font/text relevant css properties.
+     */
+    obj.getCssString = function(elem) {
+        var cssProps = elem.css([
+            // Font properties.
+            'font',
+            'font-size',
+            'font-family',
+            'font-style',
+            'font-weight',
+            'font-variant',
+            // Text properties.
+            'text-align',
+            'text-decoration',
+            'text-transform',
+            'text-indent',
+            'text-shadow',
+            'text-overflow',
+            'vertical-align',
+            // Other properties.
+            'word-spacing',
+            'letter-spacing',
+            'line-height',
+            'direction',
+        ]);
+        return JSON.stringify(cssProps);
+    };
+
+    /**
+     * Get a relatively unique hash of an elem.
+     */
+    obj.hashElem = function(elem) {
+        return TypesetBot.utils.getHash(obj.getCssString(elem) + elem.html());
+    };
+
+    /**
+     * Delete a paragraph with a certain hashcode attribute.
+     */
+    obj.deleteWorkElem = function(hash) {
+        $('p.typeset-paragraph[hashcode="' + hash + '"]').remove();
+    };
+
     return obj;
 })(TypesetBot.typesetUtils || {}, jQuery);
 
@@ -729,7 +789,6 @@ TypesetBot.typeset = (function(obj, $) {
                     if (innerElem.hasClass('typeset-hidden')) {
                         innerElem.removeClass('typeset-hidden');
                         obj.paragraph(innerElem, settings);
-
                     } else {
                         obj.paragraph(innerElem, settings);
                     }
@@ -750,21 +809,20 @@ TypesetBot.typeset = (function(obj, $) {
         }
 
         settings.loosenessParam = 0;
-        var hash = TypesetBot.utils.getHash(elem.html());
-        if (elem.attr('hashcode') != null) {
-            // Remove related typeset paragraph.
-            elem.parent().find('.typeset-paragraph[hashcode="' + hash + '"]').remove();
-            elem.removeClass('typeset-hidden');
-        }
+        var hash = TypesetBot.utils.hashElem(elem),
+            oldHash = elem.attr('hashcode');
 
-        elem.attr('hashcode', hash);
-        var copy = elem[0].outerHTML;
-        elem.addClass('typeset-hidden');
-        elem.after(copy);
-        var workElem = elem.next();
+        if (oldHash != null && oldHash !== hash) {
+            // Delete any elements with the old hash.
+            TypesetBot.typesetUtils.deleteWorkElem(oldHash);
+        }
+        // Retreive working element.
+        var workElem = TypesetBot.typesetUtils.getWorkElem(elem, hash);
+
+        elem.addClass('typeset-hidden'); // Hide original paragraph
 
         var breaks = obj.linebreak(workElem, settings);
-        if (breaks != null) {
+        if (breaks != null) { // Solution was found
             TypesetBot.vars[hash] = breaks.nodes;
             var timeApply = TypesetBot.utils.startTime();
             TypesetBot.render.applyBreaks(workElem, breaks.nodes, breaks.solutions, settings);
