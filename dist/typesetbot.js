@@ -104,16 +104,41 @@ TypesetBot.utils = (function(obj) {
     /**
      * Return new timestamp.
      */
-    obj.startTime = function () {
-        return performance.now();
+    obj.startTime = function (name, settings) {
+        if (settings && settings.debug) {
+            if (TypesetBot.debugVars[name] == null) {
+                TypesetBot.debugVars[name] = {};
+                TypesetBot.debugVars[name].start = [];
+                TypesetBot.debugVars[name].end = [];
+            }
+            TypesetBot.debugVars[name].start.push(performance.now());
+        }
     };
 
     /**
      * Return str of 'start' to new timestamp.
      */
-    obj.endTime = function (start) {
-        return (performance.now() - start).toFixed(2) + 'ms';
+    obj.endTime = function (name, settings) {
+        if (settings && settings.debug) {
+            if (TypesetBot.debugVars[name] == null) {
+                TypesetBot.debugVars[name] = {};
+                TypesetBot.debugVars[name].start = [];
+                TypesetBot.debugVars[name].end = [];
+            }
+            TypesetBot.debugVars[name].end.push(performance.now());
+        }
     };
+
+    obj.diffTime = function (time) {
+        var startTotal = 0,
+            endTotal = 0;
+        for (var i = 0; i < time.start.length; i++) {
+            startTotal += time.start[i];
+            endTotal += time.end[i];
+        }
+        return (endTotal - startTotal).toFixed(2) + 'ms --- (calls: '+ time.start.length +')';
+    };
+
 
     return obj;
 })(TypesetBot.utils || {});
@@ -158,13 +183,16 @@ TypesetBot.paraUtils = (function(obj) {
     };
 
     /**
-     * Remove breaks from paragraph.
+     * Remove images from paragraph.
      */
     obj.removeImage = function (dom) {
-        console.warn('Found image inside paragraph');
-
-        var html = dom.html().replace(/<img[\/]?>/g, '');
+        var oldHtml = dom.html(),
+            html = oldHtml.replace(/<img[\/]?[^<]*>/g, '');
+        if (html !== oldHtml) {
+            console.warn('Found image inside paragraph');
+        }
         dom.html(html);
+
     };
 
     /**
@@ -212,12 +240,14 @@ TypesetBot.lineUtils = (function(obj) {
     /**
      * Get next line width of a certain height, using stored widths.
      */
-    obj.nextLineWidthStore = function (dom, idealW, i) {
+    obj.nextLineWidthStore = function (dom, idealW, i, settings = null) {
         // Try to find already defined width.
         if (obj.widthStore[i] != null) {
             return obj.widthStore[i];
         }
+        TypesetBot.utils.startTime('linewidth', settings);
         var width = obj.nextLineWidth(dom, idealW, i);
+        TypesetBot.utils.endTime('linewidth', settings);
         obj.widthStore[i] = width;
         return width;
     };
@@ -540,7 +570,7 @@ TypesetBot.typesetUtils = (function(obj, $) {
             height = elem.height();
 
         // Init node variables.
-        var timeNodeVars = TypesetBot.utils.startTime();
+        TypesetBot.utils.startTime('nodeinit', settings);
         var foundVars = TypesetBot.vars[hash],
             props = null;
 
@@ -552,7 +582,7 @@ TypesetBot.typesetUtils = (function(obj, $) {
         } else {
             props = foundVars;
         }
-        TypesetBot.debugVars.nodeinit = settings.debug ? TypesetBot.utils.endTime(timeNodeVars) : 0;
+        TypesetBot.utils.endTime('nodeinit', settings);
 
         TypesetBot.lineUtils.widthStore = {}; // Reset dynamic width checks
 
@@ -596,7 +626,7 @@ TypesetBot.typesetUtils = (function(obj, $) {
             idealWidth = vars.width;
 
         if (settings.dynamicWidth) {
-            idealWidth = TypesetBot.lineUtils.nextLineWidthStore(elem, vars.width, a.height);
+            idealWidth = TypesetBot.lineUtils.nextLineWidthStore(elem, vars.width, a.height, settings);
         }
 
         return {
@@ -801,6 +831,8 @@ TypesetBot.typeset = (function(obj, $) {
      * Typeset single paragraph.
      */
     obj.paragraph = function (elem, settings) {
+
+        TypesetBot.utils.startTime('preprocesselem', settings);
         // Clean element
         TypesetBot.paraUtils.removeBreak(elem);
         TypesetBot.paraUtils.removeImage(elem);
@@ -809,7 +841,7 @@ TypesetBot.typeset = (function(obj, $) {
         }
 
         settings.loosenessParam = 0;
-        var hash = TypesetBot.utils.hashElem(elem),
+        var hash = TypesetBot.typesetUtils.hashElem(elem),
             oldHash = elem.attr('hashcode');
 
         if (oldHash != null && oldHash !== hash) {
@@ -820,13 +852,17 @@ TypesetBot.typeset = (function(obj, $) {
         var workElem = TypesetBot.typesetUtils.getWorkElem(elem, hash);
 
         elem.addClass('typeset-hidden'); // Hide original paragraph
+        TypesetBot.utils.endTime('preprocesselem', settings);
 
+        TypesetBot.utils.startTime('totallinebreak', settings);
         var breaks = obj.linebreak(workElem, settings);
+        TypesetBot.utils.endTime('totallinebreak', settings);
+
         if (breaks != null) { // Solution was found
             TypesetBot.vars[hash] = breaks.nodes;
-            var timeApply = TypesetBot.utils.startTime();
+            TypesetBot.utils.startTime('apply', settings);
             TypesetBot.render.applyBreaks(workElem, breaks.nodes, breaks.solutions, settings);
-            TypesetBot.debugVars.apply = settings.debug ? TypesetBot.utils.endTime(timeApply) : 0;
+            TypesetBot.utils.endTime('apply', settings);
         }
     };
 
@@ -835,19 +871,21 @@ TypesetBot.typeset = (function(obj, $) {
      */
     obj.linebreak = function (elem, settings) {
         // Set wordspacing.
+        TypesetBot.utils.startTime('setspacing', settings);
         TypesetBot.paraUtils.setSpaceWidth(elem, settings.spaceWidth - settings.spaceShrinkability, settings.spaceUnit);
+        TypesetBot.utils.endTime('setspacing', settings);
 
         // Get variables for algorithm.
-        var timeVarInit = TypesetBot.utils.startTime();
+        TypesetBot.utils.startTime('varinit', settings);
         var vars = TypesetBot.typesetUtils.initVars(elem, settings);
-        TypesetBot.debugVars.varinit = settings.debug ? TypesetBot.utils.endTime(timeVarInit) : 0;
+        TypesetBot.utils.endTime('varinit', settings);
 
         // Preprocess hyphens.
-        var timeHyphenInit = TypesetBot.utils.startTime();
+        TypesetBot.utils.startTime('hypheninit', settings);
         TypesetBot.typesetUtils.preprocessHyphens(elem, vars, settings); // Preprocess all hyphens and dimensions
-        TypesetBot.debugVars.hypheninit = settings.debug ? TypesetBot.utils.endTime(timeHyphenInit) : 0;
+        TypesetBot.utils.endTime('hypheninit', settings);
 
-        var timeLinebreak = TypesetBot.utils.startTime();
+        TypesetBot.utils.startTime('linebreak', settings);
         // Queue starting node.
         vars.activeBreakpoints.enqueue(
             TypesetBot.node.createBreak(0, null, null, 0, false, null, 0, 0, 0)
@@ -864,7 +902,9 @@ TypesetBot.typeset = (function(obj, $) {
             }
 
             // Get relevant line variables for algorithm.
+            TypesetBot.utils.startTime('linevars', settings);
             var lineVars = TypesetBot.typesetUtils.initLineVars(elem, settings, vars, a);
+            TypesetBot.utils.endTime('linevars', settings);
 
             // Find breakpoints on line.
             while (! lineVars.done) {
@@ -941,7 +981,7 @@ TypesetBot.typeset = (function(obj, $) {
             settings.loosenessParam += 1;
             return obj.linebreak(elem, settings);
         }
-        TypesetBot.debugVars.linebreak = settings.debug ? TypesetBot.utils.endTime(timeLinebreak) : 0;
+        TypesetBot.utils.endTime('linebreak', settings);
 
         // Return nodes and found solutions.
         return {
@@ -1536,12 +1576,17 @@ TypesetBot = (function(obj, $) {
     obj.debugVars = {};
     function printDebug(settings) {
         if (settings.debug) {
-            console.info('Total execution %s', obj.debugVars.run);
-            console.info('-- Init variables %s', obj.debugVars.varinit);
-            console.info('---- Node construction %s', obj.debugVars.nodeinit);
-            console.info('-- Hyphen init %s', obj.debugVars.hypheninit);
-            console.info('-- Linebreaking %s', obj.debugVars.linebreak);
-            console.info('-- Apply linebreak %s', obj.debugVars.apply);
+            console.info('Total execution %s', TypesetBot.utils.diffTime(obj.debugVars.run));
+            console.info('-- Proprocess elems %s', TypesetBot.utils.diffTime(obj.debugVars.preprocesselem));
+            console.info('-- Total linebreak %s', TypesetBot.utils.diffTime(obj.debugVars.totallinebreak));
+            console.info('---- Set word spacing %s', TypesetBot.utils.diffTime(obj.debugVars.setspacing));
+            console.info('---- Init variables %s', TypesetBot.utils.diffTime(obj.debugVars.varinit));
+            console.info('------ Node construction %s', TypesetBot.utils.diffTime(obj.debugVars.nodeinit));
+            console.info('---- Hyphen init %s', TypesetBot.utils.diffTime(obj.debugVars.hypheninit));
+            console.info('---- Linebreaking %s', TypesetBot.utils.diffTime(obj.debugVars.linebreak));
+            console.info('------ Line vars %s', TypesetBot.utils.diffTime(obj.debugVars.linevars));
+            console.info('-------- Line widths %s', TypesetBot.utils.diffTime(obj.debugVars.linewidth));
+            console.info('---- Apply linebreak %s', TypesetBot.utils.diffTime(obj.debugVars.apply));
             console.info('');
         }
     }
@@ -1552,6 +1597,7 @@ TypesetBot = (function(obj, $) {
      * @param {object} custom   The settings to use
      */
     obj.run = function(selector, custom = null, callback) {
+        obj.debugVars = {}; // Reset debug vars
         var settings = TypesetBot.settings.get(custom);
         var timer = setInterval(function () {
             if (obj.load) {
@@ -1560,9 +1606,9 @@ TypesetBot = (function(obj, $) {
                 if (elem.length === 0) {
                     return false;
                 }
-                var timeRun = TypesetBot.utils.startTime();
+                TypesetBot.utils.startTime('run', settings);
                 TypesetBot.typeset.element(elem, settings);
-                TypesetBot.debugVars.run = settings.debug ? TypesetBot.utils.endTime(timeRun) : 0;
+                TypesetBot.utils.endTime('run', settings);
 
                 printDebug(settings);
 

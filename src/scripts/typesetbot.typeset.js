@@ -28,6 +28,8 @@ TypesetBot.typeset = (function(obj, $) {
      * Typeset single paragraph.
      */
     obj.paragraph = function (elem, settings) {
+
+        TypesetBot.utils.startTime('preprocesselem', settings);
         // Clean element
         TypesetBot.paraUtils.removeBreak(elem);
         TypesetBot.paraUtils.removeImage(elem);
@@ -36,7 +38,7 @@ TypesetBot.typeset = (function(obj, $) {
         }
 
         settings.loosenessParam = 0;
-        var hash = TypesetBot.utils.hashElem(elem),
+        var hash = TypesetBot.typesetUtils.hashElem(elem),
             oldHash = elem.attr('hashcode');
 
         if (oldHash != null && oldHash !== hash) {
@@ -47,13 +49,17 @@ TypesetBot.typeset = (function(obj, $) {
         var workElem = TypesetBot.typesetUtils.getWorkElem(elem, hash);
 
         elem.addClass('typeset-hidden'); // Hide original paragraph
+        TypesetBot.utils.endTime('preprocesselem', settings);
 
+        TypesetBot.utils.startTime('totallinebreak', settings);
         var breaks = obj.linebreak(workElem, settings);
+        TypesetBot.utils.endTime('totallinebreak', settings);
+
         if (breaks != null) { // Solution was found
             TypesetBot.vars[hash] = breaks.nodes;
-            var timeApply = TypesetBot.utils.startTime();
+            TypesetBot.utils.startTime('apply', settings);
             TypesetBot.render.applyBreaks(workElem, breaks.nodes, breaks.solutions, settings);
-            TypesetBot.debugVars.apply = settings.debug ? TypesetBot.utils.endTime(timeApply) : 0;
+            TypesetBot.utils.endTime('apply', settings);
         }
     };
 
@@ -62,19 +68,21 @@ TypesetBot.typeset = (function(obj, $) {
      */
     obj.linebreak = function (elem, settings) {
         // Set wordspacing.
+        TypesetBot.utils.startTime('setspacing', settings);
         TypesetBot.paraUtils.setSpaceWidth(elem, settings.spaceWidth - settings.spaceShrinkability, settings.spaceUnit);
+        TypesetBot.utils.endTime('setspacing', settings);
 
         // Get variables for algorithm.
-        var timeVarInit = TypesetBot.utils.startTime();
+        TypesetBot.utils.startTime('varinit', settings);
         var vars = TypesetBot.typesetUtils.initVars(elem, settings);
-        TypesetBot.debugVars.varinit = settings.debug ? TypesetBot.utils.endTime(timeVarInit) : 0;
+        TypesetBot.utils.endTime('varinit', settings);
 
         // Preprocess hyphens.
-        var timeHyphenInit = TypesetBot.utils.startTime();
+        TypesetBot.utils.startTime('hypheninit', settings);
         TypesetBot.typesetUtils.preprocessHyphens(elem, vars, settings); // Preprocess all hyphens and dimensions
-        TypesetBot.debugVars.hypheninit = settings.debug ? TypesetBot.utils.endTime(timeHyphenInit) : 0;
+        TypesetBot.utils.endTime('hypheninit', settings);
 
-        var timeLinebreak = TypesetBot.utils.startTime();
+        TypesetBot.utils.startTime('linebreak', settings);
         // Queue starting node.
         vars.activeBreakpoints.enqueue(
             TypesetBot.node.createBreak(0, null, null, 0, false, null, 0, 0, 0)
@@ -91,7 +99,9 @@ TypesetBot.typeset = (function(obj, $) {
             }
 
             // Get relevant line variables for algorithm.
+            TypesetBot.utils.startTime('linevars', settings);
             var lineVars = TypesetBot.typesetUtils.initLineVars(elem, settings, vars, a);
+            TypesetBot.utils.endTime('linevars', settings);
 
             // Find breakpoints on line.
             while (! lineVars.done) {
@@ -168,7 +178,7 @@ TypesetBot.typeset = (function(obj, $) {
             settings.loosenessParam += 1;
             return obj.linebreak(elem, settings);
         }
-        TypesetBot.debugVars.linebreak = settings.debug ? TypesetBot.utils.endTime(timeLinebreak) : 0;
+        TypesetBot.utils.endTime('linebreak', settings);
 
         // Return nodes and found solutions.
         return {
