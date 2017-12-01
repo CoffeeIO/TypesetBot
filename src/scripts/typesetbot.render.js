@@ -241,4 +241,4 @@ TypesetBot.render = (function(obj, $) {
 
 
     return obj;
-})(TypesetBot.render || {}, jQuery);
+})(TypesetBot.render || {}, TypesetBotQuery);

@@ -86,4 +86,4 @@ TypesetBot.settings = (function(obj, $) {
     };
 
     return obj;
-})(TypesetBot.settings || {}, jQuery);
+})(TypesetBot.settings || {}, TypesetBotQuery);

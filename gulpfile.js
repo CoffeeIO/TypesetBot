@@ -19,7 +19,7 @@ gulp.task('sass', function () {
 });
 
 var source = [
-    'node_modules/jquery/dist/jquery.min.js',
+    'src/scripts/vendor/jquery.min.js',
     'src/scripts/vendor/Queue.js',
     'src/scripts/preModule.js',
     'src/scripts/typesetbot.utils.js',
