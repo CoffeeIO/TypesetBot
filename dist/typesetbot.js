@@ -11278,7 +11278,10 @@ TypesetBot.hyphen = (function(obj) {
         if (settings.hyphenLanguage.trim() === '') {
             return [word];
         }
-
+        if (window['Hypher'] == null || window['Hypher']['languages'] == null) {
+            console.warn('Hyphenation library not found');
+            return[word];
+        }
         if (window['Hypher']['languages'][settings.hyphenLanguage] == null) { // Language not found
             var h = new window['Hypher'](module.exports);
 
@@ -11296,10 +11299,7 @@ TypesetBot.hyphen = (function(obj) {
             console.warn("Hyphenation language '%s' not found", settings.hyphenLanguage);
             return [word];
         }
-        if (window['Hypher'] == null || window['Hypher']['language'] == null) {
-            console.warn('Hyphenation library not found');
-            return[word];
-        }
+
         window['Hypher']['languages'][settings.hyphenLanguage].leftMin = settings.hyphenLeftMin + left;
         window['Hypher']['languages'][settings.hyphenLanguage].rightMin = settings.hyphenRightMin + right;
 
