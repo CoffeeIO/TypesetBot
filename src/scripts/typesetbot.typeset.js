@@ -188,4 +188,4 @@ TypesetBot.typeset = (function(obj, $) {
     };
 
     return obj;
-})(TypesetBot.typeset || {}, jQuery);
+})(TypesetBot.typeset || {}, TypesetBotQuery);

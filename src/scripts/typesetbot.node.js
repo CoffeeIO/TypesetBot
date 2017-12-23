@@ -51,4 +51,4 @@ TypesetBot.node = (function(obj, $) {
     };
 
     return obj;
-})(TypesetBot.node || {}, jQuery);
+})(TypesetBot.node || {}, TypesetBotQuery);

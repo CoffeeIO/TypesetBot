@@ -1,5 +1,4 @@
 // Define module.
 var TypesetBot = {};
-var module = {
-    exports: null
-};
+
+var module = (typeof module !== 'undefined') ? module : {};

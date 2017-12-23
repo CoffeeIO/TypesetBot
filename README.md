@@ -63,6 +63,7 @@ $ npm install hypher hyphenation.en-us
 
 <!-- (optional) -->
 <!-- hyphenation library -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script type="text/javascript" src="https://cdn.rawgit.com/bramstein/hypher/v0.2.5/dist/jquery.hypher.js"></script>
 <!-- hyphenation pattern for US english -->
 <script type="text/javascript" src="https://cdn.rawgit.com/bramstein/hyphenation-patterns/dc01d58a/dist/browser/en-us.js"></script>
@@ -88,6 +89,7 @@ If you are creating an open source application under a license compatible with t
     <link rel="stylesheet" href="node_modules/typesetbot/dist/typesetbot.min.css">
     <script type="text/javascript" src="node_modules/typesetbot/dist/typesetbot.js"></script>
     
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script type="text/javascript" src="node_modules/hypher/dist/jquery.hypher.js"></script>
     <script type="text/javascript" src="node_modules/hyphenation.en-us/lib/en-us.js"></script>
     <script type="text/javascript">

@@ -25,7 +25,7 @@ describe('Paragraph utilities:', function () {
             expect(TypesetBot.paraUtils.getDefaultSpaceWidth($('.plain'))).not.toBeLessThan(4);
         });
         it('Big font-size', function () {
-            expect(TypesetBot.paraUtils.getDefaultSpaceWidth($('.big-font'))).toBeLessThan(9);
+            expect(TypesetBot.paraUtils.getDefaultSpaceWidth($('.big-font'))).toBeLessThan(10);
             expect(TypesetBot.paraUtils.getDefaultSpaceWidth($('.big-font'))).not.toBeLessThan(8);
             // Bigger font-size, bigger default space.
             expect(TypesetBot.paraUtils.getDefaultSpaceWidth($('.big-font')))

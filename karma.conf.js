@@ -17,6 +17,8 @@ module.exports = function(config) {
         files: [
             // Source files.
             {pattern: 'dist/typesetbot.js', watched: true, included: true, served: true},
+
+            {pattern: 'node_modules/jquery/dist/jquery.min.js', watched: true, included: true, served: true},
             {pattern: 'node_modules/hypher/dist/jquery.hypher.js', watched: true, included: true, served: true},
             {pattern: 'node_modules/hyphenation.en-us/lib/en-us.js', watched: true, included: true, served: true},
 

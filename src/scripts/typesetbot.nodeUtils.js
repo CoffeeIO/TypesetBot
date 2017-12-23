@@ -159,4 +159,4 @@ TypesetBot.nodeUtils = (function(obj, $) {
     }
 
     return obj;
-})(TypesetBot.nodeUtils || {}, jQuery);
+})(TypesetBot.nodeUtils || {}, TypesetBotQuery);

@@ -1,4 +1,4 @@
-TypesetBot.viewport = (function(obj) {
+TypesetBot.viewport = (function(obj, $) {
 
     // Check if window is loaded.
     $(window).on("load", function () {
@@ -31,4 +31,4 @@ TypesetBot.viewport = (function(obj) {
     }
 
     return obj;
-})(TypesetBot.viewport || {});
+})(TypesetBot.viewport || {}, TypesetBotQuery);

@@ -125,4 +125,4 @@ TypesetBot = (function(obj, $) {
     };
 
     return obj;
-}(TypesetBot || {}, jQuery));
+}(TypesetBot || {}, TypesetBotQuery));

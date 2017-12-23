@@ -239,4 +239,4 @@ TypesetBot.typesetUtils = (function(obj, $) {
     };
 
     return obj;
-})(TypesetBot.typesetUtils || {}, jQuery);
+})(TypesetBot.typesetUtils || {}, TypesetBotQuery);
