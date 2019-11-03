@@ -4,14 +4,23 @@
   "description": "Small project to dynamically typeset text on the web",
   "author": "Mathias Grundtvig Andreasen (MGApcDev)",
   "license": "GPL-3.0",
+
   "devDependencies": {
     "@babel/core": "^7.6.2",
     "@babel/preset-env": "^7.6.2",
     "@babel/plugin-proposal-class-properties": "^7.0.0",
     "gulp": "^4.0.2",
-    "gulp-babel": "^8.0.0-beta.2"
+    "gulp-babel": "^8.0.0-beta.2",
+    "gulp-concat": "^2.6.1",
+    "gulp-sass": "^4.0.2",
+    "gulp-typescript": "^5.0.1",
+    "gulp-watch": "^5.0.1",
+    "typescript": "^3.6.4"
   },
-  "dependencies": {},
+  "dependencies": {
+
+  },
+  
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
