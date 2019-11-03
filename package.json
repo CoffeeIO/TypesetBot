@@ -4,7 +4,6 @@
   "description": "Small project to dynamically typeset text on the web",
   "author": "Mathias Grundtvig Andreasen (MGApcDev)",
   "license": "GPL-3.0",
-
   "devDependencies": {
     "@babel/core": "^7.6.2",
     "@babel/preset-env": "^7.6.2",
@@ -18,9 +17,8 @@
     "typescript": "^3.6.4"
   },
   "dependencies": {
-
+    "gulp-minify": "^3.1.0"
   },
-  
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

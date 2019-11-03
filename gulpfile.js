@@ -4,11 +4,11 @@ var sass = require('gulp-sass');
 var watch = require('gulp-watch');
 var babel = require("gulp-babel");
 var ts = require('gulp-typescript');
+var minify = require('gulp-minify');
 
 // Ordered set of TypeScript files to load.
 var source = [
-    'src/ts/tsb.hyphen.ts',
-    'src/ts/tsb.ts'
+    'src/ts/main.ts'
 ];
 
 gulp.task('scss', function () {
@@ -30,10 +30,20 @@ gulp.task('ts', function () {
         .pipe(gulp.dest("dist"));
 });
 
-gulp.task('compile', gulp.series('ts', 'scss'))
+gulp.task('ts-minify', function () {
+    return gulp.src('dist/typesetbot.js')
+        .pipe(minify({
+            ext:{
+                min:'.min.js'
+            }
+        }))
+        .pipe(gulp.dest("dist"));
+});
+
+gulp.task('compile', gulp.series('ts', 'ts-minify', 'scss'))
 
 gulp.task('watch-src', function() {
-    return watch('src/**/*', gulp.series('ts', 'scss'));
+    return watch('src/**/*', gulp.series('ts', 'ts-minify', 'scss'));
 });
 
 gulp.task('watch', gulp.series('compile', 'watch-src'));
