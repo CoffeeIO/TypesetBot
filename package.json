@@ -6,21 +6,27 @@
   "license": "GPL-3.0",
   "devDependencies": {
     "@babel/core": "^7.6.2",
-    "@babel/preset-env": "^7.6.2",
     "@babel/plugin-proposal-class-properties": "^7.0.0",
-    "gulp": "^4.0.2",
+    "@babel/preset-env": "^7.6.2",
     "gulp-babel": "^8.0.0-beta.2",
     "gulp-concat": "^2.6.1",
+    "gulp-minify": "^3.1.0",
     "gulp-sass": "^4.0.2",
     "gulp-typescript": "^5.0.1",
     "gulp-watch": "^5.0.1",
+    "gulp": "^4.0.2",
+    "jasmine-core": "^3.5.0",
+    "karma-chrome-launcher": "^3.1.0",
+    "karma-html2js-preprocessor": "^1.1.0",
+    "karma-jasmine": "^2.0.1",
+    "karma": "^4.4.1",
     "typescript": "^3.6.4"
   },
   "dependencies": {
-    "gulp-minify": "^3.1.0"
+    
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "karma start karma.conf.js"
   },
   "repository": {
     "type": "git",

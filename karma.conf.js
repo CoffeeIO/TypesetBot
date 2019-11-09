@@ -18,21 +18,10 @@ module.exports = function(config) {
             // Source files.
             {pattern: 'dist/typesetbot.js', watched: true, included: true, served: true},
 
-            {pattern: 'node_modules/jquery/dist/jquery.min.js', watched: true, included: true, served: true},
-            {pattern: 'node_modules/hypher/dist/jquery.hypher.js', watched: true, included: true, served: true},
-            {pattern: 'node_modules/hyphenation.en-us/lib/en-us.js', watched: true, included: true, served: true},
-
-            {pattern: 'fixtures/**/*.html'},
+            {pattern: 'test/fixtures/**/*.html'},
 
             // Test files.
-            {pattern: 'test/paraUtils.test.js', watched: true, included: true, served: true},
-            {pattern: 'test/lineUtils.test.js', watched: true, included: true, served: true},
-            {pattern: 'test/nodeUtils.test.js', watched: true, included: true, served: true},
-            {pattern: 'test/typesetUtils.test.js', watched: true, included: true, served: true},
-            {pattern: 'test/utils.test.js', watched: true, included: true, served: true},
-            {pattern: 'test/math.test.js', watched: true, included: true, served: true},
-            {pattern: 'test/hyphen.test.js', watched: true, included: true, served: true},
-            {pattern: 'test/settings.test.js', watched: true, included: true, served: true},
+            {pattern: 'test/init.test.js', watched: true, included: true, served: true},
         ],
 
         // list of files to exclude
