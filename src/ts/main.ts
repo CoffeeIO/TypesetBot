@@ -1,14 +1,25 @@
+/**
+ * The main TypesetBot class handing initializing new instances of TypesetBot.
+ */
 class TypesetBot {
-    query : any;
-    settings? : object;
+    private _query?: any;
+    private _settings?: object;
 
-    constructor(query : any, settings? : object) {
-        this.query = query;
-        this.settings = settings;
-    };
+    // Class instances.
+    logger: TypesetBotLog;
+    settings: TypesetBotSettings;
 
-    getQuery = function() : any {
-        return this.query;
+    /**
+     * Constructor of new TypesetBot objects.
+     * 
+     * @param query    Nodes from a query or query selector
+     * @param settings Custom settings object
+     */
+    constructor(query?: any, settings?: object) {
+        this._query = query;
+        this._settings = settings;
+        
+        this.logger = new TypesetBotLog(this);
+        this.settings = new TypesetBotSettings(this, settings);
     };
 }
-  
