@@ -1,3 +1,15 @@
+// Ordered set of TypeScript files to load. -----------------------------------
+var source = [
+    'src/ts/main.ts',
+    'src/ts/log.ts',
+    'src/ts/query.ts',
+    'src/ts/settings.ts',
+];
+
+// ----------------------------------------------------------------------------
+
+
+// Initialize gulp variables.
 var gulp = require("gulp");
 var concat = require('gulp-concat');
 var sass = require('gulp-sass');
@@ -5,11 +17,6 @@ var watch = require('gulp-watch');
 var babel = require("gulp-babel");
 var ts = require('gulp-typescript');
 var minify = require('gulp-minify');
-
-// Ordered set of TypeScript files to load.
-var source = [
-    'src/ts/main.ts'
-];
 
 gulp.task('scss', function () {
     return gulp.src(
@@ -25,6 +32,7 @@ gulp.task('ts', function () {
         .pipe(concat('typesetbot.ts'))
         .pipe(ts({
             noImplicitAny: true,
+            lib: ['dom', 'es2017'],
         }))
         .pipe(babel())
         .pipe(gulp.dest("dist"));
