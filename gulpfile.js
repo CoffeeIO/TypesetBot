@@ -33,6 +33,8 @@ gulp.task('ts', function () {
         .pipe(ts({
             noImplicitAny: true,
             lib: ['dom', 'es2017'],
+            noLib: false,
+            removeComments: false,
         }))
         .pipe(babel())
         .pipe(gulp.dest("dist"));
