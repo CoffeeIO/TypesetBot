@@ -5,9 +5,7 @@ var source = [
     'src/ts/query.ts',
     'src/ts/settings.ts',
 ];
-
 // ----------------------------------------------------------------------------
-
 
 // Initialize gulp variables.
 var gulp = require("gulp");
