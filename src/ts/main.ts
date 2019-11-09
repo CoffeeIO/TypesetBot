@@ -8,6 +8,7 @@ class TypesetBot {
     // Class instances.
     logger: TypesetBotLog;
     settings: TypesetBotSettings;
+    elementQuery: TypesetBotElementQuery;
 
     /**
      * Constructor of new TypesetBot objects.
@@ -21,5 +22,6 @@ class TypesetBot {
         
         this.logger = new TypesetBotLog(this);
         this.settings = new TypesetBotSettings(this, settings);
+        this.elementQuery = new TypesetBotElementQuery(this);
     };
 }

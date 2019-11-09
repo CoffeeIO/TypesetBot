@@ -19,6 +19,7 @@ function () {
     this._settings = settings;
     this.logger = new TypesetBotLog(this);
     this.settings = new TypesetBotSettings(this, settings);
+    this.elementQuery = new TypesetBotElementQuery(this);
   }
 
   ;
@@ -163,6 +164,20 @@ function () {
   }
 
   return TypesetBotPerformanceEntry;
+}();
+/**
+ * Class for element querying.
+ */
+
+
+var TypesetBotElementQuery =
+/** @class */
+function () {
+  function TypesetBotElementQuery(tsb) {
+    this._tsb = tsb;
+  }
+
+  return TypesetBotElementQuery;
 }();
 /**
  * Class for managing the program settings.
