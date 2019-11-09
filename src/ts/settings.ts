@@ -90,7 +90,7 @@ class TypesetBotSettings {
     // Settings functions. ----------------------------------------------------
 
     // Adjustment ratio.
-    ratio = function(idealW: number, actualW: number, wordCount: number, shrink: number, stretch: number) { 
+    ratio = function(idealW: number, actualW: number, wordCount: number, shrink: number, stretch: number): number { 
         if (actualW < idealW) {
             return (idealW - actualW) / ((wordCount - 1) * stretch);
         }
@@ -99,7 +99,7 @@ class TypesetBotSettings {
     };
 
     // Badness calculation.
-    badness = function(ratio: number) { 
+    badness = function(ratio: number): number { 
         if (ratio == null || ratio < this.minRatio) {
             return Infinity;
         }
@@ -108,7 +108,7 @@ class TypesetBotSettings {
     };
 
     // Demerit calculation.
-    demerit = function(badness: number, penalty: number, flag: number) { 
+    demerit = function(badness: number, penalty: number, flag: number): number { 
         var flagPenalty = flag ? this.flagPenalty : 0;
         if (penalty >= 0) {
             return Math.pow(this.demeritOffset + badness + penalty, 2) + flagPenalty;

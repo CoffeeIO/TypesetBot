@@ -5,8 +5,10 @@ class TypesetBot {
     private _query?: any;
     private _settings?: object;
 
+    // Class instances.
     logger: TypesetBotLog;
-    settings: TypesetBotSettings
+    settings: TypesetBotSettings;
+
     /**
      * Constructor of new TypesetBot objects.
      * 
