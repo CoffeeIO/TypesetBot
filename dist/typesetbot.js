@@ -16,9 +16,8 @@ function () {
    */
   function TypesetBot(query, settings) {
     this._query = query;
-    this._settings = settings;
-    this.logger = new TypesetBotLog(this);
-    this.settings = new TypesetBotSettings(this, settings);
+    this._settings = settings; // this.logger = new TypesetBotLog(this);
+    // this.settings = new TypesetBotSettings(this, settings);
   }
 
   ;

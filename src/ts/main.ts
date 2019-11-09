@@ -19,7 +19,7 @@ class TypesetBot {
         this._query = query;
         this._settings = settings;
         
-        this.logger = new TypesetBotLog(this);
-        this.settings = new TypesetBotSettings(this, settings);
+        // this.logger = new TypesetBotLog(this);
+        // this.settings = new TypesetBotSettings(this, settings);
     };
 }

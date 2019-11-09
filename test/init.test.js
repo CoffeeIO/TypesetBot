@@ -6,7 +6,8 @@ describe('Init TypesetBot:', function () {
             let query = ".main";
             let tsb = new TypesetBot(query);
             
-            expect(tsb.getQuery()).toEqual(query);
+            expect(tsb.logger).not.toEqual(undefined);
+            expect(tsb.settings).not.toEqual(undefined);
         });
     });
 });
