@@ -38,7 +38,7 @@ function () {
    * @param tsb Instance of main class
    */
   function TypesetBotLog(tsb) {
-    this.debugMode = true;
+    this.debug = true;
     /**
      * Log messages if debug mode is on.
      *
@@ -46,7 +46,7 @@ function () {
      */
 
     this.log = function (message) {
-      if (this.debugMode) {
+      if (this.debug) {
         console.log('TypesetBot: %s', message);
 
         if (_typeof(message) === 'object') {
@@ -62,7 +62,7 @@ function () {
 
 
     this.warn = function (message) {
-      if (this.debugMode) {
+      if (this.debug) {
         console.warn('TypesetBot: %s', message);
 
         if (_typeof(message) === 'object') {
@@ -84,11 +84,85 @@ function () {
         console.error(message);
       }
     };
+    /**
+     * Start performance capture on specific key.
+     *
+     * @param key
+     */
+
+
+    this.start = function (key) {
+      if (!this.debug) {
+        return;
+      }
+
+      if (!(key in this._performanceMap)) {
+        this._performanceMap[key] = new TypesetBotPerformanceEntry();
+      }
+
+      this._performanceMap[key].start.push(performance.now());
+    };
+    /**
+     * End performance capture on specific key.
+     *
+     * @param key
+     */
+
+
+    this.end = function (key) {
+      if (!this.debug) {
+        return;
+      }
+
+      if (!(key in this._performanceMap)) {
+        this._performanceMap[key] = new TypesetBotPerformanceEntry();
+      }
+
+      this._performanceMap[key].end.push(performance.now());
+    };
+    /**
+     * Get formatted string of total performance time of specific key.
+     *
+     * @param key
+     *
+     * @returns Formatted string in ms and number of calls.
+     */
+
+
+    this.diff = function (key) {
+      var startTotal = 0;
+      var endTotal = 0;
+      var entry = this._performanceMap[key];
+
+      for (var i = 0; i < entry.start.length; i++) {
+        startTotal += entry.start[i];
+        endTotal += entry.end[i];
+      } // Substract combined timestamps and round to 2 decimal.
+
+
+      return (endTotal - startTotal).toFixed(2) + 'ms --- (calls: ' + entry.start.length + ')';
+    };
 
     this._tsb = tsb;
+    this._performanceMap = {};
   }
 
   return TypesetBotLog;
+}();
+/**
+ * Class to hold start and end timestamps for a specific key.
+ */
+
+
+var TypesetBotPerformanceEntry =
+/** @class */
+function () {
+  function TypesetBotPerformanceEntry() {
+    this.start = [];
+    this.end = [];
+  }
+
+  return TypesetBotPerformanceEntry;
 }();
 /**
  * Class for managing the program settings.
