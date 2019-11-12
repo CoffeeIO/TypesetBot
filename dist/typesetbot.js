@@ -15,11 +15,9 @@ function () {
    * @param settings Custom settings object
    */
   function TypesetBot(query, settings) {
-    this._query = query;
-    this._settings = settings;
     this.logger = new TypesetBotLog(this);
     this.settings = new TypesetBotSettings(this, settings);
-    this.elementQuery = new TypesetBotElementQuery(this);
+    this.elementQuery = new TypesetBotElementQuery(this, query);
   }
 
   ;
@@ -173,8 +171,55 @@ function () {
 var TypesetBotElementQuery =
 /** @class */
 function () {
-  function TypesetBotElementQuery(tsb) {
+  function TypesetBotElementQuery(tsb, query) {
+    this._queryString = null;
+    /**
+     * Handle multiple type of queries.
+     *
+     * @param query The query string, Node or NodeList
+     */
+
+    this.handleQuery = function (query) {
+      if (query == null) {
+        return;
+      }
+
+      if (typeof query == 'string') {
+        this._queryString = query;
+        console.log('Found string');
+        this.elems = document.querySelectorAll(query);
+        return;
+      } else if (_typeof(query) == 'object') {
+        if (NodeList.prototype.isPrototypeOf(query)) {
+          this.elems = query;
+          console.log('Found nodelist');
+          return;
+        } else if (Node.prototype.isPrototypeOf(query)) {
+          this.elems = [query];
+          console.log('Found node');
+          return;
+        }
+      }
+
+      this._tsb.logger.warn('Unknown type of query used.');
+    };
+    /**
+     * Requery the elements to typeset.
+     */
+
+
+    this.updateElements = function () {
+      if (this._queryString == null) {
+        this._tsb.logger.warn('Can not update elements without a query string.');
+
+        return;
+      }
+
+      this.elems = document.querySelectorAll(this._queryString);
+    };
+
     this._tsb = tsb;
+    this.handleQuery(query);
   }
 
   return TypesetBotElementQuery;
