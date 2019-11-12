@@ -186,17 +186,14 @@ function () {
 
       if (typeof query == 'string') {
         this._queryString = query;
-        console.log('Found string');
         this.elems = document.querySelectorAll(query);
         return;
       } else if (_typeof(query) == 'object') {
         if (NodeList.prototype.isPrototypeOf(query)) {
           this.elems = query;
-          console.log('Found nodelist');
           return;
         } else if (Node.prototype.isPrototypeOf(query)) {
           this.elems = [query];
-          console.log('Found node');
           return;
         }
       }
