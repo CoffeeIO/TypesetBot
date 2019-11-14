@@ -1,4 +1,4 @@
-tsb-line {
+.typesetbot-justify tsb-line {
     display: block;
     &:after {
         content: "";
@@ -10,4 +10,14 @@ tsb-line {
             display: none;
         }
     }
+}   
+
+.typesetbot-right tsb-line {
+    text-align: right;
+}
+.typesetbot-left tsb-line {
+    text-align: left;
+}
+.typesetbot-center tsb-line {
+    text-align: center;
 }
