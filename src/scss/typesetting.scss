@@ -1,0 +1,13 @@
+tsb-line {
+    display: block;
+    &:after {
+        content: "";
+        display: inline-block;
+        width: 100%;
+    }
+    &:last-of-type {
+        &:after {
+            display: none;
+        }
+    }
+}
