@@ -50,7 +50,9 @@ class TypesetBotElementQuery {
         this.elems = document.querySelectorAll(this._queryString);
     }
 
+    findTextInElement = function(elem: Node) {
 
+    }
 
 
 }

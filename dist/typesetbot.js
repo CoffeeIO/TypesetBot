@@ -215,6 +215,8 @@ function () {
       this.elems = document.querySelectorAll(this._queryString);
     };
 
+    this.findTextInElement = function (elem) {};
+
     this._tsb = tsb;
     this.handleQuery(query);
   }
