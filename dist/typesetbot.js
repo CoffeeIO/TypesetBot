@@ -214,6 +214,12 @@ function () {
 
       this.elems = document.querySelectorAll(this._queryString);
     };
+    /**
+     * Find text blocks in element.
+     *
+     * @param elem
+     */
+
 
     this.findTextInElement = function (elem) {};
 

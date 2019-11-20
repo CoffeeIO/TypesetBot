@@ -50,6 +50,11 @@ class TypesetBotElementQuery {
         this.elems = document.querySelectorAll(this._queryString);
     }
 
+    /**
+     * Find text blocks in element.
+     * 
+     * @param elem
+     */
     findTextInElement = function(elem: Node) {
 
     }
