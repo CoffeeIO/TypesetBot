@@ -9,7 +9,7 @@ class TypesetBotSettings {
     
     /**
      * The constructor.
-     * 
+     *
      * @param settings Optional settings object.
      */
     constructor(tsb: TypesetBot, settings? : object) {
@@ -20,23 +20,23 @@ class TypesetBotSettings {
 
     /**
      * Merge custom settings with a default set of settings.
-     * 
+     *
      * @param baseSettings
      * @param settings
-     * 
+     *
      * @returns The merged settings object
      */
     private _mergeSettings = function(settings? : object) : object {
         if (settings == null) {
             return;
         }
-        
+
         for (const [key, value] of Object.entries(settings)) {
             if (this[key] === undefined) {
                 this._tsb.logger.warn('Unknown settings key "' + key +'"');
             }
 
-            this[key] = value;            
+            this[key] = value;
         }
     }
     
@@ -90,7 +90,7 @@ class TypesetBotSettings {
     // Settings functions. ----------------------------------------------------
 
     // Adjustment ratio.
-    ratio = function(idealW: number, actualW: number, wordCount: number, shrink: number, stretch: number): number { 
+    ratio = function(idealW: number, actualW: number, wordCount: number, shrink: number, stretch: number): number {
         if (actualW < idealW) {
             return (idealW - actualW) / ((wordCount - 1) * stretch);
         }
@@ -99,7 +99,7 @@ class TypesetBotSettings {
     };
 
     // Badness calculation.
-    badness = function(ratio: number): number { 
+    badness = function(ratio: number): number {
         if (ratio == null || ratio < this.minRatio) {
             return Infinity;
         }
@@ -108,7 +108,7 @@ class TypesetBotSettings {
     };
 
     // Demerit calculation.
-    demerit = function(badness: number, penalty: number, flag: number): number { 
+    demerit = function(badness: number, penalty: number, flag: number): number {
         var flagPenalty = flag ? this.flagPenalty : 0;
         if (penalty >= 0) {
             return Math.pow(this.demeritOffset + badness + penalty, 2) + flagPenalty;
