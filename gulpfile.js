@@ -5,6 +5,7 @@ var source = [
     'src/ts/query.ts',
     'src/ts/settings.ts',
     'src/ts/utils.ts',
+    'src/ts/token.ts',
 ];
 // ----------------------------------------------------------------------------
 

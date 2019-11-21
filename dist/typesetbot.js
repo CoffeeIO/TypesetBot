@@ -1,5 +1,15 @@
 "use strict";
 
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
@@ -25,11 +35,16 @@ var TypesetBot =
 function TypesetBot(query, settings) {
   _classCallCheck(this, TypesetBot);
 
+  this.typeset = function () {
+    this.token.tokenizeNodes(this.query.nodes);
+  };
+
   this.logger = new TypesetBotLog(this);
   this.utils = new TypesetBotUtils(this);
-  this.uuid = this.utils.create_UUID();
+  this.uuid = this.utils.createUUID();
   this.settings = new TypesetBotSettings(this, settings);
-  this.elementQuery = new TypesetBotElementQuery(this, query);
+  this.query = new TypesetBotElementQuery(this, query);
+  this.tokenizer = new TypesetBotTokenizer(this);
 };
 /**
  * Class for handling debug messages and performance logging.
@@ -175,8 +190,8 @@ var TypesetBotElementQuery = function TypesetBotElementQuery(tsb, query) {
   this._queryString = null;
   this._index = 0;
   this._nodeMap = {};
-  this.nodes = []; // Or array
-
+  this._nodesTemp = [];
+  this.nodes = [];
   /**
    * Handle multiple type of queries.
    *
@@ -191,7 +206,11 @@ var TypesetBotElementQuery = function TypesetBotElementQuery(tsb, query) {
     if (typeof query == 'string') {
       this._queryString = query;
       var elems = document.querySelectorAll(query);
-      console.log(elems);
+
+      if (elems == null) {
+        return;
+      }
+
       var _iteratorNormalCompletion = true;
       var _didIteratorError = false;
       var _iteratorError = undefined;
@@ -199,7 +218,8 @@ var TypesetBotElementQuery = function TypesetBotElementQuery(tsb, query) {
       try {
         for (var _iterator = elems[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
           var elem = _step.value;
-          this.nodes.push(elem);
+
+          this._nodesTemp.push(elem);
         }
       } catch (err) {
         _didIteratorError = true;
@@ -219,16 +239,15 @@ var TypesetBotElementQuery = function TypesetBotElementQuery(tsb, query) {
       return;
     } else if (_typeof(query) == 'object') {
       if (NodeList.prototype.isPrototypeOf(query)) {
-        var _elems = query;
-        console.log(_elems);
         var _iteratorNormalCompletion2 = true;
         var _didIteratorError2 = false;
         var _iteratorError2 = undefined;
 
         try {
-          for (var _iterator2 = _elems[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          for (var _iterator2 = query[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
             var _elem = _step2.value;
-            this.nodes.push(_elem);
+
+            this._nodesTemp.push(_elem);
           }
         } catch (err) {
           _didIteratorError2 = true;
@@ -247,8 +266,8 @@ var TypesetBotElementQuery = function TypesetBotElementQuery(tsb, query) {
 
         return;
       } else if (Node.prototype.isPrototypeOf(query)) {
-        console.log(query);
-        this.nodes.push(query);
+        this._nodesTemp.push(query);
+
         return;
       }
     }
@@ -276,7 +295,7 @@ var TypesetBotElementQuery = function TypesetBotElementQuery(tsb, query) {
    */
 
 
-  this.findTextInElements = function (nodes) {
+  this.indexNodes = function (nodes) {
     var _iteratorNormalCompletion3 = true;
     var _didIteratorError3 = false;
     var _iteratorError3 = undefined;
@@ -284,7 +303,7 @@ var TypesetBotElementQuery = function TypesetBotElementQuery(tsb, query) {
     try {
       for (var _iterator3 = nodes[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
         var node = _step3.value;
-        this.findTextInElement(node);
+        this.indexNode(node);
       }
     } catch (err) {
       _didIteratorError3 = true;
@@ -308,7 +327,7 @@ var TypesetBotElementQuery = function TypesetBotElementQuery(tsb, query) {
    */
 
 
-  this.findTextInElement = function (node) {
+  this.indexNode = function (node) {
     // Mark node to avoid look at the same element twice.
     if (node.getAttribute('data-tsb-uuid') != null) {
       return;
@@ -320,42 +339,14 @@ var TypesetBotElementQuery = function TypesetBotElementQuery(tsb, query) {
 
     node.setAttribute('data-tsb-uuid', this._tsb.uuid);
     node.setAttribute('data-tsb-indexed', this._index);
+    this.nodes.push(node);
     this._nodeMap[this._index] = node;
     this._index += 1;
-
-    if (!('childNodes' in node)) {
-      return;
-    }
-
-    var _iteratorNormalCompletion4 = true;
-    var _didIteratorError4 = false;
-    var _iteratorError4 = undefined;
-
-    try {
-      for (var _iterator4 = node.childNodes[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-        var child = _step4.value;
-        console.log(child);
-        console.log(child.nodeType);
-      }
-    } catch (err) {
-      _didIteratorError4 = true;
-      _iteratorError4 = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion4 && _iterator4["return"] != null) {
-          _iterator4["return"]();
-        }
-      } finally {
-        if (_didIteratorError4) {
-          throw _iteratorError4;
-        }
-      }
-    }
   };
 
   this._tsb = tsb;
   this.handleQuery(query);
-  this.findTextInElements(this.nodes);
+  this.indexNodes(this._nodesTemp);
 };
 /**
  * Class for managing the program settings.
@@ -490,7 +481,7 @@ function TypesetBotSettings(tsb, settings) {
 var TypesetBotUtils = function TypesetBotUtils(tsb) {
   _classCallCheck(this, TypesetBotUtils);
 
-  this.create_UUID = function () {
+  this.createUUID = function () {
     var dt = new Date().getTime();
     var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
       var r = (dt + Math.random() * 16) % 16 | 0;
@@ -502,3 +493,88 @@ var TypesetBotUtils = function TypesetBotUtils(tsb) {
 
   this._tsb = tsb;
 };
+
+var TypesetBotTokenizer = function TypesetBotTokenizer(tsb) {
+  _classCallCheck(this, TypesetBotTokenizer);
+
+  this.tokenize = function (nodes) {};
+
+  this._tsb = tsb;
+};
+
+var TypesetBotToken = function TypesetBotToken() {
+  _classCallCheck(this, TypesetBotToken);
+
+  this.types = {
+    WORD: 1,
+    SPACE: 2,
+    TAG: 3
+  };
+
+  this.initType = function (type) {
+    this.type = type;
+  };
+};
+
+var TypesetBotTag =
+/*#__PURE__*/
+function (_TypesetBotToken) {
+  _inherits(TypesetBotTag, _TypesetBotToken);
+
+  function TypesetBotTag(tag, isEndTag) {
+    var _this;
+
+    _classCallCheck(this, TypesetBotTag);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(TypesetBotTag).call(this));
+
+    _this.initType(_this.types.TAG);
+
+    _this.tag = tag;
+    _this.isEndTag = isEndTag;
+    return _this;
+  }
+
+  return TypesetBotTag;
+}(TypesetBotToken);
+
+var TypesetBotWord =
+/*#__PURE__*/
+function (_TypesetBotToken2) {
+  _inherits(TypesetBotWord, _TypesetBotToken2);
+
+  function TypesetBotWord(text) {
+    var _this2;
+
+    _classCallCheck(this, TypesetBotWord);
+
+    _this2 = _possibleConstructorReturn(this, _getPrototypeOf(TypesetBotWord).call(this));
+
+    _this2.initType(_this2.types.WORD);
+
+    _this2.text = text;
+    return _this2;
+  }
+
+  return TypesetBotWord;
+}(TypesetBotToken);
+
+var TypesetBotSpace =
+/*#__PURE__*/
+function (_TypesetBotToken3) {
+  _inherits(TypesetBotSpace, _TypesetBotToken3);
+
+  function TypesetBotSpace() {
+    var _this3;
+
+    _classCallCheck(this, TypesetBotSpace);
+
+    _this3 = _possibleConstructorReturn(this, _getPrototypeOf(TypesetBotSpace).call(this));
+
+    _this3.initType(_this3.types.SPACE);
+
+    return _this3;
+  }
+
+  return TypesetBotSpace;
+}(TypesetBotToken);

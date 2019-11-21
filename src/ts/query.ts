@@ -6,13 +6,14 @@ class TypesetBotElementQuery {
     private _queryString: string = null;
     private _index: number = 0;
     private _nodeMap: { [index: number] : Element; } = {};
+    private _nodesTemp: Array<Element> = []; 
 
-    nodes: Array<Element> = []; // Or array
+    nodes: Array<Element> = [];
 
     constructor(tsb: TypesetBot, query?: any) {
         this._tsb = tsb;
         this.handleQuery(query);
-        this.findTextInElements(this.nodes);
+        this.indexNodes(this._nodesTemp);
     }
 
     /**
@@ -28,23 +29,21 @@ class TypesetBotElementQuery {
         if (typeof query == 'string') {
             this._queryString = query;
             let elems = document.querySelectorAll(query);
-            console.log(elems);
-            
+            if (elems == null) {
+                return;
+            }
             for (let elem of elems) {
-                this.nodes.push(elem);
+                this._nodesTemp.push(elem);
             }
             return;
         } else if(typeof query == 'object') {
             if (NodeList.prototype.isPrototypeOf(query)) {
-                let elems = query;
-                console.log(elems);
-                for (let elem of elems) {
-                    this.nodes.push(elem);
+                for (let elem of query) {
+                    this._nodesTemp.push(elem);
                 }
                 return;
             } else if (Node.prototype.isPrototypeOf(query)) {
-                console.log(query);
-                this.nodes.push(query);
+                this._nodesTemp.push(query);
                 return;
             }
         }
@@ -69,9 +68,9 @@ class TypesetBotElementQuery {
      *
      * @param elem
      */
-    findTextInElements = function(nodes: Array<Element>) {
+    indexNodes = function(nodes: Array<Element>) {
         for (let node of nodes) {
-            this.findTextInElement(node);
+            this.indexNode(node);
         }
     }
 
@@ -80,7 +79,7 @@ class TypesetBotElementQuery {
      *
      * @param elem
      */
-    findTextInElement = function(node: Element) {
+    indexNode = function(node: Element) {
         // Mark node to avoid look at the same element twice.
         if (node.getAttribute('data-tsb-uuid') != null) {
             return;
@@ -91,19 +90,8 @@ class TypesetBotElementQuery {
 
         node.setAttribute('data-tsb-uuid', this._tsb.uuid);
         node.setAttribute('data-tsb-indexed', this._index);
+        this.nodes.push(node);
         this._nodeMap[this._index] = node;
         this._index += 1;
-
-        if (!('childNodes' in node)) {
-            return;
-        }
-        for (let child of node.childNodes) {
-            console.log(child);
-            
-            console.log(child.nodeType);
-            
-        }
     }
-
-
 }
