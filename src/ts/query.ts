@@ -6,9 +6,9 @@ class TypesetBotElementQuery {
     private _queryString: string = null;
     private _index: number = 0;
     private _nodeMap: { [index: number] : Element; } = {};
-    private _nodesTemp: Array<Element> = []; 
+    private _nodesTemp: Element[] = []; 
 
-    nodes: Array<Element> = [];
+    nodes: Element[] = [];
 
     constructor(tsb: TypesetBot, query?: any) {
         this._tsb = tsb;
@@ -68,7 +68,7 @@ class TypesetBotElementQuery {
      *
      * @param elem
      */
-    indexNodes = function(nodes: Array<Element>) {
+    indexNodes = function(nodes: Element[]) {
         for (let node of nodes) {
             this.indexNode(node);
         }

@@ -18,7 +18,7 @@ class TypesetBotTokenizer {
      *
      * @returns Array of tokens
      */
-    tokenize = function(node: Element): Array<TypesetBotToken> {
+    tokenize = function(node: Element): TypesetBotToken[] {
 
 
         return [];

@@ -76,15 +76,6 @@ class TypesetBotSettings {
     // Inline element that the program will unwrap from paragraphs as they could disrupt the line breaking.
     unwrapElements: string[] = ['img'];
 
-
-    // Dynamic width. ---------------------------------------------------------
-
-    // Allow the paragraph to account for overlapping elements, turn this off if you know there's no overlapping
-    // element to gain performance.
-    dynamicWidth: boolean = true;
-    // Pixel increment of vertical search, higher better performance, lower more accurate result.
-    dynamicWidthIncrement: number = 5;
-
     // Settings functions. ----------------------------------------------------
 
     /**

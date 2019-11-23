@@ -434,13 +434,7 @@ function TypesetBotSettings(tsb, settings) {
   this.spaceShrinkability = 1 / 9; // How much can the space width shrink
   // Inline element that the program will unwrap from paragraphs as they could disrupt the line breaking.
 
-  this.unwrapElements = ['img']; // Dynamic width. ---------------------------------------------------------
-  // Allow the paragraph to account for overlapping elements, turn this off if you know there's no overlapping
-  // element to gain performance.
-
-  this.dynamicWidth = true; // Pixel increment of vertical search, higher better performance, lower more accurate result.
-
-  this.dynamicWidthIncrement = 5; // Settings functions. ----------------------------------------------------
+  this.unwrapElements = ['img']; // Settings functions. ----------------------------------------------------
 
   /**
    * Calculate adjustment ratio.

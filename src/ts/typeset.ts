@@ -16,7 +16,7 @@ class TypesetBotTypeset {
      *
      * @parma nodes
      */
-    typesetNodes = function(nodes: Array<Element>) {
+    typesetNodes = function(nodes: Element[]) {
         for (let node of nodes) {
             this.typeset(node);
         }
