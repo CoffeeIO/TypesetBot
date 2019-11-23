@@ -6,10 +6,8 @@ class TypesetBotSettings {
     // Copy of the custom user settings.
     private _tsb: TypesetBot;
     private _customSettings? : object;
-    
+
     /**
-     * The constructor.
-     * 
      * @param settings Optional settings object.
      */
     constructor(tsb: TypesetBot, settings? : object) {
@@ -20,26 +18,26 @@ class TypesetBotSettings {
 
     /**
      * Merge custom settings with a default set of settings.
-     * 
+     *
      * @param baseSettings
      * @param settings
-     * 
+     *
      * @returns The merged settings object
      */
     private _mergeSettings = function(settings? : object) : object {
         if (settings == null) {
             return;
         }
-        
+
         for (const [key, value] of Object.entries(settings)) {
             if (this[key] === undefined) {
                 this._tsb.logger.warn('Unknown settings key "' + key +'"');
             }
 
-            this[key] = value;            
+            this[key] = value;
         }
     }
-    
+
     // ------------------------------------------------------------------------
     // SETTINGS ---------------------------------------------------------------
     // ------------------------------------------------------------------------
@@ -71,45 +69,60 @@ class TypesetBotSettings {
 
     // Font. ------------------------------------------------------------------
     spaceUnit          : string = 'em'; // Space width unit, em is relative to font-size
-    spaceWidth         : number = 1/3; // Ideal space width
-    spaceStretchability: number = 1/6; // How much can the space width stretch
-    spaceShrinkability : number = 1/9; // How much can the space width shrink
+    spaceWidth         : number = 1 / 3; // Ideal space width
+    spaceStretchability: number = 1 / 6; // How much can the space width stretch
+    spaceShrinkability : number = 1 / 9; // How much can the space width shrink
 
     // Inline element that the program will unwrap from paragraphs as they could disrupt the line breaking.
     unwrapElements: string[] = ['img'];
 
-
-    // Dynamic width. ---------------------------------------------------------
-
-    // Allow the paragraph to account for overlapping elements, turn this off if you know there's no overlapping
-    // element to gain performance.
-    dynamicWidth: boolean = true;
-    // Pixel increment of vertical search, higher better performance, lower more accurate result.
-    dynamicWidthIncrement: number = 5;
-
     // Settings functions. ----------------------------------------------------
 
-    // Adjustment ratio.
-    ratio = function(idealW: number, actualW: number, wordCount: number, shrink: number, stretch: number): number { 
+    /**
+     * Calculate adjustment ratio.
+     *
+     * @param idealW
+     * @param actualW
+     * @param wordCount
+     * @param shrink
+     * @param stretch
+     *
+     * @returns The adjustment ratio
+     */
+    ratio = function(idealW: number, actualW: number, wordCount: number, shrink: number, stretch: number): number {
         if (actualW < idealW) {
             return (idealW - actualW) / ((wordCount - 1) * stretch);
         }
 
         return (idealW - actualW) / ((wordCount - 1) * shrink);
-    };
+    }
 
-    // Badness calculation.
-    badness = function(ratio: number): number { 
+    /**
+     * Calculate the badness score.
+     *
+     * @param ratio The adjustment ratio
+     *
+     * @returns The badness
+     */
+    badness = function(ratio: number): number {
         if (ratio == null || ratio < this.minRatio) {
             return Infinity;
         }
 
         return 100 * Math.pow(Math.abs(ratio), 3) + 0.5;
-    };
+    }
 
-    // Demerit calculation.
-    demerit = function(badness: number, penalty: number, flag: number): number { 
-        var flagPenalty = flag ? this.flagPenalty : 0;
+    /**
+     * Calculate the demerit.
+     *
+     * @param badness
+     * @param penalty
+     * @param flag
+     *
+     * @returns The line demerit
+     */
+    demerit = function(badness: number, penalty: number, flag: boolean): number {
+        const flagPenalty = flag ? this.flagPenalty : 0;
         if (penalty >= 0) {
             return Math.pow(this.demeritOffset + badness + penalty, 2) + flagPenalty;
         } else if (penalty === -Infinity) {
@@ -117,5 +130,5 @@ class TypesetBotSettings {
         } else {
             return Math.pow(this.demeritOffset + badness, 2) - Math.pow(penalty, 2) + flagPenalty;
         }
-    };
+    }
 }

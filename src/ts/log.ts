@@ -2,14 +2,14 @@
  * Class for handling debug messages and performance logging.
  */
 class TypesetBotLog {
+
+    debug: boolean = true;
     private _tsb: TypesetBot;
     private _performanceMap: { [key: string] : TypesetBotPerformanceEntry; };
 
-    debug:boolean = true;
-
     /**
      * The constructor.
-     * 
+     *
      * @param tsb Instance of main class
      */
     constructor(tsb: TypesetBot) {
@@ -19,7 +19,7 @@ class TypesetBotLog {
 
     /**
      * Log messages if debug mode is on.
-     * 
+     *
      * @param message The log message
      */
     log = function(message: any) {
@@ -33,7 +33,7 @@ class TypesetBotLog {
 
     /**
      * Log messages if debug mode is on.
-     * 
+     *
      * @param message The log message
      */
     warn = function(message: any) {
@@ -47,7 +47,7 @@ class TypesetBotLog {
 
     /**
      * Log messages if debug mode is on or off.
-     * 
+     *
      * @param message The log message
      */
     error = function(message: any) {
@@ -59,7 +59,7 @@ class TypesetBotLog {
 
     /**
      * Start performance capture on specific key.
-     * 
+     *
      * @param key
      */
     start = function(key: string) {
@@ -75,7 +75,7 @@ class TypesetBotLog {
 
     /**
      * End performance capture on specific key.
-     * 
+     *
      * @param key
      */
     end = function(key: string) {
@@ -91,22 +91,22 @@ class TypesetBotLog {
 
     /**
      * Get formatted string of total performance time of specific key.
-     * 
+     *
      * @param key
-     * 
+     *
      * @returns Formatted string in ms and number of calls.
      */
     diff = function(key: string): string {
         let startTotal: number = 0;
         let endTotal: number = 0;
-        let entry: TypesetBotPerformanceEntry = this._performanceMap[key];
+        const entry: TypesetBotPerformanceEntry = this._performanceMap[key];
 
-        for (var i = 0; i < entry.start.length; i++) {
+        for (let i = 0; i < entry.start.length; i++) {
             startTotal += entry.start[i];
             endTotal += entry.end[i];
         }
         // Substract combined timestamps and round to 2 decimal.
-        return (endTotal - startTotal).toFixed(2) + 'ms --- (calls: '+ entry.start.length +')';
+        return (endTotal - startTotal).toFixed(2) + 'ms --- (calls: ' + entry.start.length + ')';
     }
 }
 

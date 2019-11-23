@@ -4,6 +4,9 @@ var source = [
     'src/ts/log.ts',
     'src/ts/query.ts',
     'src/ts/settings.ts',
+    'src/ts/utils.ts',
+    'src/ts/token.ts',
+    'src/ts/typeset.ts',
 ];
 // ----------------------------------------------------------------------------
 
@@ -25,14 +28,27 @@ gulp.task('scss', function () {
     .pipe(gulp.dest('dist'));
 });
 
+gulp.task('ts-test', function () {
+    return gulp.src(source)
+        .pipe(ts({
+            noImplicitAny: true,
+            lib: ['dom', 'es2017', 'es6', 'es5', 'dom.iterable'],
+            noLib: false,
+            removeComments: false,
+            target: 'ES6',
+        }))
+        .pipe(babel());
+});
+
 gulp.task('ts', function () {
     return gulp.src(source)
         .pipe(concat('typesetbot.ts'))
         .pipe(ts({
             noImplicitAny: true,
-            lib: ['dom', 'es2017'],
+            lib: ['dom', 'es2017', 'es6', 'es5', 'dom.iterable'],
             noLib: false,
             removeComments: false,
+            target: 'ES6',
         }))
         .pipe(babel())
         .pipe(gulp.dest("dist"));
@@ -48,10 +64,10 @@ gulp.task('ts-minify', function () {
         .pipe(gulp.dest("dist"));
 });
 
-gulp.task('compile', gulp.series('ts', 'ts-minify', 'scss'))
+gulp.task('compile', gulp.series('ts-test', 'ts', 'ts-minify', 'scss'))
 
 gulp.task('watch-src', function() {
-    return watch('src/**/*', gulp.series('ts', 'ts-minify', 'scss'));
+    return watch('src/**/*', gulp.series('ts-test', 'ts', 'ts-minify', 'scss'));
 });
 
 gulp.task('watch', gulp.series('compile', 'watch-src'));
