@@ -8,8 +8,6 @@ class TypesetBotSettings {
     private _customSettings? : object;
     
     /**
-     * The constructor.
-     *
      * @param settings Optional settings object.
      */
     constructor(tsb: TypesetBot, settings? : object) {
@@ -89,7 +87,17 @@ class TypesetBotSettings {
 
     // Settings functions. ----------------------------------------------------
 
-    // Adjustment ratio.
+    /**
+     * Calculate adjustment ratio.
+     *
+     * @param idealW
+     * @param actualW
+     * @param wordCount
+     * @param shrink
+     * @param stretch
+     *
+     * @returns The adjustment ratio
+     */
     ratio = function(idealW: number, actualW: number, wordCount: number, shrink: number, stretch: number): number {
         if (actualW < idealW) {
             return (idealW - actualW) / ((wordCount - 1) * stretch);
@@ -98,7 +106,13 @@ class TypesetBotSettings {
         return (idealW - actualW) / ((wordCount - 1) * shrink);
     };
 
-    // Badness calculation.
+    /**
+     * Calculate the badness score.
+     *
+     * @param ratio The adjustment ratio
+     *
+     * @returns The badness
+     */
     badness = function(ratio: number): number {
         if (ratio == null || ratio < this.minRatio) {
             return Infinity;
@@ -107,8 +121,16 @@ class TypesetBotSettings {
         return 100 * Math.pow(Math.abs(ratio), 3) + 0.5;
     };
 
-    // Demerit calculation.
-    demerit = function(badness: number, penalty: number, flag: number): number {
+    /**
+     * Calculate the demerit.
+     *
+     * @param badness
+     * @param penalty
+     * @param flag
+     *
+     * @returns The line demerit
+     */
+    demerit = function(badness: number, penalty: number, flag: boolean): number {
         var flagPenalty = flag ? this.flagPenalty : 0;
         if (penalty >= 0) {
             return Math.pow(this.demeritOffset + badness + penalty, 2) + flagPenalty;

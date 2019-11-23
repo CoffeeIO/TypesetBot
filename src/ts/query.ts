@@ -80,10 +80,11 @@ class TypesetBotElementQuery {
      * @param elem
      */
     indexNode = function(node: Element) {
-        // Mark node to avoid look at the same element twice.
+        // Mark node with unique TypesetBot id.
         if (node.getAttribute('data-tsb-uuid') != null) {
             return;
         }
+        // Mark node to avoid look at the same element twice.
         if (node.getAttribute('data-tsb-indexed') != null) {
             return;
         }

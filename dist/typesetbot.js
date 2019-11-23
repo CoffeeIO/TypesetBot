@@ -29,22 +29,24 @@ var TypesetBot =
 /**
  * Constructor of new TypesetBot objects.
  *
- * @param query    Nodes from a query or query selector
- * @param settings Custom settings object
+ * @param query?    Nodes from a query or query selector
+ * @param settings? Custom settings object
  */
 function TypesetBot(query, settings) {
   _classCallCheck(this, TypesetBot);
 
+  /**
+   * Typeset all elements in query.
+   */
   this.typeset = function () {
-    this.token.tokenizeNodes(this.query.nodes);
+    this.typesetter.typesetNodes(this.query.nodes);
   };
 
   this.logger = new TypesetBotLog(this);
-  this.utils = new TypesetBotUtils(this);
-  this.uuid = this.utils.createUUID();
+  this.uuid = TypesetBotUtils.createUUID();
   this.settings = new TypesetBotSettings(this, settings);
   this.query = new TypesetBotElementQuery(this, query);
-  this.tokenizer = new TypesetBotTokenizer(this);
+  this.typesetter = new TypesetBotTypeset(this);
 };
 /**
  * Class for handling debug messages and performance logging.
@@ -328,10 +330,11 @@ var TypesetBotElementQuery = function TypesetBotElementQuery(tsb, query) {
 
 
   this.indexNode = function (node) {
-    // Mark node to avoid look at the same element twice.
+    // Mark node with unique TypesetBot id.
     if (node.getAttribute('data-tsb-uuid') != null) {
       return;
-    }
+    } // Mark node to avoid look at the same element twice.
+
 
     if (node.getAttribute('data-tsb-indexed') != null) {
       return;
@@ -355,8 +358,6 @@ var TypesetBotElementQuery = function TypesetBotElementQuery(tsb, query) {
 
 var TypesetBotSettings =
 /**
- * The constructor.
- *
  * @param settings Optional settings object.
  */
 function TypesetBotSettings(tsb, settings) {
@@ -440,7 +441,18 @@ function TypesetBotSettings(tsb, settings) {
   this.dynamicWidth = true; // Pixel increment of vertical search, higher better performance, lower more accurate result.
 
   this.dynamicWidthIncrement = 5; // Settings functions. ----------------------------------------------------
-  // Adjustment ratio.
+
+  /**
+   * Calculate adjustment ratio.
+   *
+   * @param idealW
+   * @param actualW
+   * @param wordCount
+   * @param shrink
+   * @param stretch
+   *
+   * @returns The adjustment ratio
+   */
 
   this.ratio = function (idealW, actualW, wordCount, shrink, stretch) {
     if (actualW < idealW) {
@@ -448,7 +460,14 @@ function TypesetBotSettings(tsb, settings) {
     }
 
     return (idealW - actualW) / ((wordCount - 1) * shrink);
-  }; // Badness calculation.
+  };
+  /**
+   * Calculate the badness score.
+   *
+   * @param ratio The adjustment ratio
+   *
+   * @returns The badness
+   */
 
 
   this.badness = function (ratio) {
@@ -457,7 +476,16 @@ function TypesetBotSettings(tsb, settings) {
     }
 
     return 100 * Math.pow(Math.abs(ratio), 3) + 0.5;
-  }; // Demerit calculation.
+  };
+  /**
+   * Calculate the demerit.
+   *
+   * @param badness
+   * @param penalty
+   * @param flag
+   *
+   * @returns The line demerit
+   */
 
 
   this.demerit = function (badness, penalty, flag) {
@@ -477,59 +505,100 @@ function TypesetBotSettings(tsb, settings) {
 
   this._mergeSettings(settings);
 };
+/**
+ * Class for utility functions.
+ */
 
-var TypesetBotUtils = function TypesetBotUtils(tsb) {
+
+var TypesetBotUtils =
+/**
+ * @param tsb Instance of main class
+ */
+function TypesetBotUtils(tsb) {
   _classCallCheck(this, TypesetBotUtils);
 
-  this.createUUID = function () {
-    var dt = new Date().getTime();
-    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-      var r = (dt + Math.random() * 16) % 16 | 0;
-      dt = Math.floor(dt / 16);
-      return (c == 'x' ? r : r & 0x3 | 0x8).toString(16);
-    });
-    return uuid;
-  };
-
   this._tsb = tsb;
 };
+/**
+ * Create UUID.
+ *
+ * @returns UUID
+ */
 
-var TypesetBotTokenizer = function TypesetBotTokenizer(tsb) {
+
+TypesetBotUtils.createUUID = function () {
+  var dt = new Date().getTime();
+  var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    var r = (dt + Math.random() * 16) % 16 | 0;
+    dt = Math.floor(dt / 16);
+    return (c == 'x' ? r : r & 0x3 | 0x8).toString(16);
+  });
+  return uuid;
+};
+/**
+ * Class for tokenizing DOM nodes.
+ */
+
+
+var TypesetBotTokenizer =
+/**
+ * The constructor.
+ *
+ * @param tsb Instance of main class
+ */
+function TypesetBotTokenizer(tsb) {
   _classCallCheck(this, TypesetBotTokenizer);
 
-  this.tokenize = function (nodes) {};
+  /**
+   * Tokenize element and get array of tokens.
+   *
+   * @returns Array of tokens
+   */
+  this.tokenize = function (node) {
+    return [];
+  };
 
   this._tsb = tsb;
 };
+/**
+ * Class for general token.
+ */
 
-var TypesetBotToken = function TypesetBotToken() {
+
+var TypesetBotToken =
+/**
+ * @param type The type of token.
+ */
+function TypesetBotToken(type) {
   _classCallCheck(this, TypesetBotToken);
 
-  this.types = {
-    WORD: 1,
-    SPACE: 2,
-    TAG: 3
-  };
-
-  this.initType = function (type) {
-    this.type = type;
-  };
+  this.type = type;
 };
+
+TypesetBotToken.types = {
+  WORD: 1,
+  SPACE: 2,
+  TAG: 3
+};
+/**
+ * Class for tag tokens.
+ */
 
 var TypesetBotTag =
 /*#__PURE__*/
 function (_TypesetBotToken) {
   _inherits(TypesetBotTag, _TypesetBotToken);
 
+  /**
+   * @param tag      The name of the tag
+   * @param isEndTag Is this token an end tag
+   */
   function TypesetBotTag(tag, isEndTag) {
     var _this;
 
     _classCallCheck(this, TypesetBotTag);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(TypesetBotTag).call(this));
-
-    _this.initType(_this.types.TAG);
-
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(TypesetBotTag).call(this, TypesetBotToken.types.TAG));
     _this.tag = tag;
     _this.isEndTag = isEndTag;
     return _this;
@@ -537,27 +606,35 @@ function (_TypesetBotToken) {
 
   return TypesetBotTag;
 }(TypesetBotToken);
+/**
+ * Class for word tokens.
+ */
+
 
 var TypesetBotWord =
 /*#__PURE__*/
 function (_TypesetBotToken2) {
   _inherits(TypesetBotWord, _TypesetBotToken2);
 
+  /**
+   * @param text The text of the word
+   */
   function TypesetBotWord(text) {
     var _this2;
 
     _classCallCheck(this, TypesetBotWord);
 
-    _this2 = _possibleConstructorReturn(this, _getPrototypeOf(TypesetBotWord).call(this));
-
-    _this2.initType(_this2.types.WORD);
-
+    _this2 = _possibleConstructorReturn(this, _getPrototypeOf(TypesetBotWord).call(this, TypesetBotToken.types.WORD));
     _this2.text = text;
     return _this2;
   }
 
   return TypesetBotWord;
 }(TypesetBotToken);
+/**
+ * Class for space tokens.
+ */
+
 
 var TypesetBotSpace =
 /*#__PURE__*/
@@ -565,16 +642,63 @@ function (_TypesetBotToken3) {
   _inherits(TypesetBotSpace, _TypesetBotToken3);
 
   function TypesetBotSpace() {
-    var _this3;
-
     _classCallCheck(this, TypesetBotSpace);
 
-    _this3 = _possibleConstructorReturn(this, _getPrototypeOf(TypesetBotSpace).call(this));
-
-    _this3.initType(_this3.types.SPACE);
-
-    return _this3;
+    return _possibleConstructorReturn(this, _getPrototypeOf(TypesetBotSpace).call(this, TypesetBotToken.types.TAG));
   }
 
   return TypesetBotSpace;
 }(TypesetBotToken);
+
+var TypesetBotTypeset =
+/**
+ * @param tsb Instance of main class
+ */
+function TypesetBotTypeset(tsb) {
+  _classCallCheck(this, TypesetBotTypeset);
+
+  /**
+   * Typeset multiple nodes.
+   *
+   * @parma nodes
+   */
+  this.typesetNodes = function (nodes) {
+    var _iteratorNormalCompletion4 = true;
+    var _didIteratorError4 = false;
+    var _iteratorError4 = undefined;
+
+    try {
+      for (var _iterator4 = nodes[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+        var node = _step4.value;
+        this.typeset(node);
+      }
+    } catch (err) {
+      _didIteratorError4 = true;
+      _iteratorError4 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion4 && _iterator4["return"] != null) {
+          _iterator4["return"]();
+        }
+      } finally {
+        if (_didIteratorError4) {
+          throw _iteratorError4;
+        }
+      }
+    }
+  };
+  /**
+   * Typeset single node.
+   *
+   * @param node
+   */
+
+
+  this.typeset = function (node) {
+    var tokens = this.tokenizer.tokenize(node);
+    console.log(tokens);
+  };
+
+  this._tsb = tsb;
+  this.tokenizer = new TypesetBotTokenizer(tsb);
+};
