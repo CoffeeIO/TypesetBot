@@ -25,4 +25,10 @@ class TypesetBotUtils {
         });
         return uuid;
     }
+
+
+    static isVisible = function(node: Element): boolean {
+        const elem = node as HTMLElement;
+        return !!( elem.offsetWidth || elem.offsetHeight || elem.getClientRects().length );
+    }
 }

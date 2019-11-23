@@ -529,6 +529,11 @@ TypesetBotUtils.createUUID = function () {
   });
   return uuid;
 };
+
+TypesetBotUtils.isVisible = function (node) {
+  var elem = node;
+  return !!(elem.offsetWidth || elem.offsetHeight || elem.getClientRects().length);
+};
 /**
  * Class for tokenizing DOM nodes.
  */
@@ -546,10 +551,118 @@ function TypesetBotTokenizer(tsb) {
   /**
    * Tokenize element and get array of tokens.
    *
+   * @param node
    * @returns Array of tokens
    */
   this.tokenize = function (node) {
-    return [];
+    var tokens = [];
+
+    if (!('childNodes' in node)) {
+      return [];
+    } // Only add tokens if node is visible.
+
+
+    if (!TypesetBotUtils.isVisible(node)) {
+      return [];
+    } // Cast childNodes to list of Elements.
+
+
+    var _iteratorNormalCompletion4 = true;
+    var _didIteratorError4 = false;
+    var _iteratorError4 = undefined;
+
+    try {
+      for (var _iterator4 = node.childNodes[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+        var child = _step4.value;
+
+        switch (child.nodeType) {
+          case 1:
+            // Element
+            tokens.push(this.tokenizeElement(child));
+            break;
+
+          case 3:
+            // Text
+            tokens.push(this.tokenizeText(child));
+            break;
+
+          case 2: // Attr
+
+          case 8: // Comment
+
+          case 9: // Document
+
+          case 10:
+            // DocumentType
+            // Ignore types.
+            this._tsb.logger.log('Tokenizer ignores node type: ' + child.nodeType);
+
+            this._tsb.logger.warn(child);
+
+          default:
+            this._tsb.logger.warn('Tokenizer found unknown node type: ' + child.nodeType);
+
+            this._tsb.logger.warn(child);
+
+            break;
+        }
+      }
+    } catch (err) {
+      _didIteratorError4 = true;
+      _iteratorError4 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion4 && _iterator4["return"] != null) {
+          _iterator4["return"]();
+        }
+      } finally {
+        if (_didIteratorError4) {
+          throw _iteratorError4;
+        }
+      }
+    }
+  };
+  /**
+   * Tokennize element node.
+   *
+   * @param node
+   * @returns Array of tokens
+   */
+
+
+  this.tokenizeElement = function (node) {
+    var tokens = [];
+
+    if (!TypesetBotUtils.isVisible(node)) {
+      return [];
+    } // Add start tag.
+
+
+    tokens.push(new TypesetBotTag(node.nodeName, node.attributes, false)); // Recursively add children.
+
+    tokens.push(this.tokenize(node)); // Add end tag.
+
+    tokens.push(new TypesetBotTag(node.nodeName, node.attributes, true));
+    return tokens;
+  };
+  /**
+   * Tokenize text node.
+   *
+   * @param node
+   * @returns Array of tokens
+   */
+
+
+  this.tokenizeText = function (node) {
+    var tokens = [];
+
+    if (node.nodeType !== 3) {
+      this._tsb.logger.warn('TokenizeText was called with wrong type: ' + node.nodeType);
+
+      this._tsb.logger.warn(node);
+
+      return [];
+    }
   };
 
   this._tsb = tsb;
@@ -575,52 +688,25 @@ TypesetBotToken.types = {
   TAG: 3
 };
 /**
- * Class for tag tokens.
- */
-
-var TypesetBotTag =
-/*#__PURE__*/
-function (_TypesetBotToken) {
-  _inherits(TypesetBotTag, _TypesetBotToken);
-
-  /**
-   * @param tag      The name of the tag
-   * @param isEndTag Is this token an end tag
-   */
-  function TypesetBotTag(tag, isEndTag) {
-    var _this;
-
-    _classCallCheck(this, TypesetBotTag);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(TypesetBotTag).call(this, TypesetBotToken.types.TAG));
-    _this.tag = tag;
-    _this.isEndTag = isEndTag;
-    return _this;
-  }
-
-  return TypesetBotTag;
-}(TypesetBotToken);
-/**
  * Class for word tokens.
  */
 
-
 var TypesetBotWord =
 /*#__PURE__*/
-function (_TypesetBotToken2) {
-  _inherits(TypesetBotWord, _TypesetBotToken2);
+function (_TypesetBotToken) {
+  _inherits(TypesetBotWord, _TypesetBotToken);
 
   /**
    * @param text The text of the word
    */
   function TypesetBotWord(text) {
-    var _this2;
+    var _this;
 
     _classCallCheck(this, TypesetBotWord);
 
-    _this2 = _possibleConstructorReturn(this, _getPrototypeOf(TypesetBotWord).call(this, TypesetBotToken.types.WORD));
-    _this2.text = text;
-    return _this2;
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(TypesetBotWord).call(this, TypesetBotToken.types.WORD));
+    _this.text = text;
+    return _this;
   }
 
   return TypesetBotWord;
@@ -632,8 +718,8 @@ function (_TypesetBotToken2) {
 
 var TypesetBotSpace =
 /*#__PURE__*/
-function (_TypesetBotToken3) {
-  _inherits(TypesetBotSpace, _TypesetBotToken3);
+function (_TypesetBotToken2) {
+  _inherits(TypesetBotSpace, _TypesetBotToken2);
 
   function TypesetBotSpace() {
     _classCallCheck(this, TypesetBotSpace);
@@ -642,6 +728,34 @@ function (_TypesetBotToken3) {
   }
 
   return TypesetBotSpace;
+}(TypesetBotToken);
+/**
+ * Class for tag tokens.
+ */
+
+
+var TypesetBotTag =
+/*#__PURE__*/
+function (_TypesetBotToken3) {
+  _inherits(TypesetBotTag, _TypesetBotToken3);
+
+  /**
+   * @param tag      The name of the tag
+   * @param isEndTag Is this token an end tag
+   */
+  function TypesetBotTag(tag, attributes, isEndTag) {
+    var _this2;
+
+    _classCallCheck(this, TypesetBotTag);
+
+    _this2 = _possibleConstructorReturn(this, _getPrototypeOf(TypesetBotTag).call(this, TypesetBotToken.types.TAG));
+    _this2.tag = tag;
+    _this2.attributes = attributes;
+    _this2.isEndTag = isEndTag;
+    return _this2;
+  }
+
+  return TypesetBotTag;
 }(TypesetBotToken);
 
 var TypesetBotTypeset =
@@ -657,26 +771,26 @@ function TypesetBotTypeset(tsb) {
    * @parma nodes
    */
   this.typesetNodes = function (nodes) {
-    var _iteratorNormalCompletion4 = true;
-    var _didIteratorError4 = false;
-    var _iteratorError4 = undefined;
+    var _iteratorNormalCompletion5 = true;
+    var _didIteratorError5 = false;
+    var _iteratorError5 = undefined;
 
     try {
-      for (var _iterator4 = nodes[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-        var node = _step4.value;
+      for (var _iterator5 = nodes[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+        var node = _step5.value;
         this.typeset(node);
       }
     } catch (err) {
-      _didIteratorError4 = true;
-      _iteratorError4 = err;
+      _didIteratorError5 = true;
+      _iteratorError5 = err;
     } finally {
       try {
-        if (!_iteratorNormalCompletion4 && _iterator4["return"] != null) {
-          _iterator4["return"]();
+        if (!_iteratorNormalCompletion5 && _iterator5["return"] != null) {
+          _iterator5["return"]();
         }
       } finally {
-        if (_didIteratorError4) {
-          throw _iteratorError4;
+        if (_didIteratorError5) {
+          throw _iteratorError5;
         }
       }
     }
