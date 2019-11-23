@@ -189,11 +189,11 @@ var TypesetBotPerformanceEntry = function TypesetBotPerformanceEntry() {
 var TypesetBotElementQuery = function TypesetBotElementQuery(tsb, query) {
   _classCallCheck(this, TypesetBotElementQuery);
 
+  this.nodes = [];
   this._queryString = null;
   this._index = 0;
   this._nodeMap = {};
   this._nodesTemp = [];
-  this.nodes = [];
   /**
    * Handle multiple type of queries.
    *
@@ -205,7 +205,7 @@ var TypesetBotElementQuery = function TypesetBotElementQuery(tsb, query) {
       return;
     }
 
-    if (typeof query == 'string') {
+    if (typeof query === 'string') {
       this._queryString = query;
       var elems = document.querySelectorAll(query);
 
@@ -239,7 +239,7 @@ var TypesetBotElementQuery = function TypesetBotElementQuery(tsb, query) {
       }
 
       return;
-    } else if (_typeof(query) == 'object') {
+    } else if (_typeof(query) === 'object') {
       if (NodeList.prototype.isPrototypeOf(query)) {
         var _iteratorNormalCompletion2 = true;
         var _didIteratorError2 = false;

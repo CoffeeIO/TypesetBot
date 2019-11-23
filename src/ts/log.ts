@@ -2,10 +2,10 @@
  * Class for handling debug messages and performance logging.
  */
 class TypesetBotLog {
+
+    debug: boolean = true;
     private _tsb: TypesetBot;
     private _performanceMap: { [key: string] : TypesetBotPerformanceEntry; };
-
-    debug:boolean = true;
 
     /**
      * The constructor.
@@ -99,14 +99,14 @@ class TypesetBotLog {
     diff = function(key: string): string {
         let startTotal: number = 0;
         let endTotal: number = 0;
-        let entry: TypesetBotPerformanceEntry = this._performanceMap[key];
+        const entry: TypesetBotPerformanceEntry = this._performanceMap[key];
 
-        for (var i = 0; i < entry.start.length; i++) {
+        for (let i = 0; i < entry.start.length; i++) {
             startTotal += entry.start[i];
             endTotal += entry.end[i];
         }
         // Substract combined timestamps and round to 2 decimal.
-        return (endTotal - startTotal).toFixed(2) + 'ms --- (calls: '+ entry.start.length +')';
+        return (endTotal - startTotal).toFixed(2) + 'ms --- (calls: ' + entry.start.length + ')';
     }
 }
 

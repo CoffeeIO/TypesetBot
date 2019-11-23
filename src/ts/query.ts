@@ -2,13 +2,13 @@
  * Class for element querying.
  */
 class TypesetBotElementQuery {
+
+    nodes: Element[] = [];
     private _tsb: TypesetBot;
     private _queryString: string = null;
     private _index: number = 0;
     private _nodeMap: { [index: number] : Element; } = {};
-    private _nodesTemp: Element[] = []; 
-
-    nodes: Element[] = [];
+    private _nodesTemp: Element[] = [];
 
     constructor(tsb: TypesetBot, query?: any) {
         this._tsb = tsb;
@@ -26,19 +26,19 @@ class TypesetBotElementQuery {
             return;
         }
 
-        if (typeof query == 'string') {
+        if (typeof query === 'string') {
             this._queryString = query;
-            let elems = document.querySelectorAll(query);
+            const elems = document.querySelectorAll(query);
             if (elems == null) {
                 return;
             }
-            for (let elem of elems) {
+            for (const elem of elems) {
                 this._nodesTemp.push(elem);
             }
             return;
-        } else if(typeof query == 'object') {
+        } else if (typeof query === 'object') {
             if (NodeList.prototype.isPrototypeOf(query)) {
-                for (let elem of query) {
+                for (const elem of query) {
                     this._nodesTemp.push(elem);
                 }
                 return;
@@ -69,7 +69,7 @@ class TypesetBotElementQuery {
      * @param elem
      */
     indexNodes = function(nodes: Element[]) {
-        for (let node of nodes) {
+        for (const node of nodes) {
             this.indexNode(node);
         }
     }

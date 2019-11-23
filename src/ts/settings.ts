@@ -6,7 +6,7 @@ class TypesetBotSettings {
     // Copy of the custom user settings.
     private _tsb: TypesetBot;
     private _customSettings? : object;
-    
+
     /**
      * @param settings Optional settings object.
      */
@@ -37,7 +37,7 @@ class TypesetBotSettings {
             this[key] = value;
         }
     }
-    
+
     // ------------------------------------------------------------------------
     // SETTINGS ---------------------------------------------------------------
     // ------------------------------------------------------------------------
@@ -69,9 +69,9 @@ class TypesetBotSettings {
 
     // Font. ------------------------------------------------------------------
     spaceUnit          : string = 'em'; // Space width unit, em is relative to font-size
-    spaceWidth         : number = 1/3; // Ideal space width
-    spaceStretchability: number = 1/6; // How much can the space width stretch
-    spaceShrinkability : number = 1/9; // How much can the space width shrink
+    spaceWidth         : number = 1 / 3; // Ideal space width
+    spaceStretchability: number = 1 / 6; // How much can the space width stretch
+    spaceShrinkability : number = 1 / 9; // How much can the space width shrink
 
     // Inline element that the program will unwrap from paragraphs as they could disrupt the line breaking.
     unwrapElements: string[] = ['img'];
@@ -95,7 +95,7 @@ class TypesetBotSettings {
         }
 
         return (idealW - actualW) / ((wordCount - 1) * shrink);
-    };
+    }
 
     /**
      * Calculate the badness score.
@@ -110,7 +110,7 @@ class TypesetBotSettings {
         }
 
         return 100 * Math.pow(Math.abs(ratio), 3) + 0.5;
-    };
+    }
 
     /**
      * Calculate the demerit.
@@ -122,7 +122,7 @@ class TypesetBotSettings {
      * @returns The line demerit
      */
     demerit = function(badness: number, penalty: number, flag: boolean): number {
-        var flagPenalty = flag ? this.flagPenalty : 0;
+        const flagPenalty = flag ? this.flagPenalty : 0;
         if (penalty >= 0) {
             return Math.pow(this.demeritOffset + badness + penalty, 2) + flagPenalty;
         } else if (penalty === -Infinity) {
@@ -130,5 +130,5 @@ class TypesetBotSettings {
         } else {
             return Math.pow(this.demeritOffset + badness, 2) - Math.pow(penalty, 2) + flagPenalty;
         }
-    };
+    }
 }

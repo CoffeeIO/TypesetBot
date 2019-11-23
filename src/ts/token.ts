@@ -32,7 +32,7 @@ class TypesetBotToken {
     static readonly types = {
         WORD:  1,
         SPACE: 2,
-        TAG:   3
+        TAG:   3,
     };
     type: number;
 

@@ -1,7 +1,7 @@
 class TypesetBotTypeset {
-    private _tsb: TypesetBot;
 
     tokenizer: TypesetBotTokenizer;
+    private _tsb: TypesetBot;
 
     /**
      * @param tsb Instance of main class
@@ -17,7 +17,7 @@ class TypesetBotTypeset {
      * @parma nodes
      */
     typesetNodes = function(nodes: Element[]) {
-        for (let node of nodes) {
+        for (const node of nodes) {
             this.typeset(node);
         }
     }
@@ -28,7 +28,7 @@ class TypesetBotTypeset {
      * @param node
      */
     typeset = function (node: Element) {
-        let tokens = this.tokenizer.tokenize(node);
+        const tokens = this.tokenizer.tokenize(node);
         console.log(tokens);
     }
 }
