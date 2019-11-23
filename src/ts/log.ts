@@ -115,7 +115,7 @@ class TypesetBotLog {
  */
 class TypesetBotPerformanceEntry {
     start: number[];
-    end: number[]
+    end: number[];
     constructor() {
         this.start = [];
         this.end = [];
