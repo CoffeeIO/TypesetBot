@@ -149,8 +149,7 @@ function TypesetBotLog(tsb) {
    * Get formatted string of total performance time of specific key.
    *
    * @param key
-   *
-   * @returns Formatted string in ms and number of calls.
+   * @returns   Formatted string in ms and number of calls.
    */
 
 
@@ -361,18 +360,20 @@ var TypesetBotSettings =
 /**
  * @param settings Optional settings object.
  */
-function TypesetBotSettings(tsb, settings) {
+function TypesetBotSettings(tsb) {
+  var settings = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
   _classCallCheck(this, TypesetBotSettings);
 
   /**
    * Merge custom settings with a default set of settings.
    *
-   * @param baseSettings
    * @param settings
-   *
-   * @returns The merged settings object
+   * @returns        The merged settings object
    */
-  this._mergeSettings = function (settings) {
+  this._mergeSettings = function () {
+    var settings = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
     if (settings == null) {
       return;
     }
@@ -435,10 +436,7 @@ function TypesetBotSettings(tsb, settings) {
   this.spaceShrinkability = 1 / 9; // How much can the space width shrink
   // Tags inside element that might break the typesetting algorithm
 
-  this.unsupportedTags = ['BR', 'IMG'];
-  this.charactersToReplace = {
-    '\n': ' '
-  }; // Settings functions. ----------------------------------------------------
+  this.unsupportedTags = ['BR', 'IMG']; // Settings functions. ----------------------------------------------------
 
   /**
    * Calculate adjustment ratio.
@@ -448,8 +446,7 @@ function TypesetBotSettings(tsb, settings) {
    * @param wordCount
    * @param shrink
    * @param stretch
-   *
-   * @returns The adjustment ratio
+   * @returns         The adjustment ratio
    */
 
   this.ratio = function (idealW, actualW, wordCount, shrink, stretch) {
@@ -463,8 +460,7 @@ function TypesetBotSettings(tsb, settings) {
    * Calculate the badness score.
    *
    * @param ratio The adjustment ratio
-   *
-   * @returns The badness
+   * @returns     The badness
    */
 
 
@@ -481,8 +477,7 @@ function TypesetBotSettings(tsb, settings) {
    * @param badness
    * @param penalty
    * @param flag
-   *
-   * @returns The line demerit
+   * @returns       The line demerit
    */
 
 
@@ -601,7 +596,7 @@ function TypesetBotTokenizer(tsb) {
    *
    * @param root The root element node
    * @param node The node to tokenize
-   * @returns Array of tokens
+   * @returns    Array of tokens
    */
 
   this.tokenize = function (root) {

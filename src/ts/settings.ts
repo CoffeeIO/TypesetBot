@@ -5,12 +5,12 @@ class TypesetBotSettings {
 
     // Copy of the custom user settings.
     private _tsb: TypesetBot;
-    private _customSettings? : object;
+    private _customSettings: object;
 
     /**
      * @param settings Optional settings object.
      */
-    constructor(tsb: TypesetBot, settings? : object) {
+    constructor(tsb: TypesetBot, settings: object = null) {
         this._tsb = tsb;
         this._customSettings = settings;
         this._mergeSettings(settings);
@@ -19,12 +19,10 @@ class TypesetBotSettings {
     /**
      * Merge custom settings with a default set of settings.
      *
-     * @param baseSettings
      * @param settings
-     *
-     * @returns The merged settings object
+     * @returns        The merged settings object
      */
-    private _mergeSettings = function(settings? : object) : object {
+    private _mergeSettings = function(settings: object = null): object {
         if (settings == null) {
             return;
         }
@@ -75,9 +73,6 @@ class TypesetBotSettings {
 
     // Tags inside element that might break the typesetting algorithm
     unsupportedTags: string[] = ['BR', 'IMG'];
-    charactersToReplace: {[key: string]: string} =  {
-        '\n' : ' ',
-    };
 
     // Settings functions. ----------------------------------------------------
 
@@ -89,8 +84,7 @@ class TypesetBotSettings {
      * @param wordCount
      * @param shrink
      * @param stretch
-     *
-     * @returns The adjustment ratio
+     * @returns         The adjustment ratio
      */
     ratio = function(idealW: number, actualW: number, wordCount: number, shrink: number, stretch: number): number {
         if (actualW < idealW) {
@@ -104,8 +98,7 @@ class TypesetBotSettings {
      * Calculate the badness score.
      *
      * @param ratio The adjustment ratio
-     *
-     * @returns The badness
+     * @returns     The badness
      */
     badness = function(ratio: number): number {
         if (ratio == null || ratio < this.minRatio) {
@@ -121,8 +114,7 @@ class TypesetBotSettings {
      * @param badness
      * @param penalty
      * @param flag
-     *
-     * @returns The line demerit
+     * @returns       The line demerit
      */
     demerit = function(badness: number, penalty: number, flag: boolean): number {
         const flagPenalty = flag ? this.flagPenalty : 0;

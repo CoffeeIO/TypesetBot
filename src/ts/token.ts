@@ -19,7 +19,7 @@ class TypesetBotTokenizer {
      *
      * @param root The root element node
      * @param node The node to tokenize
-     * @returns Array of tokens
+     * @returns    Array of tokens
      */
     tokenize = function(root: Element, node: Element = null): TypesetBotToken[] {
         let tokens: TypesetBotToken[] = [];

@@ -93,8 +93,7 @@ class TypesetBotLog {
      * Get formatted string of total performance time of specific key.
      *
      * @param key
-     *
-     * @returns Formatted string in ms and number of calls.
+     * @returns   Formatted string in ms and number of calls.
      */
     diff = function(key: string): string {
         let startTotal: number = 0;
