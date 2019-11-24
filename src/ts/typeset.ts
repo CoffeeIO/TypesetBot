@@ -27,7 +27,7 @@ class TypesetBotTypeset {
      *
      * @param node
      */
-    typeset = function (node: Element) {
+    typeset = function(node: Element) {
         const tokens = this.tokenizer.tokenize(node);
         console.log(tokens);
     }

@@ -3,6 +3,7 @@
  */
 class TypesetBotTokenizer {
     private _tsb: TypesetBot;
+    private _elementMap: { [index: number] : Element[]; };
 
     /**
      * The constructor.
@@ -16,11 +17,15 @@ class TypesetBotTokenizer {
     /**
      * Tokenize element and get array of tokens.
      *
-     * @param node
+     * @param root The root element node
+     * @param node The node to tokenize
      * @returns Array of tokens
      */
-    tokenize = function(node: Element): TypesetBotToken[] {
+    tokenize = function(root: Element, node: Element = null): TypesetBotToken[] {
         const tokens = [];
+        if (node == null) {
+            node = root;
+        }
         if (!('childNodes' in node)) {
             return [];
         }
@@ -33,10 +38,10 @@ class TypesetBotTokenizer {
         for (const child of node.childNodes as NodeListOf<Element>) {
             switch (child.nodeType) {
                 case 1: // Element
-                    tokens.push(this.tokenizeElement(child));
+                    tokens.push(this.tokenizeElement(node, child));
                     break;
                 case 3: // Text
-                    tokens.push(this.tokenizeText(child));
+                    tokens.push(this.tokenizeText(node, child));
                     break;
                 case 2: // Attr
                 case 8: // Comment
@@ -51,16 +56,16 @@ class TypesetBotTokenizer {
                     break;
             }
         }
-
     }
 
     /**
-     * Tokennize element node.
+     * Tokenize element node.
      *
-     * @param node
+     * @param root The root element node
+     * @param node The node to tokenize
      * @returns Array of tokens
      */
-    tokenizeElement = function(node: Element): TypesetBotToken[] {
+    tokenizeElement = function(root: Element, node: Element): TypesetBotToken[] {
         const tokens = [];
 
         if (!TypesetBotUtils.isVisible(node)) {
@@ -68,11 +73,13 @@ class TypesetBotTokenizer {
         }
 
         // Add start tag.
-        tokens.push(new TypesetBotTag(node.nodeName, node.attributes, false));
+        const nodeIndex = this.appendToNodeMap(root, node);
+
+        tokens.push(new TypesetBotTag(nodeIndex, node.nodeName, false));
         // Recursively add children.
-        tokens.push(this.tokenize(node));
+        tokens.push(this.tokenize(root, node));
         // Add end tag.
-        tokens.push(new TypesetBotTag(node.nodeName, node.attributes, true));
+        tokens.push(new TypesetBotTag(nodeIndex, node.nodeName, true));
 
         return tokens;
     }
@@ -80,10 +87,11 @@ class TypesetBotTokenizer {
     /**
      * Tokenize text node.
      *
-     * @param node
+     * @param root The root element node
+     * @param node The node to tokenize
      * @returns Array of tokens
      */
-    tokenizeText = function(node: Element): TypesetBotToken[] {
+    tokenizeText = function(root: Element, node: Element): TypesetBotToken[] {
         const tokens = [];
 
         if (node.nodeType !== 3) {
@@ -92,6 +100,30 @@ class TypesetBotTokenizer {
             return [];
         }
 
+    }
+
+    /**
+     * Append node to map of nodes for the specific query element.
+     *
+     * @param root The root element node
+     * @param node The node to append
+     * @returns The index of appended node
+     */
+    appendToNodeMap = function(root: Element, node: Element): number {
+        if (TypesetBotUtils.getElementIndex(root) == null) {
+            this._tsb.logger.error('Root node is not indexed');
+            this._tsb.logger.error(root);
+            return null;
+        }
+
+        const index = TypesetBotUtils.getElementIndex(root);
+        if (!(index in this._elementMap)) {
+            this._elementMap[index] = [];
+        }
+        this._elementMap[index].push(node);
+
+        // Return -1 as the array is zero indexed.
+        return this._elementMap[index].length - 1;
     }
 }
 
@@ -105,11 +137,13 @@ class TypesetBotToken {
         TAG:   3,
     };
     type: number;
+    nodeIndex: number;
 
     /**
      * @param type The type of token.
      */
-    constructor(type: number) {
+    constructor(nodeIndex: number, type: number) {
+        this.nodeIndex = nodeIndex;
         this.type = type;
     }
 }
@@ -123,8 +157,8 @@ class TypesetBotWord extends TypesetBotToken {
     /**
      * @param text The text of the word
      */
-    constructor(text: string) {
-        super(TypesetBotToken.types.WORD);
+    constructor(nodeIndex: number, text: string) {
+        super(nodeIndex, TypesetBotToken.types.WORD);
         this.text = text;
     }
 }
@@ -133,8 +167,8 @@ class TypesetBotWord extends TypesetBotToken {
  * Class for space tokens.
  */
 class TypesetBotSpace extends TypesetBotToken {
-    constructor() {
-        super(TypesetBotToken.types.TAG);
+    constructor(nodeIndex: number) {
+        super(nodeIndex, TypesetBotToken.types.TAG);
     }
 }
 
@@ -143,17 +177,15 @@ class TypesetBotSpace extends TypesetBotToken {
  */
 class TypesetBotTag extends TypesetBotToken {
     tag: string;
-    attributes: NamedNodeMap;
     isEndTag: boolean;
 
     /**
      * @param tag      The name of the tag
      * @param isEndTag Is this token an end tag
      */
-    constructor(tag: string, attributes: NamedNodeMap, isEndTag: boolean) {
-        super(TypesetBotToken.types.TAG);
+    constructor(nodeIndex: number, tag: string, isEndTag: boolean) {
+        super(nodeIndex, TypesetBotToken.types.TAG);
         this.tag = tag;
-        this.attributes = attributes;
         this.isEndTag = isEndTag;
     }
 }

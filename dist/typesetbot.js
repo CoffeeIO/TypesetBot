@@ -336,12 +336,12 @@ var TypesetBotElementQuery = function TypesetBotElementQuery(tsb, query) {
     } // Mark node to avoid look at the same element twice.
 
 
-    if (node.getAttribute('data-tsb-indexed') != null) {
+    if (TypesetBotUtils.getElementIndex(node) != null) {
       return;
     }
 
+    TypesetBotUtils.setElementIndex(node, this._index);
     node.setAttribute('data-tsb-uuid', this._tsb.uuid);
-    node.setAttribute('data-tsb-indexed', this._index);
     this.nodes.push(node);
     this._nodeMap[this._index] = node;
     this._index += 1;
@@ -529,10 +529,53 @@ TypesetBotUtils.createUUID = function () {
   });
   return uuid;
 };
+/**
+ * Check if node is visible in dom.
+ *
+ * @returns True if visible, otherwise return false
+ */
+
 
 TypesetBotUtils.isVisible = function (node) {
   var elem = node;
   return !!(elem.offsetWidth || elem.offsetHeight || elem.getClientRects().length);
+};
+/**
+ * Get index of queried node.
+ *
+ * @param node The node to get index of
+ * @returns    The index of the node, otherwise null
+ */
+
+
+TypesetBotUtils.getElementIndex = function (node) {
+  if (node.getAttribute('data-tsb-indexed') == null) {
+    return null;
+  }
+
+  var indexString = node.getAttribute('data-tsb-indexed');
+  var index = parseInt(indexString); // Check NaN and if information is lost in integer parsing.
+
+  if (isNaN(index) || index.toString() !== indexString) {
+    this._tsb.logger.error('Element has attribute "data-tsb-indexed", but could not parse it.');
+
+    this._tsb.logger.error(node);
+
+    return null;
+  }
+
+  return index;
+};
+/**
+ * Set index on node.
+ *
+ * @param node  The node to set index on
+ * @param index The index to set
+ */
+
+
+TypesetBotUtils.setElementIndex = function (node, index) {
+  node.setAttribute('data-tsb-indexed', '' + index);
 };
 /**
  * Class for tokenizing DOM nodes.
@@ -551,11 +594,17 @@ function TypesetBotTokenizer(tsb) {
   /**
    * Tokenize element and get array of tokens.
    *
-   * @param node
+   * @param root The root element node
+   * @param node The node to tokenize
    * @returns Array of tokens
    */
-  this.tokenize = function (node) {
+  this.tokenize = function (root) {
+    var node = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
     var tokens = [];
+
+    if (node == null) {
+      node = root;
+    }
 
     if (!('childNodes' in node)) {
       return [];
@@ -578,12 +627,12 @@ function TypesetBotTokenizer(tsb) {
         switch (child.nodeType) {
           case 1:
             // Element
-            tokens.push(this.tokenizeElement(child));
+            tokens.push(this.tokenizeElement(node, child));
             break;
 
           case 3:
             // Text
-            tokens.push(this.tokenizeText(child));
+            tokens.push(this.tokenizeText(node, child));
             break;
 
           case 2: // Attr
@@ -623,14 +672,15 @@ function TypesetBotTokenizer(tsb) {
     }
   };
   /**
-   * Tokennize element node.
+   * Tokenize element node.
    *
-   * @param node
+   * @param root The root element node
+   * @param node The node to tokenize
    * @returns Array of tokens
    */
 
 
-  this.tokenizeElement = function (node) {
+  this.tokenizeElement = function (root, node) {
     var tokens = [];
 
     if (!TypesetBotUtils.isVisible(node)) {
@@ -638,22 +688,24 @@ function TypesetBotTokenizer(tsb) {
     } // Add start tag.
 
 
-    tokens.push(new TypesetBotTag(node.nodeName, node.attributes, false)); // Recursively add children.
+    var nodeIndex = this.appendToNodeMap(root, node);
+    tokens.push(new TypesetBotTag(nodeIndex, node.nodeName, false)); // Recursively add children.
 
-    tokens.push(this.tokenize(node)); // Add end tag.
+    tokens.push(this.tokenize(root, node)); // Add end tag.
 
-    tokens.push(new TypesetBotTag(node.nodeName, node.attributes, true));
+    tokens.push(new TypesetBotTag(nodeIndex, node.nodeName, true));
     return tokens;
   };
   /**
    * Tokenize text node.
    *
-   * @param node
+   * @param root The root element node
+   * @param node The node to tokenize
    * @returns Array of tokens
    */
 
 
-  this.tokenizeText = function (node) {
+  this.tokenizeText = function (root, node) {
     var tokens = [];
 
     if (node.nodeType !== 3) {
@@ -663,6 +715,35 @@ function TypesetBotTokenizer(tsb) {
 
       return [];
     }
+  };
+  /**
+   * Append node to map of nodes for the specific query element.
+   *
+   * @param root The root element node
+   * @param node The node to append
+   * @returns The index of appended node
+   */
+
+
+  this.appendToNodeMap = function (root, node) {
+    if (TypesetBotUtils.getElementIndex(root) == null) {
+      this._tsb.logger.error('Root node is not indexed');
+
+      this._tsb.logger.error(root);
+
+      return null;
+    }
+
+    var index = TypesetBotUtils.getElementIndex(root);
+
+    if (!(index in this._elementMap)) {
+      this._elementMap[index] = [];
+    }
+
+    this._elementMap[index].push(node); // Return -1 as the array is zero indexed.
+
+
+    return this._elementMap[index].length - 1;
   };
 
   this._tsb = tsb;
@@ -676,9 +757,10 @@ var TypesetBotToken =
 /**
  * @param type The type of token.
  */
-function TypesetBotToken(type) {
+function TypesetBotToken(nodeIndex, type) {
   _classCallCheck(this, TypesetBotToken);
 
+  this.nodeIndex = nodeIndex;
   this.type = type;
 };
 
@@ -699,12 +781,12 @@ function (_TypesetBotToken) {
   /**
    * @param text The text of the word
    */
-  function TypesetBotWord(text) {
+  function TypesetBotWord(nodeIndex, text) {
     var _this;
 
     _classCallCheck(this, TypesetBotWord);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(TypesetBotWord).call(this, TypesetBotToken.types.WORD));
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(TypesetBotWord).call(this, nodeIndex, TypesetBotToken.types.WORD));
     _this.text = text;
     return _this;
   }
@@ -721,10 +803,10 @@ var TypesetBotSpace =
 function (_TypesetBotToken2) {
   _inherits(TypesetBotSpace, _TypesetBotToken2);
 
-  function TypesetBotSpace() {
+  function TypesetBotSpace(nodeIndex) {
     _classCallCheck(this, TypesetBotSpace);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(TypesetBotSpace).call(this, TypesetBotToken.types.TAG));
+    return _possibleConstructorReturn(this, _getPrototypeOf(TypesetBotSpace).call(this, nodeIndex, TypesetBotToken.types.TAG));
   }
 
   return TypesetBotSpace;
@@ -743,14 +825,13 @@ function (_TypesetBotToken3) {
    * @param tag      The name of the tag
    * @param isEndTag Is this token an end tag
    */
-  function TypesetBotTag(tag, attributes, isEndTag) {
+  function TypesetBotTag(nodeIndex, tag, isEndTag) {
     var _this2;
 
     _classCallCheck(this, TypesetBotTag);
 
-    _this2 = _possibleConstructorReturn(this, _getPrototypeOf(TypesetBotTag).call(this, TypesetBotToken.types.TAG));
+    _this2 = _possibleConstructorReturn(this, _getPrototypeOf(TypesetBotTag).call(this, nodeIndex, TypesetBotToken.types.TAG));
     _this2.tag = tag;
-    _this2.attributes = attributes;
     _this2.isEndTag = isEndTag;
     return _this2;
   }
