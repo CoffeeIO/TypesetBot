@@ -47,6 +47,7 @@ function TypesetBot(query, settings) {
   this.settings = new TypesetBotSettings(this, settings);
   this.query = new TypesetBotElementQuery(this, query);
   this.typesetter = new TypesetBotTypeset(this);
+  this.typeset();
 };
 /**
  * Class for handling debug messages and performance logging.
@@ -432,9 +433,12 @@ function TypesetBotSettings(tsb, settings) {
   this.spaceStretchability = 1 / 6; // How much can the space width stretch
 
   this.spaceShrinkability = 1 / 9; // How much can the space width shrink
-  // Inline element that the program will unwrap from paragraphs as they could disrupt the line breaking.
+  // Tags inside element that might break the typesetting algorithm
 
-  this.unwrapElements = ['img']; // Settings functions. ----------------------------------------------------
+  this.unsupportedTags = ['BR', 'IMG'];
+  this.charactersToReplace = {
+    '\n': ' '
+  }; // Settings functions. ----------------------------------------------------
 
   /**
    * Calculate adjustment ratio.
@@ -591,6 +595,7 @@ var TypesetBotTokenizer =
 function TypesetBotTokenizer(tsb) {
   _classCallCheck(this, TypesetBotTokenizer);
 
+  this._elementMap = {};
   /**
    * Tokenize element and get array of tokens.
    *
@@ -598,6 +603,7 @@ function TypesetBotTokenizer(tsb) {
    * @param node The node to tokenize
    * @returns Array of tokens
    */
+
   this.tokenize = function (root) {
     var node = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
     var tokens = [];
@@ -627,12 +633,12 @@ function TypesetBotTokenizer(tsb) {
         switch (child.nodeType) {
           case 1:
             // Element
-            tokens.push(this.tokenizeElement(node, child));
+            tokens = tokens.concat(this.tokenizeElement(root, child));
             break;
 
           case 3:
             // Text
-            tokens.push(this.tokenizeText(node, child));
+            tokens = tokens.concat(this.tokenizeText(root, child));
             break;
 
           case 2: // Attr
@@ -670,13 +676,15 @@ function TypesetBotTokenizer(tsb) {
         }
       }
     }
+
+    return tokens;
   };
   /**
    * Tokenize element node.
    *
    * @param root The root element node
    * @param node The node to tokenize
-   * @returns Array of tokens
+   * @returns    Array of tokens
    */
 
 
@@ -685,13 +693,19 @@ function TypesetBotTokenizer(tsb) {
 
     if (!TypesetBotUtils.isVisible(node)) {
       return [];
-    } // Add start tag.
+    }
 
+    if (node.nodeName in this._tsb.settings.unsupportedTags) {
+      this._tsb.logger.warn('Tokenizer found unsupported node type, typesetting might not work as intended.');
 
-    var nodeIndex = this.appendToNodeMap(root, node);
+      this._tsb.logger.warn(node);
+    }
+
+    var nodeIndex = this.appendToNodeMap(root, node); // Add start tag.
+
     tokens.push(new TypesetBotTag(nodeIndex, node.nodeName, false)); // Recursively add children.
 
-    tokens.push(this.tokenize(root, node)); // Add end tag.
+    tokens = tokens.concat(this.tokenize(root, node)); // Add end tag.
 
     tokens.push(new TypesetBotTag(nodeIndex, node.nodeName, true));
     return tokens;
@@ -701,7 +715,7 @@ function TypesetBotTokenizer(tsb) {
    *
    * @param root The root element node
    * @param node The node to tokenize
-   * @returns Array of tokens
+   * @returns    Array of tokens
    */
 
 
@@ -715,13 +729,59 @@ function TypesetBotTokenizer(tsb) {
 
       return [];
     }
+
+    var nodeIndex = this.appendToNodeMap(root, node);
+    var htmlNode = node;
+    var text = this.replaceInvalidCharacters(htmlNode.nodeValue);
+    var words = text.split(' ');
+
+    if (text[0] === ' ') {
+      tokens.push(new TypesetBotSpace(nodeIndex));
+    }
+
+    var _iteratorNormalCompletion5 = true;
+    var _didIteratorError5 = false;
+    var _iteratorError5 = undefined;
+
+    try {
+      for (var _iterator5 = words[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+        var word = _step5.value;
+
+        if (word === '') {
+          continue;
+        }
+
+        tokens.push(new TypesetBotWord(nodeIndex, word)); // Assume all words are followed by a space.
+
+        tokens.push(new TypesetBotSpace(nodeIndex));
+      }
+    } catch (err) {
+      _didIteratorError5 = true;
+      _iteratorError5 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion5 && _iterator5["return"] != null) {
+          _iterator5["return"]();
+        }
+      } finally {
+        if (_didIteratorError5) {
+          throw _iteratorError5;
+        }
+      }
+    }
+
+    if (htmlNode.nodeValue[htmlNode.nodeValue.length - 1] !== ' ') {
+      tokens.pop();
+    }
+
+    return tokens;
   };
   /**
    * Append node to map of nodes for the specific query element.
    *
    * @param root The root element node
    * @param node The node to append
-   * @returns The index of appended node
+   * @returns    The index of appended node
    */
 
 
@@ -744,6 +804,17 @@ function TypesetBotTokenizer(tsb) {
 
 
     return this._elementMap[index].length - 1;
+  };
+  /**
+   * Replace various newlines characters with spaces.
+   *
+   * @param text The text to check
+   * @returns    The new string with no newlines
+   */
+
+
+  this.replaceInvalidCharacters = function (text) {
+    return text.replace(/(?:\r\n|\r|\n)/g, ' ');
   };
 
   this._tsb = tsb;
@@ -852,26 +923,26 @@ function TypesetBotTypeset(tsb) {
    * @parma nodes
    */
   this.typesetNodes = function (nodes) {
-    var _iteratorNormalCompletion5 = true;
-    var _didIteratorError5 = false;
-    var _iteratorError5 = undefined;
+    var _iteratorNormalCompletion6 = true;
+    var _didIteratorError6 = false;
+    var _iteratorError6 = undefined;
 
     try {
-      for (var _iterator5 = nodes[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-        var node = _step5.value;
+      for (var _iterator6 = nodes[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+        var node = _step6.value;
         this.typeset(node);
       }
     } catch (err) {
-      _didIteratorError5 = true;
-      _iteratorError5 = err;
+      _didIteratorError6 = true;
+      _iteratorError6 = err;
     } finally {
       try {
-        if (!_iteratorNormalCompletion5 && _iterator5["return"] != null) {
-          _iterator5["return"]();
+        if (!_iteratorNormalCompletion6 && _iterator6["return"] != null) {
+          _iterator6["return"]();
         }
       } finally {
-        if (_didIteratorError5) {
-          throw _iteratorError5;
+        if (_didIteratorError6) {
+          throw _iteratorError6;
         }
       }
     }

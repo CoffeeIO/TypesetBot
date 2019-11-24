@@ -24,6 +24,8 @@ class TypesetBot {
         this.settings = new TypesetBotSettings(this, settings);
         this.query = new TypesetBotElementQuery(this, query);
         this.typesetter = new TypesetBotTypeset(this);
+
+        this.typeset();
     }
 
     /**

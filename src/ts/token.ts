@@ -3,7 +3,7 @@
  */
 class TypesetBotTokenizer {
     private _tsb: TypesetBot;
-    private _elementMap: { [index: number] : Element[]; };
+    private _elementMap: { [index: number] : Element[]; } = {};
 
     /**
      * The constructor.
@@ -22,7 +22,7 @@ class TypesetBotTokenizer {
      * @returns Array of tokens
      */
     tokenize = function(root: Element, node: Element = null): TypesetBotToken[] {
-        const tokens = [];
+        let tokens: TypesetBotToken[] = [];
         if (node == null) {
             node = root;
         }
@@ -38,10 +38,10 @@ class TypesetBotTokenizer {
         for (const child of node.childNodes as NodeListOf<Element>) {
             switch (child.nodeType) {
                 case 1: // Element
-                    tokens.push(this.tokenizeElement(node, child));
+                    tokens = tokens.concat(this.tokenizeElement(root, child));
                     break;
                 case 3: // Text
-                    tokens.push(this.tokenizeText(node, child));
+                    tokens = tokens.concat(this.tokenizeText(root, child));
                     break;
                 case 2: // Attr
                 case 8: // Comment
@@ -56,6 +56,8 @@ class TypesetBotTokenizer {
                     break;
             }
         }
+
+        return tokens;
     }
 
     /**
@@ -63,21 +65,26 @@ class TypesetBotTokenizer {
      *
      * @param root The root element node
      * @param node The node to tokenize
-     * @returns Array of tokens
+     * @returns    Array of tokens
      */
     tokenizeElement = function(root: Element, node: Element): TypesetBotToken[] {
-        const tokens = [];
+        let tokens: TypesetBotToken[] = [];
 
         if (!TypesetBotUtils.isVisible(node)) {
             return [];
         }
 
-        // Add start tag.
+        if (node.nodeName in this._tsb.settings.unsupportedTags) {
+            this._tsb.logger.warn('Tokenizer found unsupported node type, typesetting might not work as intended.');
+            this._tsb.logger.warn(node);
+        }
+
         const nodeIndex = this.appendToNodeMap(root, node);
 
+        // Add start tag.
         tokens.push(new TypesetBotTag(nodeIndex, node.nodeName, false));
         // Recursively add children.
-        tokens.push(this.tokenize(root, node));
+        tokens = tokens.concat(this.tokenize(root, node));
         // Add end tag.
         tokens.push(new TypesetBotTag(nodeIndex, node.nodeName, true));
 
@@ -89,10 +96,10 @@ class TypesetBotTokenizer {
      *
      * @param root The root element node
      * @param node The node to tokenize
-     * @returns Array of tokens
+     * @returns    Array of tokens
      */
     tokenizeText = function(root: Element, node: Element): TypesetBotToken[] {
-        const tokens = [];
+        const tokens: TypesetBotToken[] = [];
 
         if (node.nodeType !== 3) {
             this._tsb.logger.warn('TokenizeText was called with wrong type: ' + node.nodeType);
@@ -100,6 +107,29 @@ class TypesetBotTokenizer {
             return [];
         }
 
+        const nodeIndex: number = this.appendToNodeMap(root, node);
+        const htmlNode = node as HTMLElement;
+        const text: string = this.replaceInvalidCharacters(htmlNode.nodeValue);
+        const words: string[] = text.split(' ');
+
+        if (text[0] === ' ') {
+            tokens.push(new TypesetBotSpace(nodeIndex));
+        }
+
+        for (const word of words) {
+            if (word === '') {
+                continue;
+            }
+            tokens.push(new TypesetBotWord(nodeIndex, word));
+            // Assume all words are followed by a space.
+            tokens.push(new TypesetBotSpace(nodeIndex));
+        }
+
+        if (htmlNode.nodeValue[htmlNode.nodeValue.length - 1] !== ' ') {
+            tokens.pop();
+        }
+
+        return tokens;
     }
 
     /**
@@ -107,7 +137,7 @@ class TypesetBotTokenizer {
      *
      * @param root The root element node
      * @param node The node to append
-     * @returns The index of appended node
+     * @returns    The index of appended node
      */
     appendToNodeMap = function(root: Element, node: Element): number {
         if (TypesetBotUtils.getElementIndex(root) == null) {
@@ -124,6 +154,16 @@ class TypesetBotTokenizer {
 
         // Return -1 as the array is zero indexed.
         return this._elementMap[index].length - 1;
+    }
+
+    /**
+     * Replace various newlines characters with spaces.
+     *
+     * @param text The text to check
+     * @returns    The new string with no newlines
+     */
+    replaceInvalidCharacters = function(text: string): string {
+        return text.replace(/(?:\r\n|\r|\n)/g, ' ');
     }
 }
 

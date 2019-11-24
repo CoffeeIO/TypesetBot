@@ -73,8 +73,11 @@ class TypesetBotSettings {
     spaceStretchability: number = 1 / 6; // How much can the space width stretch
     spaceShrinkability : number = 1 / 9; // How much can the space width shrink
 
-    // Inline element that the program will unwrap from paragraphs as they could disrupt the line breaking.
-    unwrapElements: string[] = ['img'];
+    // Tags inside element that might break the typesetting algorithm
+    unsupportedTags: string[] = ['BR', 'IMG'];
+    charactersToReplace: {[key: string]: string} =  {
+        '\n' : ' ',
+    };
 
     // Settings functions. ----------------------------------------------------
 
