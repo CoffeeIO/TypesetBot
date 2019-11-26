@@ -20,7 +20,8 @@
         "semicolon": [false, "always", "ignore-bound-class-methods"],
         "typedef-whitespace": false,
         "quotemark": [true, "single", "avoid-escape", "avoid-template"],
-        "member-ordering": [false, {"order": "fields-first"}]
+        "member-ordering": [false, {"order": "fields-first"}],
+        "indent": [true,"spaces", 4]
 
     },
     "jsRules": {

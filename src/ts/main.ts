@@ -10,6 +10,8 @@ class TypesetBot {
 
     // Variables.
     uuid: string;
+    indexToNodes: { [index: number] : Element[]; } = {};
+    indexToTokens: { [index: number]: TypesetBotToken[] } = {};
 
     /**
      * Constructor of new TypesetBot objects.
@@ -24,6 +26,8 @@ class TypesetBot {
         this.settings = new TypesetBotSettings(this, settings);
         this.query = new TypesetBotElementQuery(this, query);
         this.typesetter = new TypesetBotTypeset(this);
+
+        this.typeset();
     }
 
     /**
