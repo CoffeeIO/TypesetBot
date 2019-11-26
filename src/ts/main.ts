@@ -10,6 +10,8 @@ class TypesetBot {
 
     // Variables.
     uuid: string;
+    indexToNodes: { [index: number] : Element[]; } = {};
+    indexToTokens: { [index: number]: TypesetBotToken[] } = {};
 
     /**
      * Constructor of new TypesetBot objects.

@@ -19,10 +19,9 @@ class TypesetBotSettings {
     /**
      * Merge custom settings with a default set of settings.
      *
-     * @param settings
-     * @returns        The merged settings object
+     * @param settings The custom overwrite settings
      */
-    private _mergeSettings = function(settings: object = null): object {
+    private _mergeSettings = function(settings: object = null) {
         if (settings == null) {
             return;
         }

@@ -3,7 +3,6 @@
  */
 class TypesetBotTokenizer {
     private _tsb: TypesetBot;
-    private _elementMap: { [index: number] : Element[]; } = {};
 
     /**
      * The constructor.
@@ -147,13 +146,13 @@ class TypesetBotTokenizer {
         }
 
         const index = TypesetBotUtils.getElementIndex(root);
-        if (!(index in this._elementMap)) {
-            this._elementMap[index] = [];
+        if (!(index in this._tsb.indexToNodes)) {
+            this._tsb.indexToNodes[index] = [];
         }
-        this._elementMap[index].push(node);
+        this._tsb.indexToNodes[index].push(node);
 
         // Return -1 as the array is zero indexed.
-        return this._elementMap[index].length - 1;
+        return this._tsb.indexToNodes[index].length - 1;
     }
 
     /**

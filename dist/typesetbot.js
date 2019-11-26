@@ -35,9 +35,12 @@ var TypesetBot =
 function TypesetBot(query, settings) {
   _classCallCheck(this, TypesetBot);
 
+  this.indexToNodes = {};
+  this.indexToTokens = {};
   /**
    * Typeset all elements in query.
    */
+
   this.typeset = function () {
     this.typesetter.typesetNodes(this.query.nodes);
   };
@@ -368,8 +371,7 @@ function TypesetBotSettings(tsb) {
   /**
    * Merge custom settings with a default set of settings.
    *
-   * @param settings
-   * @returns        The merged settings object
+   * @param settings The custom overwrite settings
    */
   this._mergeSettings = function () {
     var settings = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
@@ -590,7 +592,6 @@ var TypesetBotTokenizer =
 function TypesetBotTokenizer(tsb) {
   _classCallCheck(this, TypesetBotTokenizer);
 
-  this._elementMap = {};
   /**
    * Tokenize element and get array of tokens.
    *
@@ -598,7 +599,6 @@ function TypesetBotTokenizer(tsb) {
    * @param node The node to tokenize
    * @returns    Array of tokens
    */
-
   this.tokenize = function (root) {
     var node = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
     var tokens = [];
@@ -791,14 +791,14 @@ function TypesetBotTokenizer(tsb) {
 
     var index = TypesetBotUtils.getElementIndex(root);
 
-    if (!(index in this._elementMap)) {
-      this._elementMap[index] = [];
+    if (!(index in this._tsb.indexToNodes)) {
+      this._tsb.indexToNodes[index] = [];
     }
 
-    this._elementMap[index].push(node); // Return -1 as the array is zero indexed.
+    this._tsb.indexToNodes[index].push(node); // Return -1 as the array is zero indexed.
 
 
-    return this._elementMap[index].length - 1;
+    return this._tsb.indexToNodes[index].length - 1;
   };
   /**
    * Replace various newlines characters with spaces.
@@ -950,8 +950,29 @@ function TypesetBotTypeset(tsb) {
 
 
   this.typeset = function (node) {
+    // Tokenize nodes and store them.
     var tokens = this.tokenizer.tokenize(node);
-    console.log(tokens);
+    this.appendToTokenMap(node, tokens);
+  };
+  /**
+   * Add tokens to map for specific node.
+   *
+   * @param root
+   * @param tokens
+   */
+
+
+  this.appendToTokenMap = function (root, tokens) {
+    if (TypesetBotUtils.getElementIndex(root) == null) {
+      this._tsb.logger.error('Root node is not indexed');
+
+      this._tsb.logger.error(root);
+
+      return;
+    }
+
+    var index = TypesetBotUtils.getElementIndex(root);
+    this._tsb.indexToTokens[index] = tokens;
   };
 
   this._tsb = tsb;
