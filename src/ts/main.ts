@@ -22,10 +22,10 @@ class TypesetBot {
      */
     constructor(query?: any, settings?: object) {
         this.util = new TypesetBotUtils(this);
+        this.settings = new TypesetBotSettings(this, settings);
         this.logger = new TypesetBotLog(this);
         this.uuid = TypesetBotUtils.createUUID();
 
-        this.settings = new TypesetBotSettings(this, settings);
         this.query = new TypesetBotElementQuery(this, query);
         this.typesetter = new TypesetBotTypeset(this);
 
@@ -38,7 +38,22 @@ class TypesetBot {
     typeset = function()  {
         console.log('typesettings init');
 
+        this.logger.start('Typeset');
         this.typesetNodes(this.query.nodes);
+        this.logger.end('Typeset');
+
+        // Log the time diffs.
+
+        this.logger.diff('Typeset');
+        this.logger.diff('-- Preprocess');
+        this.logger.diff('---- Clone working node');
+        this.logger.diff('---- Tokenize text');
+        this.logger.diff('---- Get render size of words');
+        this.logger.diff('------ Build HTML');
+        this.logger.diff('------ Update DOM');
+        this.logger.diff('------ Query DOM');
+        this.logger.diff('------ Get Properties');
+        this.logger.diff('---- other');
     }
 
     /**

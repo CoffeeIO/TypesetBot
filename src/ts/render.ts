@@ -1,11 +1,12 @@
-
+/**
+ * Class that does complex DOM interactions.
+ */
 class TypesetBotRender {
 
-    typesetter: TypesetBotTypeset;
     htmlGenerator: TypesetBotHtml;
     private _tsb: TypesetBot;
 
-    constructor(tsb: TypesetBot, typesetter: TypesetBotTypeset) {
+    constructor(tsb: TypesetBot) {
         this._tsb = tsb;
         this.htmlGenerator = new TypesetBotHtml(tsb);
     }
@@ -53,29 +54,25 @@ class TypesetBotRender {
     getWordProperties = function(node: HTMLElement, tokens: TypesetBotToken[]) {
         console.log('Get word properties');
 
+
         const elementNodes = this._tsb.util.getElementNodes(node);
         const backupHtml = node.innerHTML;
-        let html = '';
         const renderIndexToToken: { [index: number] : TypesetBotToken; } = {};
+        let html = '';
         let currentIndex = 0;
-        // const nodeToNewContent: { [index: number] : string; } = {};
 
-
+        this._tsb.logger.start('------ Build HTML');
         for (const token of tokens) {
-            // console.log('Looking at token');
-            // console.log(token);
-
-
             switch (token.type) {
                 case TypesetBotToken.types.WORD:
-                    const word = <TypesetBotWord>token;
+                    const word = token as TypesetBotWord;
                     // const wordNode = elementNodes[token.nodeIndex];
                     renderIndexToToken[currentIndex] = token;
                     currentIndex += 1;
                     html += '<span class="typeset-word-node">' + word.text + '</span>';
                     break;
                 case TypesetBotToken.types.TAG:
-                    const tag = <TypesetBotTag>token;
+                    const tag = token as TypesetBotTag;
                     html += this.htmlGenerator.createTagHtml(node, tag);
                     break;
                 case TypesetBotToken.types.SPACE:
@@ -87,19 +84,32 @@ class TypesetBotRender {
                     break;
             }
         }
+        this._tsb.logger.end('------ Build HTML');
 
+
+        this._tsb.logger.start('------ Update DOM');
         node.innerHTML = html;
-        const renderedWordNodes = node.querySelectorAll('.typeset-word-node');
+        this._tsb.logger.end('------ Update DOM');
 
+        this._tsb.logger.start('------ Query DOM');
+        const renderedWordNodes = node.querySelectorAll('.typeset-word-node');
+        this._tsb.logger.end('------ Query DOM');
+
+        this._tsb.logger.start('------ Get Properties');
         let renderIndex = 0;
         for (const renderedWordNode of renderedWordNodes) {
-            const wordToken = <TypesetBotWord>renderIndexToToken[renderIndex];
+            const wordToken = renderIndexToToken[renderIndex] as TypesetBotWord;
             wordToken.width = renderedWordNode.getBoundingClientRect().width;
             wordToken.height = renderedWordNode.getBoundingClientRect().height;
 
             renderIndex += 1;
         }
+        this._tsb.logger.end('------ Get Properties');
 
+
+        this._tsb.logger.start('------ Update DOM');
         node.innerHTML = backupHtml;
+        this._tsb.logger.end('------ Update DOM');
+
     }
 }

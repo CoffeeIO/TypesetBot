@@ -39,6 +39,9 @@ class TypesetBotSettings {
     // SETTINGS ---------------------------------------------------------------
     // ------------------------------------------------------------------------
 
+    // Debug mode: prints performance stats.
+    debug: boolean = true;
+
     // Algorithm. -------------------------------------------------------------
     alignment: string = 'justify'; // Other options are 'ragged-right', 'ragged-left' and 'ragged-center'
 

@@ -2,7 +2,11 @@
  * Linebreak
  */
 class TypesetBotLinebreak {
-    constructor() {
+    private _tsb: TypesetBot;
 
+    constructor(tsb: TypesetBot) {
+        this._tsb = tsb;
     }
+
+
 }

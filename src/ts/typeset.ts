@@ -31,7 +31,7 @@ class TypesetBotTypeset {
      */
     constructor(tsb: TypesetBot) {
         this._tsb = tsb;
-        this.render = new TypesetBotRender(tsb, this);
+        this.render = new TypesetBotRender(tsb);
         this.tokenizer = new TypesetBotTokenizer(tsb, this);
     }
 
@@ -55,7 +55,10 @@ class TypesetBotTypeset {
         // (ignored for now)
 
         // Make a copy of node which can be worked on without breaking webpage.
+        this._tsb.logger.start('---- Clone working node');
         let cloneNode = node.cloneNode(true);
+        this._tsb.logger.end('---- Clone working node');
+
 
         // Calculate linebreaks.
         let linebreaks = this.calcLinebreaks(node);
@@ -74,15 +77,31 @@ class TypesetBotTypeset {
      * Calculate the valid linebreaks
      */
     calcLinebreaks = function(node: Element): TypesetBotLinebreak[] {
+        this._tsb.logger.start('-- Preprocess');
+
+
         // Set space width based on settings.
+        this._tsb.logger.start('---- other');
         this.render.setMinimumWordSpacing(node);
+        this._tsb.logger.end('---- other');
 
         // Init paragraph variables.
         // Copy content.
         // Tokenize nodes and store them.
+        this._tsb.logger.start('---- Tokenize text');
         this.tokens = this.tokenizer.tokenize(node);
+        this._tsb.logger.end('---- Tokenize text');
+
+        this._tsb.logger.start('---- other');
         this.appendToTokenMap(node, this.tokens);
+        this._tsb.logger.end('---- other');
+
+        this._tsb.logger.start('---- Get render size of words');
         this.render.getWordProperties(node, this.tokens);
+        this._tsb.logger.end('---- Get render size of words');
+
+        this._tsb.logger.end('-- Preprocess');
+
 
         console.log('tokens');
 

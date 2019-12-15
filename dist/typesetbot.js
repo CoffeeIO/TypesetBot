@@ -43,7 +43,20 @@ function TypesetBot(query, settings) {
 
   this.typeset = function () {
     console.log('typesettings init');
+    this.logger.start('Typeset');
     this.typesetNodes(this.query.nodes);
+    this.logger.end('Typeset'); // Log the time diffs.
+
+    this.logger.diff('Typeset');
+    this.logger.diff('-- Preprocess');
+    this.logger.diff('---- Clone working node');
+    this.logger.diff('---- Tokenize text');
+    this.logger.diff('---- Get render size of words');
+    this.logger.diff('------ Build HTML');
+    this.logger.diff('------ Update DOM');
+    this.logger.diff('------ Query DOM');
+    this.logger.diff('------ Get Properties');
+    this.logger.diff('---- other');
   };
   /**
    * Typeset multiple nodes.
@@ -80,9 +93,9 @@ function TypesetBot(query, settings) {
   };
 
   this.util = new TypesetBotUtils(this);
+  this.settings = new TypesetBotSettings(this, settings);
   this.logger = new TypesetBotLog(this);
   this.uuid = TypesetBotUtils.createUUID();
-  this.settings = new TypesetBotSettings(this, settings);
   this.query = new TypesetBotElementQuery(this, query);
   this.typesetter = new TypesetBotTypeset(this);
   this.typeset();
@@ -101,7 +114,7 @@ var TypesetBotLog =
 function TypesetBotLog(tsb) {
   _classCallCheck(this, TypesetBotLog);
 
-  this.debug = true;
+  this.debug = false;
   /**
    * Log messages if debug mode is on.
    *
@@ -192,9 +205,19 @@ function TypesetBotLog(tsb) {
 
 
   this.diff = function (key) {
+    var logOutput = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
+    if (!this.debug) {
+      return;
+    }
+
     var startTotal = 0;
     var endTotal = 0;
     var entry = this._performanceMap[key];
+
+    if (entry == null) {
+      return;
+    }
 
     for (var i = 0; i < entry.start.length; i++) {
       startTotal += entry.start[i];
@@ -202,11 +225,18 @@ function TypesetBotLog(tsb) {
     } // Substract combined timestamps and round to 2 decimal.
 
 
-    return (endTotal - startTotal).toFixed(2) + 'ms --- (calls: ' + entry.start.length + ')';
+    var output = key + ' ' + (endTotal - startTotal).toFixed(2) + 'ms --- (calls: ' + entry.start.length + ')';
+
+    if (logOutput) {
+      this.log(output);
+    }
+
+    return output;
   };
 
   this._tsb = tsb;
   this._performanceMap = {};
+  this.debug = this._tsb.settings.debug;
 };
 /**
  * Class to hold start and end timestamps for a specific key.
@@ -430,8 +460,10 @@ function TypesetBotSettings(tsb) {
   }; // ------------------------------------------------------------------------
   // SETTINGS ---------------------------------------------------------------
   // ------------------------------------------------------------------------
-  // Algorithm. -------------------------------------------------------------
+  // Debug mode: prints performance stats.
 
+
+  this.debug = true; // Algorithm. -------------------------------------------------------------
 
   this.alignment = 'justify'; // Other options are 'ragged-right', 'ragged-left' and 'ragged-center'
 
@@ -976,7 +1008,12 @@ function TypesetBotTypeset(tsb) {
     // (ignored for now)
     // Make a copy of node which can be worked on without breaking webpage.
 
-    var cloneNode = node.cloneNode(true); // Calculate linebreaks.
+    this._tsb.logger.start('---- Clone working node');
+
+    var cloneNode = node.cloneNode(true);
+
+    this._tsb.logger.end('---- Clone working node'); // Calculate linebreaks.
+
 
     var linebreaks = this.calcLinebreaks(node); // Visually apply linebreaks to original element.
     // Loop final solutions and find the one with lowest demerit.
@@ -992,14 +1029,38 @@ function TypesetBotTypeset(tsb) {
 
 
   this.calcLinebreaks = function (node) {
-    // Set space width based on settings.
-    this.render.setMinimumWordSpacing(node); // Init paragraph variables.
+    this._tsb.logger.start('-- Preprocess'); // Set space width based on settings.
+
+
+    this._tsb.logger.start('---- other');
+
+    this.render.setMinimumWordSpacing(node);
+
+    this._tsb.logger.end('---- other'); // Init paragraph variables.
     // Copy content.
     // Tokenize nodes and store them.
 
+
+    this._tsb.logger.start('---- Tokenize text');
+
     this.tokens = this.tokenizer.tokenize(node);
+
+    this._tsb.logger.end('---- Tokenize text');
+
+    this._tsb.logger.start('---- other');
+
     this.appendToTokenMap(node, this.tokens);
+
+    this._tsb.logger.end('---- other');
+
+    this._tsb.logger.start('---- Get render size of words');
+
     this.render.getWordProperties(node, this.tokens);
+
+    this._tsb.logger.end('---- Get render size of words');
+
+    this._tsb.logger.end('-- Preprocess');
+
     console.log('tokens');
     console.log(this.tokens); // Get element width.
     // Preprocess nodes.
@@ -1081,7 +1142,7 @@ function TypesetBotTypeset(tsb) {
   };
 
   this._tsb = tsb;
-  this.render = new TypesetBotRender(tsb, this);
+  this.render = new TypesetBotRender(tsb);
   this.tokenizer = new TypesetBotTokenizer(tsb, this);
 };
 /**
@@ -1089,11 +1150,17 @@ function TypesetBotTypeset(tsb) {
  */
 
 
-var TypesetBotLinebreak = function TypesetBotLinebreak() {
+var TypesetBotLinebreak = function TypesetBotLinebreak(tsb) {
   _classCallCheck(this, TypesetBotLinebreak);
-};
 
-var TypesetBotRender = function TypesetBotRender(tsb, typesetter) {
+  this._tsb = tsb;
+};
+/**
+ * Class that does complex DOM interactions.
+ */
+
+
+var TypesetBotRender = function TypesetBotRender(tsb) {
   _classCallCheck(this, TypesetBotRender);
 
   /**
@@ -1140,9 +1207,11 @@ var TypesetBotRender = function TypesetBotRender(tsb, typesetter) {
     var elementNodes = this._tsb.util.getElementNodes(node);
 
     var backupHtml = node.innerHTML;
-    var html = '';
     var renderIndexToToken = {};
-    var currentIndex = 0; // const nodeToNewContent: { [index: number] : string; } = {};
+    var html = '';
+    var currentIndex = 0;
+
+    this._tsb.logger.start('------ Build HTML');
 
     var _iteratorNormalCompletion7 = true;
     var _didIteratorError7 = false;
@@ -1152,8 +1221,6 @@ var TypesetBotRender = function TypesetBotRender(tsb, typesetter) {
       for (var _iterator7 = tokens[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
         var token = _step7.value;
 
-        // console.log('Looking at token');
-        // console.log(token);
         switch (token.type) {
           case TypesetBotToken.types.WORD:
             var word = token; // const wordNode = elementNodes[token.nodeIndex];
@@ -1194,8 +1261,22 @@ var TypesetBotRender = function TypesetBotRender(tsb, typesetter) {
       }
     }
 
+    this._tsb.logger.end('------ Build HTML');
+
+    this._tsb.logger.start('------ Update DOM');
+
     node.innerHTML = html;
+
+    this._tsb.logger.end('------ Update DOM');
+
+    this._tsb.logger.start('------ Query DOM');
+
     var renderedWordNodes = node.querySelectorAll('.typeset-word-node');
+
+    this._tsb.logger.end('------ Query DOM');
+
+    this._tsb.logger.start('------ Get Properties');
+
     var renderIndex = 0;
     var _iteratorNormalCompletion8 = true;
     var _didIteratorError8 = false;
@@ -1224,7 +1305,13 @@ var TypesetBotRender = function TypesetBotRender(tsb, typesetter) {
       }
     }
 
+    this._tsb.logger.end('------ Get Properties');
+
+    this._tsb.logger.start('------ Update DOM');
+
     node.innerHTML = backupHtml;
+
+    this._tsb.logger.end('------ Update DOM');
   };
 
   this._tsb = tsb;
