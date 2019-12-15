@@ -42,9 +42,44 @@ function TypesetBot(query, settings) {
    */
 
   this.typeset = function () {
-    this.typesetter.typesetNodes(this.query.nodes);
+    console.log('typesettings init');
+    this.typesetNodes(this.query.nodes);
+  };
+  /**
+   * Typeset multiple nodes.
+   *
+   * @parma nodes
+   */
+
+
+  this.typesetNodes = function (nodes) {
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
+
+    try {
+      for (var _iterator = nodes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        var node = _step.value;
+        var typesetter = new TypesetBotTypeset(this);
+        typesetter.typeset(node);
+      }
+    } catch (err) {
+      _didIteratorError = true;
+      _iteratorError = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion && _iterator["return"] != null) {
+          _iterator["return"]();
+        }
+      } finally {
+        if (_didIteratorError) {
+          throw _iteratorError;
+        }
+      }
+    }
   };
 
+  this.util = new TypesetBotUtils(this);
   this.logger = new TypesetBotLog(this);
   this.uuid = TypesetBotUtils.createUUID();
   this.settings = new TypesetBotSettings(this, settings);
@@ -216,27 +251,27 @@ var TypesetBotElementQuery = function TypesetBotElementQuery(tsb, query) {
         return;
       }
 
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
+      var _iteratorNormalCompletion2 = true;
+      var _didIteratorError2 = false;
+      var _iteratorError2 = undefined;
 
       try {
-        for (var _iterator = elems[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var elem = _step.value;
+        for (var _iterator2 = elems[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          var elem = _step2.value;
 
           this._nodesTemp.push(elem);
         }
       } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
+        _didIteratorError2 = true;
+        _iteratorError2 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion && _iterator["return"] != null) {
-            _iterator["return"]();
+          if (!_iteratorNormalCompletion2 && _iterator2["return"] != null) {
+            _iterator2["return"]();
           }
         } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
+          if (_didIteratorError2) {
+            throw _iteratorError2;
           }
         }
       }
@@ -244,27 +279,27 @@ var TypesetBotElementQuery = function TypesetBotElementQuery(tsb, query) {
       return;
     } else if (_typeof(query) === 'object') {
       if (NodeList.prototype.isPrototypeOf(query)) {
-        var _iteratorNormalCompletion2 = true;
-        var _didIteratorError2 = false;
-        var _iteratorError2 = undefined;
+        var _iteratorNormalCompletion3 = true;
+        var _didIteratorError3 = false;
+        var _iteratorError3 = undefined;
 
         try {
-          for (var _iterator2 = query[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-            var _elem = _step2.value;
+          for (var _iterator3 = query[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+            var _elem = _step3.value;
 
             this._nodesTemp.push(_elem);
           }
         } catch (err) {
-          _didIteratorError2 = true;
-          _iteratorError2 = err;
+          _didIteratorError3 = true;
+          _iteratorError3 = err;
         } finally {
           try {
-            if (!_iteratorNormalCompletion2 && _iterator2["return"] != null) {
-              _iterator2["return"]();
+            if (!_iteratorNormalCompletion3 && _iterator3["return"] != null) {
+              _iterator3["return"]();
             }
           } finally {
-            if (_didIteratorError2) {
-              throw _iteratorError2;
+            if (_didIteratorError3) {
+              throw _iteratorError3;
             }
           }
         }
@@ -301,26 +336,26 @@ var TypesetBotElementQuery = function TypesetBotElementQuery(tsb, query) {
 
 
   this.indexNodes = function (nodes) {
-    var _iteratorNormalCompletion3 = true;
-    var _didIteratorError3 = false;
-    var _iteratorError3 = undefined;
+    var _iteratorNormalCompletion4 = true;
+    var _didIteratorError4 = false;
+    var _iteratorError4 = undefined;
 
     try {
-      for (var _iterator3 = nodes[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-        var node = _step3.value;
+      for (var _iterator4 = nodes[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+        var node = _step4.value;
         this.indexNode(node);
       }
     } catch (err) {
-      _didIteratorError3 = true;
-      _iteratorError3 = err;
+      _didIteratorError4 = true;
+      _iteratorError4 = err;
     } finally {
       try {
-        if (!_iteratorNormalCompletion3 && _iterator3["return"] != null) {
-          _iterator3["return"]();
+        if (!_iteratorNormalCompletion4 && _iterator4["return"] != null) {
+          _iterator4["return"]();
         }
       } finally {
-        if (_didIteratorError3) {
-          throw _iteratorError3;
+        if (_didIteratorError4) {
+          throw _iteratorError4;
         }
       }
     }
@@ -339,11 +374,12 @@ var TypesetBotElementQuery = function TypesetBotElementQuery(tsb, query) {
     } // Mark node to avoid look at the same element twice.
 
 
-    if (TypesetBotUtils.getElementIndex(node) != null) {
+    if (this._tsb.util.getElementIndex(node) != null) {
       return;
     }
 
-    TypesetBotUtils.setElementIndex(node, this._index);
+    this._tsb.util.setElementIndex(node, this._index);
+
     node.setAttribute('data-tsb-uuid', this._tsb.uuid);
     this.nodes.push(node);
     this._nodeMap[this._index] = node;
@@ -512,6 +548,52 @@ var TypesetBotUtils =
 function TypesetBotUtils(tsb) {
   _classCallCheck(this, TypesetBotUtils);
 
+  /**
+   * Get index of queried node.
+   *
+   * @param node The node to get index of
+   * @returns    The index of the node, otherwise null
+   */
+  this.getElementIndex = function (node) {
+    if (node.getAttribute('data-tsb-indexed') == null) {
+      return null;
+    }
+
+    var indexString = node.getAttribute('data-tsb-indexed');
+    var index = parseInt(indexString); // Check NaN and if information is lost in integer parsing.
+
+    if (isNaN(index) || index.toString() !== indexString) {
+      this._tsb.logger.error('Element has attribute "data-tsb-indexed", but could not parse it.');
+
+      this._tsb.logger.error(node);
+
+      return null;
+    }
+
+    return index;
+  };
+  /**
+   * Set index on node.
+   *
+   * @param node  The node to set index on
+   * @param index The index to set
+   */
+
+
+  this.setElementIndex = function (node, index) {
+    node.setAttribute('data-tsb-indexed', '' + index);
+  };
+
+  this.getElementNodes = function (node) {
+    var index = this.getElementIndex(node);
+
+    if (isNaN(index)) {
+      this._tsb.logger.error('Could not find nodes to element.');
+    }
+
+    return this._tsb.indexToNodes[index];
+  };
+
   this._tsb = tsb;
 };
 /**
@@ -542,43 +624,6 @@ TypesetBotUtils.isVisible = function (node) {
   return !!(elem.offsetWidth || elem.offsetHeight || elem.getClientRects().length);
 };
 /**
- * Get index of queried node.
- *
- * @param node The node to get index of
- * @returns    The index of the node, otherwise null
- */
-
-
-TypesetBotUtils.getElementIndex = function (node) {
-  if (node.getAttribute('data-tsb-indexed') == null) {
-    return null;
-  }
-
-  var indexString = node.getAttribute('data-tsb-indexed');
-  var index = parseInt(indexString); // Check NaN and if information is lost in integer parsing.
-
-  if (isNaN(index) || index.toString() !== indexString) {
-    this._tsb.logger.error('Element has attribute "data-tsb-indexed", but could not parse it.');
-
-    this._tsb.logger.error(node);
-
-    return null;
-  }
-
-  return index;
-};
-/**
- * Set index on node.
- *
- * @param node  The node to set index on
- * @param index The index to set
- */
-
-
-TypesetBotUtils.setElementIndex = function (node, index) {
-  node.setAttribute('data-tsb-indexed', '' + index);
-};
-/**
  * Class for tokenizing DOM nodes.
  */
 
@@ -589,7 +634,7 @@ var TypesetBotTokenizer =
  *
  * @param tsb Instance of main class
  */
-function TypesetBotTokenizer(tsb) {
+function TypesetBotTokenizer(tsb, typesetter) {
   _classCallCheck(this, TypesetBotTokenizer);
 
   /**
@@ -617,13 +662,13 @@ function TypesetBotTokenizer(tsb) {
     } // Cast childNodes to list of Elements.
 
 
-    var _iteratorNormalCompletion4 = true;
-    var _didIteratorError4 = false;
-    var _iteratorError4 = undefined;
+    var _iteratorNormalCompletion5 = true;
+    var _didIteratorError5 = false;
+    var _iteratorError5 = undefined;
 
     try {
-      for (var _iterator4 = node.childNodes[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-        var child = _step4.value;
+      for (var _iterator5 = node.childNodes[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+        var child = _step5.value;
 
         switch (child.nodeType) {
           case 1:
@@ -658,16 +703,16 @@ function TypesetBotTokenizer(tsb) {
         }
       }
     } catch (err) {
-      _didIteratorError4 = true;
-      _iteratorError4 = err;
+      _didIteratorError5 = true;
+      _iteratorError5 = err;
     } finally {
       try {
-        if (!_iteratorNormalCompletion4 && _iterator4["return"] != null) {
-          _iterator4["return"]();
+        if (!_iteratorNormalCompletion5 && _iterator5["return"] != null) {
+          _iterator5["return"]();
         }
       } finally {
-        if (_didIteratorError4) {
-          throw _iteratorError4;
+        if (_didIteratorError5) {
+          throw _iteratorError5;
         }
       }
     }
@@ -734,13 +779,13 @@ function TypesetBotTokenizer(tsb) {
       tokens.push(new TypesetBotSpace(nodeIndex));
     }
 
-    var _iteratorNormalCompletion5 = true;
-    var _didIteratorError5 = false;
-    var _iteratorError5 = undefined;
+    var _iteratorNormalCompletion6 = true;
+    var _didIteratorError6 = false;
+    var _iteratorError6 = undefined;
 
     try {
-      for (var _iterator5 = words[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-        var word = _step5.value;
+      for (var _iterator6 = words[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+        var word = _step6.value;
 
         if (word === '') {
           continue;
@@ -751,16 +796,16 @@ function TypesetBotTokenizer(tsb) {
         tokens.push(new TypesetBotSpace(nodeIndex));
       }
     } catch (err) {
-      _didIteratorError5 = true;
-      _iteratorError5 = err;
+      _didIteratorError6 = true;
+      _iteratorError6 = err;
     } finally {
       try {
-        if (!_iteratorNormalCompletion5 && _iterator5["return"] != null) {
-          _iterator5["return"]();
+        if (!_iteratorNormalCompletion6 && _iterator6["return"] != null) {
+          _iterator6["return"]();
         }
       } finally {
-        if (_didIteratorError5) {
-          throw _iteratorError5;
+        if (_didIteratorError6) {
+          throw _iteratorError6;
         }
       }
     }
@@ -781,7 +826,7 @@ function TypesetBotTokenizer(tsb) {
 
 
   this.appendToNodeMap = function (root, node) {
-    if (TypesetBotUtils.getElementIndex(root) == null) {
+    if (this._tsb.util.getElementIndex(root) == null) {
       this._tsb.logger.error('Root node is not indexed');
 
       this._tsb.logger.error(root);
@@ -789,7 +834,7 @@ function TypesetBotTokenizer(tsb) {
       return null;
     }
 
-    var index = TypesetBotUtils.getElementIndex(root);
+    var index = this._tsb.util.getElementIndex(root);
 
     if (!(index in this._tsb.indexToNodes)) {
       this._tsb.indexToNodes[index] = [];
@@ -813,6 +858,7 @@ function TypesetBotTokenizer(tsb) {
   };
 
   this._tsb = tsb;
+  this.typesetter = typesetter;
 };
 /**
  * Class for general token.
@@ -872,7 +918,7 @@ function (_TypesetBotToken2) {
   function TypesetBotSpace(nodeIndex) {
     _classCallCheck(this, TypesetBotSpace);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(TypesetBotSpace).call(this, nodeIndex, TypesetBotToken.types.TAG));
+    return _possibleConstructorReturn(this, _getPrototypeOf(TypesetBotSpace).call(this, nodeIndex, TypesetBotToken.types.SPACE));
   }
 
   return TypesetBotSpace;
@@ -904,6 +950,10 @@ function (_TypesetBotToken3) {
 
   return TypesetBotTag;
 }(TypesetBotToken);
+/**
+ * Typesetting class for a single element.
+ */
+
 
 var TypesetBotTypeset =
 /**
@@ -913,51 +963,22 @@ function TypesetBotTypeset(tsb) {
   _classCallCheck(this, TypesetBotTypeset);
 
   /**
-   * Typeset multiple nodes.
-   *
-   * @parma nodes
-   */
-  this.typesetNodes = function (nodes) {
-    var _iteratorNormalCompletion6 = true;
-    var _didIteratorError6 = false;
-    var _iteratorError6 = undefined;
-
-    try {
-      for (var _iterator6 = nodes[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-        var node = _step6.value;
-        this.typeset(node);
-      }
-    } catch (err) {
-      _didIteratorError6 = true;
-      _iteratorError6 = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion6 && _iterator6["return"] != null) {
-          _iterator6["return"]();
-        }
-      } finally {
-        if (_didIteratorError6) {
-          throw _iteratorError6;
-        }
-      }
-    }
-  };
-  /**
    * Typeset single node.
    *
    * @param node
    */
-
-
   this.typeset = function (node) {
-    // Tokenize nodes and store them.
-    var tokens = this.tokenizer.tokenize(node);
-    this.appendToTokenMap(node, tokens);
-    this._tbs.settings.loosenessParam = 0; // Check if node has changed content (inner nodes) since last typesetting.
+    console.log('Typesetting:');
+    console.log(node); // Apply basic reset CSS styles.
+    // (ignore for now)
+
+    this._tsb.settings.loosenessParam = 0; // Check if node has changed content (inner nodes) since last typesetting.
+    // (ignored for now)
     // Make a copy of node which can be worked on without breaking webpage.
-    // Calculate linebreaks.
-    // func().
-    // Visually apply linebreaks to original element.
+
+    var cloneNode = node.cloneNode(true); // Calculate linebreaks.
+
+    var linebreaks = this.calcLinebreaks(node); // Visually apply linebreaks to original element.
     // Loop final solutions and find the one with lowest demerit.
     // Construct lines.
     // Word, Tag Space
@@ -965,11 +986,22 @@ function TypesetBotTypeset(tsb) {
     // Start unfinished tags at the beginning of each line.
     // Convert to HTML.
   };
+  /**
+   * Calculate the valid linebreaks
+   */
 
-  this.calcLinebreaks = function (node) {// Set space width based on settings.
-    // Init paragraph variables.
+
+  this.calcLinebreaks = function (node) {
+    // Set space width based on settings.
+    this.render.setMinimumWordSpacing(node); // Init paragraph variables.
     // Copy content.
-    // Get element width.
+    // Tokenize nodes and store them.
+
+    this.tokens = this.tokenizer.tokenize(node);
+    this.appendToTokenMap(node, this.tokens);
+    this.render.getWordProperties(node, this.tokens);
+    console.log('tokens');
+    console.log(this.tokens); // Get element width.
     // Preprocess nodes.
     // Tokenize.
     // Get render sizes.
@@ -1004,6 +1036,8 @@ function TypesetBotTypeset(tsb) {
     // Run linebreaking algorithm again if no solution was found.
     // Increase looseness.
     // Return calculated nodes and valid linebreak solutions.
+
+    return [];
   };
 
   this.addBreakpoint = function () {// Get fitness class
@@ -1033,7 +1067,7 @@ function TypesetBotTypeset(tsb) {
 
 
   this.appendToTokenMap = function (root, tokens) {
-    if (TypesetBotUtils.getElementIndex(root) == null) {
+    if (this._tsb.util.getElementIndex(root) == null) {
       this._tsb.logger.error('Root node is not indexed');
 
       this._tsb.logger.error(root);
@@ -1041,10 +1075,206 @@ function TypesetBotTypeset(tsb) {
       return;
     }
 
-    var index = TypesetBotUtils.getElementIndex(root);
+    var index = this._tsb.util.getElementIndex(root);
+
     this._tsb.indexToTokens[index] = tokens;
   };
 
   this._tsb = tsb;
-  this.tokenizer = new TypesetBotTokenizer(tsb);
+  this.render = new TypesetBotRender(tsb, this);
+  this.tokenizer = new TypesetBotTokenizer(tsb, this);
+};
+/**
+ * Linebreak
+ */
+
+
+var TypesetBotLinebreak = function TypesetBotLinebreak() {
+  _classCallCheck(this, TypesetBotLinebreak);
+};
+
+var TypesetBotRender = function TypesetBotRender(tsb, typesetter) {
+  _classCallCheck(this, TypesetBotRender);
+
+  /**
+   * Get default word space of node.
+   *
+   * @param node The node to check
+   * @returns    The default word spacing in pixels
+   */
+  this.getSpaceWidth = function (node) {
+    var spanNode = document.createElement('SPAN');
+    var preTextNode = document.createTextNode('1');
+    var postTextNode = document.createTextNode('1');
+    var textNode = document.createTextNode(' ');
+    var spaceContainer = document.createElement('SPAN');
+    spaceContainer.appendChild(textNode);
+    spanNode.appendChild(preTextNode);
+    spanNode.appendChild(spaceContainer);
+    spanNode.appendChild(postTextNode);
+    node.appendChild(spanNode);
+    var rect = spaceContainer.getBoundingClientRect();
+    var width = rect.right - rect.left;
+    spanNode.remove();
+    console.log(width);
+    return width;
+  };
+  /**
+   * Get word spacing on node to the minimum allowed word spacing for typesetting.
+   * This will setup the code for checking how many words can possibly be on a line.
+   * This does not reflect how many words should be on any given line.
+   *
+   * @param node
+   */
+
+
+  this.setMinimumWordSpacing = function (node) {
+    var minSpaceSize = this._tsb.settings.spaceWidth - this._tsb.settings.spaceShrinkability;
+    var defaultWidth = this.getSpaceWidth(node);
+    node.style.wordSpacing = 'calc((1px * ' + minSpaceSize + ') - ' + defaultWidth + 'px)';
+  };
+
+  this.getWordProperties = function (node, tokens) {
+    console.log('Get word properties');
+
+    var elementNodes = this._tsb.util.getElementNodes(node);
+
+    var backupHtml = node.innerHTML;
+    var html = '';
+    var renderIndexToToken = {};
+    var currentIndex = 0; // const nodeToNewContent: { [index: number] : string; } = {};
+
+    var _iteratorNormalCompletion7 = true;
+    var _didIteratorError7 = false;
+    var _iteratorError7 = undefined;
+
+    try {
+      for (var _iterator7 = tokens[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+        var token = _step7.value;
+
+        // console.log('Looking at token');
+        // console.log(token);
+        switch (token.type) {
+          case TypesetBotToken.types.WORD:
+            var word = token; // const wordNode = elementNodes[token.nodeIndex];
+
+            renderIndexToToken[currentIndex] = token;
+            currentIndex += 1;
+            html += '<span class="typeset-word-node">' + word.text + '</span>';
+            break;
+
+          case TypesetBotToken.types.TAG:
+            var tag = token;
+            html += this.htmlGenerator.createTagHtml(node, tag);
+            break;
+
+          case TypesetBotToken.types.SPACE:
+            html += ' ';
+            break;
+
+          default:
+            // Ignore the other node types.
+            this._tsb.logger.error('Unknown token type found: ' + token.type);
+
+            break;
+        }
+      }
+    } catch (err) {
+      _didIteratorError7 = true;
+      _iteratorError7 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion7 && _iterator7["return"] != null) {
+          _iterator7["return"]();
+        }
+      } finally {
+        if (_didIteratorError7) {
+          throw _iteratorError7;
+        }
+      }
+    }
+
+    node.innerHTML = html;
+    var renderedWordNodes = node.querySelectorAll('.typeset-word-node');
+    var renderIndex = 0;
+    var _iteratorNormalCompletion8 = true;
+    var _didIteratorError8 = false;
+    var _iteratorError8 = undefined;
+
+    try {
+      for (var _iterator8 = renderedWordNodes[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+        var renderedWordNode = _step8.value;
+        var wordToken = renderIndexToToken[renderIndex];
+        wordToken.width = renderedWordNode.getBoundingClientRect().width;
+        wordToken.height = renderedWordNode.getBoundingClientRect().height;
+        renderIndex += 1;
+      }
+    } catch (err) {
+      _didIteratorError8 = true;
+      _iteratorError8 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion8 && _iterator8["return"] != null) {
+          _iterator8["return"]();
+        }
+      } finally {
+        if (_didIteratorError8) {
+          throw _iteratorError8;
+        }
+      }
+    }
+
+    node.innerHTML = backupHtml;
+  };
+
+  this._tsb = tsb;
+  this.htmlGenerator = new TypesetBotHtml(tsb);
+};
+
+var TypesetBotHtml = function TypesetBotHtml(tsb) {
+  _classCallCheck(this, TypesetBotHtml);
+
+  this.createTagHtml = function (node, token) {
+    var elementNodes = this._tsb.util.getElementNodes(node);
+
+    var tagNode = elementNodes[token.nodeIndex];
+    console.log(token);
+    console.log(elementNodes);
+    console.log(tagNode);
+
+    if (token.isEndTag) {
+      console.log('</' + tagNode.tagName.toLowerCase() + '>');
+      return '</' + tagNode.tagName.toLowerCase() + '>';
+    } else {
+      var attrText = '';
+      var _iteratorNormalCompletion9 = true;
+      var _didIteratorError9 = false;
+      var _iteratorError9 = undefined;
+
+      try {
+        for (var _iterator9 = tagNode.attributes[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
+          var attr = _step9.value;
+          attrText += attr.name + '=' + attr.value + ' ';
+        }
+      } catch (err) {
+        _didIteratorError9 = true;
+        _iteratorError9 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion9 && _iterator9["return"] != null) {
+            _iterator9["return"]();
+          }
+        } finally {
+          if (_didIteratorError9) {
+            throw _iteratorError9;
+          }
+        }
+      }
+
+      console.log('<' + tagNode.tagName.toLowerCase() + ' ' + attrText + '>');
+      return '<' + tagNode.tagName.toLowerCase() + ' ' + attrText + '>';
+    }
+  };
+
+  this._tsb = tsb;
 };

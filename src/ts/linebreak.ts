@@ -1,0 +1,8 @@
+/**
+ * Linebreak
+ */
+class TypesetBotLinebreak {
+    constructor() {
+
+    }
+}

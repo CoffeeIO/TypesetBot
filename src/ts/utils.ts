@@ -42,7 +42,7 @@ class TypesetBotUtils {
      * @param node The node to get index of
      * @returns    The index of the node, otherwise null
      */
-    static getElementIndex = function(node: Element): number {
+    getElementIndex = function(node: Element): number {
         if (node.getAttribute('data-tsb-indexed') == null) {
             return null;
         }
@@ -65,7 +65,15 @@ class TypesetBotUtils {
      * @param node  The node to set index on
      * @param index The index to set
      */
-    static setElementIndex = function(node: Element, index: number) {
+    setElementIndex = function(node: Element, index: number) {
         node.setAttribute('data-tsb-indexed', '' + index);
+    }
+
+    getElementNodes = function(node: Element) {
+        const index = this.getElementIndex(node);
+        if (isNaN(index)) {
+            this._tsb.logger.error('Could not find nodes to element.');
+        }
+        return this._tsb.indexToNodes[index];
     }
 }

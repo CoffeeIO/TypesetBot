@@ -2,6 +2,7 @@
  * Class for tokenizing DOM nodes.
  */
 class TypesetBotTokenizer {
+    typesetter: TypesetBotTypeset;
     private _tsb: TypesetBot;
 
     /**
@@ -9,8 +10,9 @@ class TypesetBotTokenizer {
      *
      * @param tsb Instance of main class
      */
-    constructor(tsb: TypesetBot) {
+    constructor(tsb: TypesetBot, typesetter: TypesetBotTypeset) {
         this._tsb = tsb;
+        this.typesetter = typesetter;
     }
 
     /**
@@ -139,13 +141,13 @@ class TypesetBotTokenizer {
      * @returns    The index of appended node
      */
     appendToNodeMap = function(root: Element, node: Element): number {
-        if (TypesetBotUtils.getElementIndex(root) == null) {
+        if (this._tsb.util.getElementIndex(root) == null) {
             this._tsb.logger.error('Root node is not indexed');
             this._tsb.logger.error(root);
             return null;
         }
 
-        const index = TypesetBotUtils.getElementIndex(root);
+        const index = this._tsb.util.getElementIndex(root);
         if (!(index in this._tsb.indexToNodes)) {
             this._tsb.indexToNodes[index] = [];
         }
@@ -192,6 +194,8 @@ class TypesetBotToken {
  */
 class TypesetBotWord extends TypesetBotToken {
     text: string;
+    width: number;
+    height: number;
 
     /**
      * @param text The text of the word
@@ -207,7 +211,7 @@ class TypesetBotWord extends TypesetBotToken {
  */
 class TypesetBotSpace extends TypesetBotToken {
     constructor(nodeIndex: number) {
-        super(nodeIndex, TypesetBotToken.types.TAG);
+        super(nodeIndex, TypesetBotToken.types.SPACE);
     }
 }
 

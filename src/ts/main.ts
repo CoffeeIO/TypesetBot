@@ -7,6 +7,7 @@ class TypesetBot {
     settings:   TypesetBotSettings;
     query:      TypesetBotElementQuery;
     typesetter: TypesetBotTypeset;
+    util:       TypesetBotUtils;
 
     // Variables.
     uuid: string;
@@ -20,6 +21,7 @@ class TypesetBot {
      * @param settings? Custom settings object
      */
     constructor(query?: any, settings?: object) {
+        this.util = new TypesetBotUtils(this);
         this.logger = new TypesetBotLog(this);
         this.uuid = TypesetBotUtils.createUUID();
 
@@ -34,6 +36,20 @@ class TypesetBot {
      * Typeset all elements in query.
      */
     typeset = function()  {
-        this.typesetter.typesetNodes(this.query.nodes);
+        console.log('typesettings init');
+
+        this.typesetNodes(this.query.nodes);
+    }
+
+    /**
+     * Typeset multiple nodes.
+     *
+     * @parma nodes
+     */
+    typesetNodes = function(nodes: Element[]) {
+        for (const node of nodes) {
+            const typesetter = new TypesetBotTypeset(this);
+            typesetter.typeset(node);
+        }
     }
 }

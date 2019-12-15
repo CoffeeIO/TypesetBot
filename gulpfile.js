@@ -7,6 +7,9 @@ var source = [
     'src/ts/utils.ts',
     'src/ts/token.ts',
     'src/ts/typeset.ts',
+    'src/ts/linebreak.ts',
+    'src/ts/render.ts',
+    'src/ts/html.ts',
 ];
 // ----------------------------------------------------------------------------
 
@@ -74,4 +77,4 @@ gulp.task('watch', gulp.series('compile', 'watch-src'));
 
 gulp.task("default", gulp.series('compile'));
 
- 
+

@@ -1,25 +1,38 @@
+/**
+ * Typesetting class for a single element.
+ */
 class TypesetBotTypeset {
 
+    render: TypesetBotRender;
     tokenizer: TypesetBotTokenizer;
+
+    tokens: TypesetBotToken[];
+
     private _tsb: TypesetBot;
+
+    // Node variables.
+    originalHTML: string;
+    nodeWidth: number; // In pixels
+    nodes: object;
+    nodeProperties: object;
+    nodeFontSize: number;
+    spaceWidth: number;
+    spaceShrink: number;
+    spaceStretch: number;
+    lastRenderNodeIndex: number;
+    renderContent: string;
+    finalBreakpoints: TypesetBotLinebreak[];
+    activeBreakpoints: TypesetBotLinebreak[];
+    isFinished: boolean;
+    shortestPath: object;
 
     /**
      * @param tsb Instance of main class
      */
     constructor(tsb: TypesetBot) {
         this._tsb = tsb;
-        this.tokenizer = new TypesetBotTokenizer(tsb);
-    }
-
-    /**
-     * Typeset multiple nodes.
-     *
-     * @parma nodes
-     */
-    typesetNodes = function(nodes: Element[]) {
-        for (const node of nodes) {
-            this.typeset(node);
-        }
+        this.render = new TypesetBotRender(tsb, this);
+        this.tokenizer = new TypesetBotTokenizer(tsb, this);
     }
 
     /**
@@ -28,18 +41,24 @@ class TypesetBotTypeset {
      * @param node
      */
     typeset = function(node: Element) {
-        // Tokenize nodes and store them.
-        const tokens = this.tokenizer.tokenize(node);
-        this.appendToTokenMap(node, tokens);
+        console.log('Typesetting:');
+        console.log(node);
 
-        this._tbs.settings.loosenessParam = 0;
+
+        // Apply basic reset CSS styles.
+        // (ignore for now)
+
+
+        this._tsb.settings.loosenessParam = 0;
 
         // Check if node has changed content (inner nodes) since last typesetting.
+        // (ignored for now)
 
         // Make a copy of node which can be worked on without breaking webpage.
+        let cloneNode = node.cloneNode(true);
 
         // Calculate linebreaks.
-            // func().
+        let linebreaks = this.calcLinebreaks(node);
 
         // Visually apply linebreaks to original element.
             // Loop final solutions and find the one with lowest demerit.
@@ -50,12 +69,25 @@ class TypesetBotTypeset {
             // Convert to HTML.
     }
 
-    calcLinebreaks = function(node: Element) {
 
+    /**
+     * Calculate the valid linebreaks
+     */
+    calcLinebreaks = function(node: Element): TypesetBotLinebreak[] {
         // Set space width based on settings.
+        this.render.setMinimumWordSpacing(node);
 
         // Init paragraph variables.
-            // Copy content.
+        // Copy content.
+        // Tokenize nodes and store them.
+        this.tokens = this.tokenizer.tokenize(node);
+        this.appendToTokenMap(node, this.tokens);
+        this.render.getWordProperties(node, this.tokens);
+
+        console.log('tokens');
+
+        console.log(this.tokens);
+
             // Get element width.
             // Preprocess nodes.
                 // Tokenize.
@@ -108,6 +140,9 @@ class TypesetBotTypeset {
             // Increase looseness.
 
         // Return calculated nodes and valid linebreak solutions.
+
+
+        return [];
     }
 
 
@@ -138,14 +173,14 @@ class TypesetBotTypeset {
      * @param root
      * @param tokens
      */
-    appendToTokenMap = function(root: Element, tokens: TypesetBotToken) {
-        if (TypesetBotUtils.getElementIndex(root) == null) {
+    appendToTokenMap = function(root: Element, tokens: TypesetBotToken[]) {
+        if (this._tsb.util.getElementIndex(root) == null) {
             this._tsb.logger.error('Root node is not indexed');
             this._tsb.logger.error(root);
             return;
         }
 
-        const index = TypesetBotUtils.getElementIndex(root);
+        const index = this._tsb.util.getElementIndex(root);
         this._tsb.indexToTokens[index] = tokens;
     }
 }
