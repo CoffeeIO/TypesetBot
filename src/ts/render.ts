@@ -34,7 +34,6 @@ class TypesetBotRender {
         const width = rect.right - rect.left;
         spanNode.remove();
 
-        console.log(width);
         return width;
     }
 
@@ -52,9 +51,6 @@ class TypesetBotRender {
     }
 
     getWordProperties = function(node: HTMLElement, tokens: TypesetBotToken[]) {
-        console.log('Get word properties');
-
-
         const elementNodes = this._tsb.util.getElementNodes(node);
         const backupHtml = node.innerHTML;
         const renderIndexToToken: { [index: number] : TypesetBotToken; } = {};
@@ -111,5 +107,28 @@ class TypesetBotRender {
         node.innerHTML = backupHtml;
         this._tsb.logger.end('------ Update DOM');
 
+    }
+
+    /**
+     * Get default font size of element.
+     *
+     * @param   node
+     * @returns      The font size in pixels as number
+     */
+    getDefaultFontSize = function(node: HTMLElement) : number {
+        const fontSize = window.getComputedStyle(node).fontSize;
+
+        // Remove pixels from output and convert to number.
+        return Number(fontSize.replace('px', ''));
+    }
+
+    /**
+     * Get width of node.
+     *
+     * @param   node
+     * @returns      The width of node in pixels as number
+     */
+    getNodeWidth = function(node: HTMLElement): number {
+        return node.getBoundingClientRect().width
     }
 }

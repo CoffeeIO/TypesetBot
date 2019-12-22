@@ -1,3 +1,6 @@
+// Declare vendor library.
+declare var Queue: any;
+
 /**
  * Typesetting class for a single element.
  */
@@ -12,13 +15,16 @@ class TypesetBotTypeset {
 
     // Node variables.
     originalHTML: string;
-    nodeWidth: number; // In pixels
     nodes: object;
     nodeProperties: object;
-    nodeFontSize: number;
+
+    // Font properties
+    elemWidth: number; // In pixels
+    elemFontSize: number;
     spaceWidth: number;
     spaceShrink: number;
     spaceStretch: number;
+
     lastRenderNodeIndex: number;
     renderContent: string;
     finalBreakpoints: TypesetBotLinebreak[];
@@ -72,6 +78,25 @@ class TypesetBotTypeset {
             // Convert to HTML.
     }
 
+    getElementProperties = function(node: Element) {
+        this._tsb.logger.start('---- other');
+
+        this.originalHTML = node.outerHTML;
+
+        // Set space width based on settings.
+        this.render.setMinimumWordSpacing(node);
+
+        this.elemWidth = this.render.getNodeWidth(node);
+
+        // Get font size and calc real space properties.
+        this.elemFontSize = this.render.getDefaultFontSize(node);
+        this.spaceWidth = this.elemFontSizeSize * this._tsb.settings.spaceWidth,
+        this.spaceShrink = this.elemFontSize * this._tsb.settings.spaceShrinkability,
+        this.spaceStretch = this.elemFontSize * this._tsb.settings.spaceStretchability;
+
+        this._tsb.logger.end('---- other');
+    }
+
 
     /**
      * Calculate the valid linebreaks
@@ -80,46 +105,32 @@ class TypesetBotTypeset {
         this._tsb.logger.start('-- Preprocess');
 
 
-        // Set space width based on settings.
-        this._tsb.logger.start('---- other');
-        this.render.setMinimumWordSpacing(node);
-        this._tsb.logger.end('---- other');
-
+        // Get element width.
         // Init paragraph variables.
         // Copy content.
+        this.getElementProperties(node);
+
         // Tokenize nodes and store them.
         this._tsb.logger.start('---- Tokenize text');
         this.tokens = this.tokenizer.tokenize(node);
         this._tsb.logger.end('---- Tokenize text');
 
         this._tsb.logger.start('---- other');
+        // Append tokens to map for quick access.
         this.appendToTokenMap(node, this.tokens);
         this._tsb.logger.end('---- other');
 
         this._tsb.logger.start('---- Get render size of words');
+        // Get render sizes of nodes.
         this.render.getWordProperties(node, this.tokens);
         this._tsb.logger.end('---- Get render size of words');
 
         this._tsb.logger.end('-- Preprocess');
 
+        this.activeBreakpoints = new Queue();
+        this.shortestPath = [];
+        this.finalBreakpoints = [];
 
-        console.log('tokens');
-
-        console.log(this.tokens);
-
-            // Get element width.
-            // Preprocess nodes.
-                // Tokenize.
-                // Get render sizes.
-                // Store these.
-            // Get font size of node.
-            // Calc space size.
-            // Calc space shrink.
-            // Calc space stretch.
-
-            // Queue of active breakpoints[]
-            // Shortest path {}
-            // FinalBreaks[]
             // Counter for last rendered node.
 
         // Preprocess all hyphens.

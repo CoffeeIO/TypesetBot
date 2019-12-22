@@ -1023,23 +1023,32 @@ function TypesetBotTypeset(tsb) {
     // Start unfinished tags at the beginning of each line.
     // Convert to HTML.
   };
+
+  this.getElementProperties = function (node) {
+    this._tsb.logger.start('---- other');
+
+    this.originalHTML = node.outerHTML; // Set space width based on settings.
+
+    this.render.setMinimumWordSpacing(node);
+    this.elemWidth = this.render.getNodeWidth(node); // Get font size and calc real space properties.
+
+    this.elemFontSize = this.render.getDefaultFontSize(node);
+    this.spaceWidth = this.elemFontSizeSize * this._tsb.settings.spaceWidth, this.spaceShrink = this.elemFontSize * this._tsb.settings.spaceShrinkability, this.spaceStretch = this.elemFontSize * this._tsb.settings.spaceStretchability;
+
+    this._tsb.logger.end('---- other');
+  };
   /**
    * Calculate the valid linebreaks
    */
 
 
   this.calcLinebreaks = function (node) {
-    this._tsb.logger.start('-- Preprocess'); // Set space width based on settings.
-
-
-    this._tsb.logger.start('---- other');
-
-    this.render.setMinimumWordSpacing(node);
-
-    this._tsb.logger.end('---- other'); // Init paragraph variables.
+    this._tsb.logger.start('-- Preprocess'); // Get element width.
+    // Init paragraph variables.
     // Copy content.
-    // Tokenize nodes and store them.
 
+
+    this.getElementProperties(node); // Tokenize nodes and store them.
 
     this._tsb.logger.start('---- Tokenize text');
 
@@ -1047,13 +1056,15 @@ function TypesetBotTypeset(tsb) {
 
     this._tsb.logger.end('---- Tokenize text');
 
-    this._tsb.logger.start('---- other');
+    this._tsb.logger.start('---- other'); // Append tokens to map for quick access.
+
 
     this.appendToTokenMap(node, this.tokens);
 
     this._tsb.logger.end('---- other');
 
-    this._tsb.logger.start('---- Get render size of words');
+    this._tsb.logger.start('---- Get render size of words'); // Get render sizes of nodes.
+
 
     this.render.getWordProperties(node, this.tokens);
 
@@ -1061,20 +1072,9 @@ function TypesetBotTypeset(tsb) {
 
     this._tsb.logger.end('-- Preprocess');
 
-    console.log('tokens');
-    console.log(this.tokens); // Get element width.
-    // Preprocess nodes.
-    // Tokenize.
-    // Get render sizes.
-    // Store these.
-    // Get font size of node.
-    // Calc space size.
-    // Calc space shrink.
-    // Calc space stretch.
-    // Queue of active breakpoints[]
-    // Shortest path {}
-    // FinalBreaks[]
-    // Counter for last rendered node.
+    this.activeBreakpoints = new Queue();
+    this.shortestPath = [];
+    this.finalBreakpoints = []; // Counter for last rendered node.
     // Preprocess all hyphens.
     // Loop all nodes.
     // Find hyphens in word.
@@ -1183,7 +1183,6 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
     var rect = spaceContainer.getBoundingClientRect();
     var width = rect.right - rect.left;
     spanNode.remove();
-    console.log(width);
     return width;
   };
   /**
@@ -1202,8 +1201,6 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
   };
 
   this.getWordProperties = function (node, tokens) {
-    console.log('Get word properties');
-
     var elementNodes = this._tsb.util.getElementNodes(node);
 
     var backupHtml = node.innerHTML;
@@ -1313,24 +1310,55 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
     this._tsb.logger.end('------ Update DOM');
   };
+  /**
+   * Get default font size of element.
+   *
+   * @param   node
+   * @returns      The font size in pixels as number
+   */
+
+
+  this.getDefaultFontSize = function (node) {
+    var fontSize = window.getComputedStyle(node).fontSize; // Remove pixels from output and convert to number.
+
+    return Number(fontSize.replace('px', ''));
+  };
+  /**
+   * Get width of node.
+   *
+   * @param   node
+   * @returns      The width of node in pixels as number
+   */
+
+
+  this.getNodeWidth = function (node) {
+    return node.getBoundingClientRect().width;
+  };
 
   this._tsb = tsb;
   this.htmlGenerator = new TypesetBotHtml(tsb);
 };
+/**
+ * Class for constructing HTML code.
+ */
+
 
 var TypesetBotHtml = function TypesetBotHtml(tsb) {
   _classCallCheck(this, TypesetBotHtml);
 
+  /**
+   * Create HTML code from HTML tag object.
+   *
+   * @param   node  The element to typeset
+   * @param   token The token representing HTML tag
+   * @returns       The HTML string
+   */
   this.createTagHtml = function (node, token) {
     var elementNodes = this._tsb.util.getElementNodes(node);
 
     var tagNode = elementNodes[token.nodeIndex];
-    console.log(token);
-    console.log(elementNodes);
-    console.log(tagNode);
 
     if (token.isEndTag) {
-      console.log('</' + tagNode.tagName.toLowerCase() + '>');
       return '</' + tagNode.tagName.toLowerCase() + '>';
     } else {
       var attrText = '';
@@ -1358,7 +1386,6 @@ var TypesetBotHtml = function TypesetBotHtml(tsb) {
         }
       }
 
-      console.log('<' + tagNode.tagName.toLowerCase() + ' ' + attrText + '>');
       return '<' + tagNode.tagName.toLowerCase() + ' ' + attrText + '>';
     }
   };

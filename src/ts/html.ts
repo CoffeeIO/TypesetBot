@@ -1,3 +1,6 @@
+/**
+ * Class for constructing HTML code.
+ */
 class TypesetBotHtml {
     private _tsb: TypesetBot;
 
@@ -5,16 +8,18 @@ class TypesetBotHtml {
         this._tsb = tsb;
     }
 
+    /**
+     * Create HTML code from HTML tag object.
+     *
+     * @param   node  The element to typeset
+     * @param   token The token representing HTML tag
+     * @returns       The HTML string
+     */
     createTagHtml = function(node: Element, token: TypesetBotTag): string {
         const elementNodes = this._tsb.util.getElementNodes(node);
         const tagNode = elementNodes[token.nodeIndex];
 
-        console.log(token);
-        console.log(elementNodes);
-        console.log(tagNode);
-
         if (token.isEndTag) {
-            console.log('</' + tagNode.tagName.toLowerCase() + '>');
             return '</' + tagNode.tagName.toLowerCase() + '>';
         } else {
             let attrText = '';
@@ -22,7 +27,6 @@ class TypesetBotHtml {
                 attrText += attr.name + '=' + attr.value + ' ';
             }
 
-            console.log('<' + tagNode.tagName.toLowerCase() + ' ' + attrText + '>');
             return '<' + tagNode.tagName.toLowerCase() + ' ' + attrText + '>';
         }
     }
