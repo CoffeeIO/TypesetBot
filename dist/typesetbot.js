@@ -1510,8 +1510,6 @@ var TypesetBotHyphen = function TypesetBotHyphen(tsb) {
 
     window.Hypher.languages[this._tsb.settings.hyphenLanguage].leftMin = this._tsb.settings.hyphenLeftMin + leftOffset;
     window.Hypher.languages[this._tsb.settings.hyphenLanguage].rightMin = this._tsb.settings.hyphenRightMin + rightOffset;
-    console.log(window.Hypher.languages);
-    console.log(window.Hypher.languages[this._tsb.settings.hyphenLanguage]);
     return window.Hypher.languages[this._tsb.settings.hyphenLanguage].hyphenate(word);
   };
   /**

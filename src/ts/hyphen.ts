@@ -41,13 +41,13 @@ class TypesetBotHyphen {
             return[word];
         }
         if ((window as any).Hypher.languages[this._tsb.settings.hyphenLanguage] == null) { // Language not found
-            var h = new (window as any).Hypher(module.exports);
+            const h = new (window as any).Hypher(module.exports);
 
             if (typeof module.exports.id === 'string') {
                 module.exports.id = [module.exports.id];
             }
 
-            for (var i = 0; i < module.exports.id.length; i += 1) {
+            for (let i = 0; i < module.exports.id.length; i += 1) {
                 (window as any).Hypher.languages[module.exports.id[i]] = h;
             }
             if ((window as any).Hypher.languages[this._tsb.settings.hyphenLanguage] != null) {
@@ -60,10 +60,6 @@ class TypesetBotHyphen {
 
         (window as any).Hypher.languages[this._tsb.settings.hyphenLanguage].leftMin = this._tsb.settings.hyphenLeftMin + leftOffset;
         (window as any).Hypher.languages[this._tsb.settings.hyphenLanguage].rightMin = this._tsb.settings.hyphenRightMin + rightOffset;
-
-        console.log((window as any).Hypher.languages);
-        console.log((window as any).Hypher.languages[this._tsb.settings.hyphenLanguage]);
-
 
         return (window as any).Hypher.languages[this._tsb.settings.hyphenLanguage].hyphenate(word);
     }
@@ -87,7 +83,7 @@ class TypesetBotHyphen {
             left = matchesStart[0].length;
         }
 
-        const matchesEnd = word.match(endRegex)
+        const matchesEnd = word.match(endRegex);
         if (matchesEnd) {
             right = matchesEnd[0].length;
         }
