@@ -69,12 +69,32 @@ class TypesetBotUtils {
         node.setAttribute('data-tsb-indexed', '' + index);
     }
 
-    getElementNodes = function(node: Element) {
+    /**
+     * Get nodes of element.
+     *
+     * @param   node
+     * @returns      Array of nodes
+     */
+    getElementNodes = function(node: Element): Element[] {
         const index = this.getElementIndex(node);
         if (isNaN(index)) {
             this._tsb.logger.error('Could not find nodes to element.');
         }
         return this._tsb.indexToNodes[index];
+    }
+
+    /**
+     * Get tokens of element.
+     *
+     * @param   node
+     * @returns      Array of tokens
+     */
+    getElementTokens = function(node: Element): TypesetBotToken[] {
+        const index = this.getElementIndex(node);
+        if (isNaN(index)) {
+            this._tsb.logger.error('Could not find nodes to element.');
+        }
+        return this._tsb.indexToTokens[index];
     }
 
     /**

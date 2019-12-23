@@ -197,9 +197,9 @@ class TypesetBotWord extends TypesetBotToken {
     width: number;
     height: number;
     // Hyphen properties.
-    hasHyphen: boolean;
-    hyphenIndexes: number[];
-    hyphenWidth: number[];
+    hasHyphen: boolean = false;
+    hyphenIndexPositions: number[];
+    hyphenIndexWidths: number[];
     hyphenRemain: number;
 
     /**
@@ -208,6 +208,13 @@ class TypesetBotWord extends TypesetBotToken {
     constructor(nodeIndex: number, text: string) {
         super(nodeIndex, TypesetBotToken.types.WORD);
         this.text = text;
+    }
+
+    initHyphen = function() {
+        this.hasHyphen = true;
+        this.hyphenIndexPositions = [];
+        this.hyphenIndexWidths = [];
+        this.hyphenRemain = 0;
     }
 }
 

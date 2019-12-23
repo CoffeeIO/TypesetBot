@@ -69,9 +69,9 @@ class TypesetBotHyphen {
      * Fx: ,|Hello.$. --> { left: 2, right: 3 }
      *
      * @param   word
-     * @returns      Additional word offset
+     * @returns      Additional word offset { left: number, right: number }
      */
-    getWordOffset = function(word: string): any {
+    getWordOffset = function(word: string): object {
         const beginRegex = /^[\W]*/;
         const endRegex = /[\W]*$/;
 
@@ -93,4 +93,110 @@ class TypesetBotHyphen {
             right,
         };
     };
+
+    /**
+     * Next word tokens until word is finished.
+     * Definition:
+     * - A word is at least 1 word node.
+     * - A word can have any number of tags nodes and tags don't have to end.
+     * - A word ends after a space node.
+     *
+     * @param   element    The element to typeset
+     * @param   tokenIndex The node index to start constructing words
+     * @returns            The next word represented as one or multiple nodes { str: string, indexes: number[] }
+     */
+    nextWord = function(element: Element, tokenIndex: number): object {
+        let str: string = '';
+        const indexes: number[] = [];
+
+        const tokens = this._tsb.util.getElementTokens(element);
+
+        let isFinished = false;
+        while (!isFinished) {
+            const token = tokens[tokenIndex];
+            // Finish loop if there is no more tokens.
+            if (token == null) {
+                isFinished = true;
+                continue;
+            }
+
+            switch (token.type) {
+                case TypesetBotToken.types.WORD:
+                    const word = token as TypesetBotWord;
+                    str += word.text;
+                    indexes.push(tokenIndex)
+                    break;
+                case TypesetBotToken.types.TAG:
+                    // Ignore.
+                    break;
+                case TypesetBotToken.types.SPACE:
+                    // Only allow word to finish if it is not empty.
+                    if (str !== '') {
+                        isFinished = true;
+                    }
+                    break;
+                default:
+                    // Ignore the other node types.
+                    this._tsb.logger.error('Unknown token type found: ' + token.type);
+                    break;
+            }
+
+            tokenIndex++;
+        }
+
+        // Return null if word is empty.
+        if (str === '') {
+            return null;
+        }
+
+        return {
+            str,
+            indexes,
+            tokenIndex,
+        };
+    }
+
+    /**
+     * Calculate hyphens in word and attach hyphen properties to tokens.
+     *
+     * @param   element
+     * @param   wordData Word string and token indexes
+     */
+    calcWordHyphens = function(element: Element, wordData: any) {
+        const hyphens = this.hyphenate(wordData.str);
+
+        // If does not have any hyphens, stop execution.
+        if (hyphens.length <= 1) {
+            return;
+        }
+
+        const tokens = this._tsb.util.getElementTokens(element);
+        // Set properties on tokens.
+        for (const tokenIndex of wordData.indexes) {
+            tokens[tokenIndex].initHyphen();
+        }
+
+        const hyphenLengths = TypesetBotUtils.getArrayIndexes(hyphens);
+        // First word token.
+        let tokenIndex = 0;
+        let curToken = tokens[wordData.indexes[tokenIndex++]] as TypesetBotWord;
+        let curTokenLength = curToken.text.length;
+        let prevLength = 0;
+        let curHyphenLength = 0;
+
+        // Add the accurate hyphen indexes to the nodes.
+        // Fx: ['hyph', <tag>, 'e', <tag>, 'nation'] --> ['hyp(-)h', <tag>, 'e', </tag>, 'n(-)ation']
+        for (const hyphenLength of hyphenLengths) {
+            curHyphenLength += hyphenLength;
+            // Go to next token until we find a token that contains a hyphen.
+            while (curTokenLength < curHyphenLength) {
+                prevLength = curTokenLength;
+                curToken = tokens[wordData.indexes[tokenIndex++]] as TypesetBotWord;
+                curTokenLength += curToken.text.length;
+            }
+
+            const hyphenIndex = curHyphenLength - prevLength - 1; // 1 for index offset
+            curToken.hyphenIndexPositions.push(hyphenIndex);
+        }
+    }
 }

@@ -50,8 +50,9 @@ class TypesetBotRender {
         node.style.wordSpacing = 'calc((1px * ' + minSpaceSize + ') - ' + defaultWidth + 'px)';
     }
 
-    getWordProperties = function(node: HTMLElement, tokens: TypesetBotToken[]) {
-        const elementNodes = this._tsb.util.getElementNodes(node);
+    getWordProperties = function(node: HTMLElement) {
+        // const elementNodes = this._tsb.util.getElementNodes(node);
+        const tokens = this._tsb.util.getElementTokens(node);
         const backupHtml = node.innerHTML;
         const renderIndexToToken: { [index: number] : TypesetBotToken; } = {};
         let html = '';
