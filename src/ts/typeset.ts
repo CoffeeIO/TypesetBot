@@ -64,12 +64,12 @@ class TypesetBotTypeset {
 
         // Make a copy of node which can be worked on without breaking webpage.
         this._tsb.logger.start('---- Clone working node');
-        let cloneNode = node.cloneNode(true);
+        const cloneNode = node.cloneNode(true);
         this._tsb.logger.end('---- Clone working node');
 
 
         // Calculate linebreaks.
-        let linebreaks = this.calcLinebreaks(node);
+        const linebreaks = this.calcLinebreaks(node);
 
         // Visually apply linebreaks to original element.
             // Loop final solutions and find the one with lowest demerit.
