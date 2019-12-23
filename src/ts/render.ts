@@ -129,6 +129,13 @@ class TypesetBotRender {
      * @returns      The width of node in pixels as number
      */
     getNodeWidth = function(node: HTMLElement): number {
-        return node.getBoundingClientRect().width
+        return node.getBoundingClientRect().width;
+    }
+
+    /**
+     *
+     */
+    getHyphenProperties = function(node: HTMLElement, tokens: TypesetBotToken[]) {
+
     }
 }

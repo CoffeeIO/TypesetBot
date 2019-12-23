@@ -76,4 +76,18 @@ class TypesetBotUtils {
         }
         return this._tsb.indexToNodes[index];
     }
+
+    /**
+     * Take a string array and return array of string length and ignore last element.
+     * Fx: ["hyp", "hen", "ation"] --> [3, 3].
+     */
+    static getArrayIndexes = function(arr: string[]) {
+        const indexes = [];
+
+        for (let i = 0; i < arr.length - 1; i++) {
+            indexes.push(arr[i].length);
+        }
+
+        return indexes;
+    };
 }

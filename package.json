@@ -21,7 +21,9 @@
     "karma-html2js-preprocessor": "^1.1.0",
     "karma-jasmine": "^2.0.1",
     "tslint": "^5.20.1",
-    "typescript": "^3.6.4"
+    "typescript": "^3.6.4",
+    "hyphenation.en-us": "~0.2.1",
+    "hypher": "~0.2.5"
   },
   "dependencies": {},
   "scripts": {

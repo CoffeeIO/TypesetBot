@@ -8,6 +8,7 @@ class TypesetBotTypeset {
 
     render: TypesetBotRender;
     tokenizer: TypesetBotTokenizer;
+    hyphen: TypesetBotHyphen;
 
     tokens: TypesetBotToken[];
 
@@ -39,6 +40,7 @@ class TypesetBotTypeset {
         this._tsb = tsb;
         this.render = new TypesetBotRender(tsb);
         this.tokenizer = new TypesetBotTokenizer(tsb, this);
+        this.hyphen = new TypesetBotHyphen(tsb);
     }
 
     /**
@@ -78,8 +80,13 @@ class TypesetBotTypeset {
             // Convert to HTML.
     }
 
+    /**
+     * Get a set initial state properties of element.
+     *
+     * @param node
+     */
     getElementProperties = function(node: Element) {
-        this._tsb.logger.start('---- other');
+        this._tsb.logger.start('---- Getting element properties');
 
         this.originalHTML = node.outerHTML;
 
@@ -94,7 +101,16 @@ class TypesetBotTypeset {
         this.spaceShrink = this.elemFontSize * this._tsb.settings.spaceShrinkability,
         this.spaceStretch = this.elemFontSize * this._tsb.settings.spaceStretchability;
 
-        this._tsb.logger.end('---- other');
+        this._tsb.logger.end('---- Getting element properties');
+    }
+
+    /**
+     * Calculate the hyphens on available tokens.
+     *
+     * @param node
+     */
+    setWordHyphens = function(node: Element) {
+
     }
 
 
@@ -103,7 +119,6 @@ class TypesetBotTypeset {
      */
     calcLinebreaks = function(node: Element): TypesetBotLinebreak[] {
         this._tsb.logger.start('-- Preprocess');
-
 
         // Get element width.
         // Init paragraph variables.
@@ -124,6 +139,17 @@ class TypesetBotTypeset {
         // Get render sizes of nodes.
         this.render.getWordProperties(node, this.tokens);
         this._tsb.logger.end('---- Get render size of words');
+
+        this._tsb.logger.start('---- Hyphen calc');
+        // Calculate hyphens on tokens.
+        this.setWordHyphens(node);
+        this._tsb.logger.start('---- Hyphen calc');
+
+        this._tsb.logger.start('---- Hyphen render');
+        // Calculate hyphens on tokens.
+        this.render.getHyphenProperties(node, this.tokens);
+        this._tsb.logger.start('---- Hyphen render');
+
 
         this._tsb.logger.end('-- Preprocess');
 

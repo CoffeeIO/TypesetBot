@@ -53,6 +53,9 @@ class TypesetBot {
         this.logger.diff('------ Update DOM');
         this.logger.diff('------ Query DOM');
         this.logger.diff('------ Get Properties');
+        this.logger.diff('---- Getting element properties');
+        this.logger.diff('---- Hyphen calc');
+        this.logger.diff('---- Hyphen render');
         this.logger.diff('---- other');
     }
 

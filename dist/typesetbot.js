@@ -56,6 +56,9 @@ function TypesetBot(query, settings) {
     this.logger.diff('------ Update DOM');
     this.logger.diff('------ Query DOM');
     this.logger.diff('------ Get Properties');
+    this.logger.diff('---- Getting element properties');
+    this.logger.diff('---- Hyphen calc');
+    this.logger.diff('---- Hyphen render');
     this.logger.diff('---- other');
   };
   /**
@@ -656,6 +659,21 @@ TypesetBotUtils.isVisible = function (node) {
   return !!(elem.offsetWidth || elem.offsetHeight || elem.getClientRects().length);
 };
 /**
+ * Take a string array and return array of string length and ignore last element.
+ * Fx: ["hyp", "hen", "ation"] --> [3, 3].
+ */
+
+
+TypesetBotUtils.getArrayIndexes = function (arr) {
+  var indexes = [];
+
+  for (var i = 0; i < arr.length - 1; i++) {
+    indexes.push(arr[i].length);
+  }
+
+  return indexes;
+};
+/**
  * Class for tokenizing DOM nodes.
  */
 
@@ -1023,9 +1041,15 @@ function TypesetBotTypeset(tsb) {
     // Start unfinished tags at the beginning of each line.
     // Convert to HTML.
   };
+  /**
+   * Get a set initial state properties of element.
+   *
+   * @param node
+   */
+
 
   this.getElementProperties = function (node) {
-    this._tsb.logger.start('---- other');
+    this._tsb.logger.start('---- Getting element properties');
 
     this.originalHTML = node.outerHTML; // Set space width based on settings.
 
@@ -1035,8 +1059,16 @@ function TypesetBotTypeset(tsb) {
     this.elemFontSize = this.render.getDefaultFontSize(node);
     this.spaceWidth = this.elemFontSizeSize * this._tsb.settings.spaceWidth, this.spaceShrink = this.elemFontSize * this._tsb.settings.spaceShrinkability, this.spaceStretch = this.elemFontSize * this._tsb.settings.spaceStretchability;
 
-    this._tsb.logger.end('---- other');
+    this._tsb.logger.end('---- Getting element properties');
   };
+  /**
+   * Calculate the hyphens on available tokens.
+   *
+   * @param node
+   */
+
+
+  this.setWordHyphens = function (node) {};
   /**
    * Calculate the valid linebreaks
    */
@@ -1069,6 +1101,20 @@ function TypesetBotTypeset(tsb) {
     this.render.getWordProperties(node, this.tokens);
 
     this._tsb.logger.end('---- Get render size of words');
+
+    this._tsb.logger.start('---- Hyphen calc'); // Calculate hyphens on tokens.
+
+
+    this.setWordHyphens(node);
+
+    this._tsb.logger.start('---- Hyphen calc');
+
+    this._tsb.logger.start('---- Hyphen render'); // Calculate hyphens on tokens.
+
+
+    this.render.getHyphenProperties(node, this.tokens);
+
+    this._tsb.logger.start('---- Hyphen render');
 
     this._tsb.logger.end('-- Preprocess');
 
@@ -1144,6 +1190,7 @@ function TypesetBotTypeset(tsb) {
   this._tsb = tsb;
   this.render = new TypesetBotRender(tsb);
   this.tokenizer = new TypesetBotTokenizer(tsb, this);
+  this.hyphen = new TypesetBotHyphen(tsb);
 };
 /**
  * Linebreak
@@ -1334,6 +1381,12 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
   this.getNodeWidth = function (node) {
     return node.getBoundingClientRect().width;
   };
+  /**
+   *
+   */
+
+
+  this.getHyphenProperties = function (node, tokens) {};
 
   this._tsb = tsb;
   this.htmlGenerator = new TypesetBotHtml(tsb);
@@ -1388,6 +1441,109 @@ var TypesetBotHtml = function TypesetBotHtml(tsb) {
 
       return '<' + tagNode.tagName.toLowerCase() + ' ' + attrText + '>';
     }
+  };
+
+  this._tsb = tsb;
+};
+/**
+ * Class to handle text hyphenations.
+ */
+
+
+var TypesetBotHyphen = function TypesetBotHyphen(tsb) {
+  _classCallCheck(this, TypesetBotHyphen);
+
+  /**
+   * Hyphenate word.
+   *
+   * @param   word The word to hyphen
+   * @returns      Array of string parts
+   */
+  this.hyphenate = function (word) {
+    var offset = this.getWordOffset(word);
+    return this.getWordParts(word, offset.right, offset.left);
+  };
+  /**
+   * Hyphen word with specific settings.
+   * Return array of possible word hyphens.
+   * Fx: hyphenation --> ["hyp", "hen", "ation"]
+   *
+   * @param   word        The word to hyphen
+   * @param   rightOffset Addition offset of word on right side
+   * @param   leftOffset  Addition offset of word on left side
+   * @returns             Array of string parts
+   */
+
+
+  this.getWordParts = function (word) {
+    var rightOffset = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+    var leftOffset = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+
+    if (this._tsb.settings.hyphenLanguage.trim() === '') {
+      return [word];
+    }
+
+    if (window.Hypher == null || window.Hypher.languages == null) {
+      console.warn('Hyphenation library not found');
+      return [word];
+    }
+
+    if (window.Hypher.languages[this._tsb.settings.hyphenLanguage] == null) {
+      // Language not found
+      var h = new window.Hypher(module.exports);
+
+      if (typeof module.exports.id === 'string') {
+        module.exports.id = [module.exports.id];
+      }
+
+      for (var i = 0; i < module.exports.id.length; i += 1) {
+        window.Hypher.languages[module.exports.id[i]] = h;
+      }
+
+      if (window.Hypher.languages[this._tsb.settings.hyphenLanguage] != null) {
+        return this.getWordParts(word);
+      }
+
+      console.warn("Hyphenation language '%s' not found", this._tsb.settings.hyphenLanguage);
+      return [word];
+    }
+
+    window.Hypher.languages[this._tsb.settings.hyphenLanguage].leftMin = this._tsb.settings.hyphenLeftMin + leftOffset;
+    window.Hypher.languages[this._tsb.settings.hyphenLanguage].rightMin = this._tsb.settings.hyphenRightMin + rightOffset;
+    console.log(window.Hypher.languages);
+    console.log(window.Hypher.languages[this._tsb.settings.hyphenLanguage]);
+    return window.Hypher.languages[this._tsb.settings.hyphenLanguage].hyphenate(word);
+  };
+  /**
+   * Get the right and left offset of non-word characters in string.
+   * Fx: ,|Hello.$. --> { left: 2, right: 3 }
+   *
+   * @param   word
+   * @returns      Additional word offset
+   */
+
+
+  this.getWordOffset = function (word) {
+    var beginRegex = /^[\W]*/;
+    var endRegex = /[\W]*$/;
+    var left = 0;
+    var right = 0;
+    var matchesStart = word.match(beginRegex);
+
+    if (matchesStart) {
+      left = matchesStart[0].length;
+    }
+
+    var matchesEnd = word.match(endRegex);
+
+    if (matchesEnd) {
+      right = matchesEnd[0].length;
+    }
+
+    return {
+      left: left,
+      right: right
+    };
   };
 
   this._tsb = tsb;

@@ -10,6 +10,7 @@ var source = [
     'src/ts/linebreak.ts',
     'src/ts/render.ts',
     'src/ts/html.ts',
+    'src/ts/hyphen.ts',
 ];
 // ----------------------------------------------------------------------------
 
