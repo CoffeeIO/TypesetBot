@@ -124,7 +124,7 @@ class TypesetBotHyphen {
                 case TypesetBotToken.types.WORD:
                     const word = token as TypesetBotWord;
                     str += word.text;
-                    indexes.push(tokenIndex)
+                    indexes.push(tokenIndex);
                     break;
                 case TypesetBotToken.types.TAG:
                     // Ignore.
@@ -178,8 +178,8 @@ class TypesetBotHyphen {
 
         const hyphenLengths = TypesetBotUtils.getArrayIndexes(hyphens);
         // First word token.
-        let tokenIndex = 0;
-        let curToken = tokens[wordData.indexes[tokenIndex++]] as TypesetBotWord;
+        let curTokenIndex = 0;
+        let curToken = tokens[wordData.indexes[curTokenIndex++]] as TypesetBotWord;
         let curTokenLength = curToken.text.length;
         let prevLength = 0;
         let curHyphenLength = 0;
@@ -191,7 +191,7 @@ class TypesetBotHyphen {
             // Go to next token until we find a token that contains a hyphen.
             while (curTokenLength < curHyphenLength) {
                 prevLength = curTokenLength;
-                curToken = tokens[wordData.indexes[tokenIndex++]] as TypesetBotWord;
+                curToken = tokens[wordData.indexes[curTokenIndex++]] as TypesetBotWord;
                 curTokenLength += curToken.text.length;
             }
 

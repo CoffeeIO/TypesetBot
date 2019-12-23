@@ -1104,12 +1104,14 @@ function TypesetBotTypeset(tsb) {
 
   this.setWordHyphens = function (element) {
     var tokenIndex = 0;
+    var isFinished = false;
 
-    while (true) {
+    while (!isFinished) {
       var wordData = this.hyphen.nextWord(element, tokenIndex);
 
       if (wordData == null) {
-        break;
+        isFinished = true;
+        continue;
       }
 
       tokenIndex = wordData.tokenIndex;
@@ -1684,9 +1686,8 @@ var TypesetBotHyphen = function TypesetBotHyphen(tsb) {
 
     try {
       for (var _iterator10 = wordData.indexes[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
-        var _tokenIndex = _step10.value;
-
-        tokens[_tokenIndex].initHyphen();
+        var tokenIndex = _step10.value;
+        tokens[tokenIndex].initHyphen();
       }
     } catch (err) {
       _didIteratorError10 = true;
@@ -1705,8 +1706,8 @@ var TypesetBotHyphen = function TypesetBotHyphen(tsb) {
 
     var hyphenLengths = TypesetBotUtils.getArrayIndexes(hyphens); // First word token.
 
-    var tokenIndex = 0;
-    var curToken = tokens[wordData.indexes[tokenIndex++]];
+    var curTokenIndex = 0;
+    var curToken = tokens[wordData.indexes[curTokenIndex++]];
     var curTokenLength = curToken.text.length;
     var prevLength = 0;
     var curHyphenLength = 0; // Add the accurate hyphen indexes to the nodes.
@@ -1723,7 +1724,7 @@ var TypesetBotHyphen = function TypesetBotHyphen(tsb) {
 
         while (curTokenLength < curHyphenLength) {
           prevLength = curTokenLength;
-          curToken = tokens[wordData.indexes[tokenIndex++]];
+          curToken = tokens[wordData.indexes[curTokenIndex++]];
           curTokenLength += curToken.text.length;
         }
 

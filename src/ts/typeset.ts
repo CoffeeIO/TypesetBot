@@ -112,10 +112,12 @@ class TypesetBotTypeset {
     setWordHyphens = function(element: Element) {
         let tokenIndex = 0;
 
-        while (true) {
-            const wordData = this.hyphen.nextWord(element, tokenIndex)
+        let isFinished = false;
+        while (!isFinished) {
+            const wordData = this.hyphen.nextWord(element, tokenIndex);
             if (wordData == null) {
-                break;
+                isFinished = true;
+                continue;
             }
 
             tokenIndex = wordData.tokenIndex;
