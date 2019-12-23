@@ -168,11 +168,15 @@ class TypesetBotTypeset {
         this._tsb.logger.end('-- Preprocess');
         console.log(this.tokens);
 
+
+        this._tsb.logger.start('-- Dynamic programming');
+
         this.activeBreakpoints = new Queue();
         this.shortestPath = [];
         this.finalBreakpoints = [];
 
-            // Counter for last rendered node.
+
+        // Counter for last rendered node.
 
         // Preprocess all hyphens.
             // Loop all nodes.
@@ -194,25 +198,26 @@ class TypesetBotTypeset {
 
                 // Loop hyphen breakpoints.
 
-                    // Get hyphen adjustment ratio.
+                // Get hyphen adjustment ratio.
 
-                    // If "valid" breaking point, generate break.
+                // If "valid" breaking point, generate break.
 
                 // Check if adjustment ratio is within the minimum ratio.
 
                 // Generate break.
 
-            // Add space width to current line with.
+                // Add space width to current line with.
 
-        // Reset node content.
+                // Reset node content.
 
-        // Run linebreaking algorithm again if no solution was found.
+                // Run linebreaking algorithm again if no solution was found.
 
-            // Increase looseness.
+                // Increase looseness.
 
-        // Return calculated nodes and valid linebreak solutions.
+                // Return calculated nodes and valid linebreak solutions.
 
 
+        this._tsb.logger.end('-- Dynamic programming');
         return [];
     }
 

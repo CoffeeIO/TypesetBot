@@ -217,6 +217,9 @@ class TypesetBotRender {
                 case 'dash':
                     token.dashWidth = width;
                     break;
+                default:
+                    this._tsb.logger.error('Unknown request object type found: ' + request.type);
+                    break;
             }
         }
 

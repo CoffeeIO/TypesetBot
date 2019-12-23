@@ -1169,6 +1169,9 @@ function TypesetBotTypeset(tsb) {
     this._tsb.logger.end('-- Preprocess');
 
     console.log(this.tokens);
+
+    this._tsb.logger.start('-- Dynamic programming');
+
     this.activeBreakpoints = new Queue();
     this.shortestPath = [];
     this.finalBreakpoints = []; // Counter for last rendered node.
@@ -1194,6 +1197,8 @@ function TypesetBotTypeset(tsb) {
     // Run linebreaking algorithm again if no solution was found.
     // Increase looseness.
     // Return calculated nodes and valid linebreak solutions.
+
+    this._tsb.logger.end('-- Dynamic programming');
 
     return [];
   };
@@ -1571,6 +1576,11 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
           case 'dash':
             _token.dashWidth = width;
+            break;
+
+          default:
+            this._tsb.logger.error('Unknown request object type found: ' + request.type);
+
             break;
         }
       }
