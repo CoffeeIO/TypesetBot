@@ -51,7 +51,6 @@ class TypesetBotRender {
     }
 
     getWordProperties = function(node: HTMLElement) {
-        // const elementNodes = this._tsb.util.getElementNodes(node);
         const tokens = this._tsb.util.getElementTokens(node);
         const backupHtml = node.innerHTML;
         const renderIndexToToken: { [index: number] : TypesetBotToken; } = {};
@@ -136,7 +135,91 @@ class TypesetBotRender {
     /**
      *
      */
-    getHyphenProperties = function(node: HTMLElement, tokens: TypesetBotToken[]) {
+    getHyphenProperties = function(element: HTMLElement) {
+        const tokens = this._tsb.util.getElementTokens(element);
+        const backupHtml: string = element.innerHTML;
+        let html: string = '';
+        // Array of objects in dom to inspect.
+        const renderRequest: any[] = [];
 
+        // Loop tokens to build HTML.
+        for (const token of tokens) {
+            switch (token.type) {
+                case TypesetBotToken.types.WORD:
+                    const word = token as TypesetBotWord;
+                    let lastIndex = 0;
+
+                    // Skip if word has not hyphens
+                    if (!word.hasHyphen) {
+                        continue;
+                    }
+                    // Queue hyphenation parts or word.
+                    for (const hyphenIndex of word.hyphenIndexPositions) {
+                        const cut = word.text.substring(lastIndex, hyphenIndex + 1);
+                        lastIndex = hyphenIndex + 1;
+
+                        html += '<span class="typeset-hyphen-check">' + cut + '</span>';
+                        renderRequest.push({
+                            token,
+                            type: 'hyphen',
+                        });
+                    }
+                    // Queue remain (if any), fx 'phen'.
+                    if (word.text.length !== lastIndex) {
+                        const cut = word.text.substr(lastIndex);
+                        html += '<span class="typeset-hyphen-check">' + cut + '</span>';
+                        renderRequest.push({
+                            token,
+                            type: 'remain',
+                        });
+                    }
+
+                    // Queue dash, '-'.
+                    html += '<span class="typeset-hyphen-check">-</span>';
+                    renderRequest.push({
+                        token,
+                        type: 'dash',
+                    });
+
+                    break;
+                case TypesetBotToken.types.TAG:
+                    const tag = token as TypesetBotTag;
+                    html += this.htmlGenerator.createTagHtml(element, tag);
+                    break;
+                case TypesetBotToken.types.SPACE:
+                    html += ' ';
+                    break;
+                default:
+                    // Ignore the other node types.
+                    this._tsb.logger.error('Unknown token type found: ' + token.type);
+                    break;
+            }
+        }
+
+        element.innerHTML = html;
+
+        const renderedHyphenNodes = element.querySelectorAll('.typeset-hyphen-check');
+
+        // Loop elements from DOM.
+        let renderIndex = 0;
+        for (const renderedHyphenNode of renderedHyphenNodes) {
+            const request = renderRequest[renderIndex++];
+            const token = request.token as TypesetBotWord;
+
+            // Get width of requested element and insert to correct type.
+            const width = renderedHyphenNode.getBoundingClientRect().width;
+            switch (request.type) {
+                case 'hyphen':
+                    token.hyphenIndexWidths.push(width);
+                    break;
+                case 'remain':
+                    token.hyphenRemainWidth = width;
+                case 'dash':
+                    token.dashWidth = width;
+                    break;
+            }
+        }
+
+        element.innerHTML = backupHtml;
     }
 }

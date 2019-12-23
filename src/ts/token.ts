@@ -200,7 +200,8 @@ class TypesetBotWord extends TypesetBotToken {
     hasHyphen: boolean = false;
     hyphenIndexPositions: number[];
     hyphenIndexWidths: number[];
-    hyphenRemain: number;
+    hyphenRemainWidth: number;
+    dashWidth: number;
 
     /**
      * @param text The text of the word
@@ -214,7 +215,8 @@ class TypesetBotWord extends TypesetBotToken {
         this.hasHyphen = true;
         this.hyphenIndexPositions = [];
         this.hyphenIndexWidths = [];
-        this.hyphenRemain = 0;
+        this.hyphenRemainWidth = 0;
+        this.dashWidth = 0;
     }
 }
 

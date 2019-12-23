@@ -163,7 +163,10 @@ class TypesetBotTypeset {
         this._tsb.logger.end('---- Hyphen render');
 
 
+
+
         this._tsb.logger.end('-- Preprocess');
+        console.log(this.tokens);
 
         this.activeBreakpoints = new Queue();
         this.shortestPath = [];
