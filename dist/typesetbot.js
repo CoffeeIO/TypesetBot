@@ -509,63 +509,7 @@ function TypesetBotSettings(tsb) {
   this.spaceShrinkability = 1 / 9; // How much can the space width shrink
   // Tags inside element that might break the typesetting algorithm
 
-  this.unsupportedTags = ['BR', 'IMG']; // Settings functions. ----------------------------------------------------
-
-  /**
-   * Calculate adjustment ratio.
-   *
-   * @param idealW
-   * @param actualW
-   * @param wordCount
-   * @param shrink
-   * @param stretch
-   * @returns         The adjustment ratio
-   */
-
-  this.ratio = function (idealW, actualW, wordCount, shrink, stretch) {
-    if (actualW < idealW) {
-      return (idealW - actualW) / ((wordCount - 1) * stretch);
-    }
-
-    return (idealW - actualW) / ((wordCount - 1) * shrink);
-  };
-  /**
-   * Calculate the badness score.
-   *
-   * @param ratio The adjustment ratio
-   * @returns     The badness
-   */
-
-
-  this.badness = function (ratio) {
-    if (ratio == null || ratio < this.minRatio) {
-      return Infinity;
-    }
-
-    return 100 * Math.pow(Math.abs(ratio), 3) + 0.5;
-  };
-  /**
-   * Calculate the demerit.
-   *
-   * @param badness
-   * @param penalty
-   * @param flag
-   * @returns       The line demerit
-   */
-
-
-  this.demerit = function (badness, penalty, flag) {
-    var flagPenalty = flag ? this.flagPenalty : 0;
-
-    if (penalty >= 0) {
-      return Math.pow(this.demeritOffset + badness + penalty, 2) + flagPenalty;
-    } else if (penalty === -Infinity) {
-      return Math.pow(this.demeritOffset + badness, 2) + flagPenalty;
-    } else {
-      return Math.pow(this.demeritOffset + badness, 2) - Math.pow(penalty, 2) + flagPenalty;
-    }
-  };
-
+  this.unsupportedTags = ['BR', 'IMG'];
   this._tsb = tsb;
   this._customSettings = settings;
 
@@ -1192,6 +1136,11 @@ function TypesetBotTypeset(tsb) {
       while (!lineIsFinished) {
         var oldLineWidth = lineProperties.curWidth;
         var wordData = this.hyphen.nextWord(element, lineProperties.tokenIndex);
+
+        if (wordData == null) {
+          lineIsFinished = true;
+          continue;
+        }
       }
     } // Create starting node.
     // Loop until queue is empty.

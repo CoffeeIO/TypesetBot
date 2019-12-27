@@ -186,7 +186,7 @@ class TypesetBotTypeset {
                 null,
                 0,
                 0,
-                0
+                0,
             ),
         );
 
@@ -205,6 +205,11 @@ class TypesetBotTypeset {
             while (!lineIsFinished) {
                 const oldLineWidth = lineProperties.curWidth;
                 const wordData = this.hyphen.nextWord(element, lineProperties.tokenIndex)
+
+                if (wordData == null) {
+                    lineIsFinished = true;
+                    continue;
+                }
 
             }
         }
