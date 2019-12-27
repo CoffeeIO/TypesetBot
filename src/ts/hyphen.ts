@@ -108,6 +108,7 @@ class TypesetBotHyphen {
     nextWord = function(element: Element, tokenIndex: number): TypesetBotWordData {
         let str: string = '';
         const indexes: number[] = [];
+        let width: number = 0;
 
         const tokens = this._tsb.util.getElementTokens(element);
 
@@ -125,6 +126,12 @@ class TypesetBotHyphen {
                     const word = token as TypesetBotWord;
                     str += word.text;
                     indexes.push(tokenIndex);
+
+                    // @todo add complex hyphen cut calculation.
+                    if (token.width != null) {
+                        width += token.width;
+                    }
+
                     break;
                 case TypesetBotToken.types.TAG:
                     // Ignore.
@@ -149,7 +156,7 @@ class TypesetBotHyphen {
             return null;
         }
 
-        return new TypesetBotWordData(str, indexes, tokenIndex);
+        return new TypesetBotWordData(str, indexes, tokenIndex, width);
     }
 
     /**
@@ -201,10 +208,16 @@ class TypesetBotHyphen {
  * Class representing a word as one of multiple tokens.
  */
 class TypesetBotWordData {
+    /**
+     * @param str         The total string in word
+     * @param indexes     Token indexes of word tokens involved in word
+     * @param tokenIndex  Next token index
+     */
     constructor(
         public str: string,
         public indexes: number[],
         public tokenIndex: number,
+        public width: number,
     ) { }
 }
 
@@ -212,6 +225,10 @@ class TypesetBotWordData {
  * Class representing additional offset on either side of word for hyphenation.
  */
 class TypesetBotWordOffset {
+    /**
+     * @param left  Offset of left side of word
+     * @param right Offset of right side of word
+     */
     constructor(
         public left: number,
         public right: number,

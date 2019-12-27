@@ -5,6 +5,7 @@ var source = [
     'src/ts/query.ts',
     'src/ts/settings.ts',
     'src/ts/utils.ts',
+    'src/ts/math.ts',
     'src/ts/token.ts',
     'src/ts/typeset.ts',
     'src/ts/linebreak.ts',

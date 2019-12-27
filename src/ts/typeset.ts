@@ -5,19 +5,17 @@ declare var Queue: any;
  * Typesetting class for a single element.
  */
 class TypesetBotTypeset {
-
-    render: TypesetBotRender;
-    tokenizer: TypesetBotTokenizer;
-    hyphen: TypesetBotHyphen;
+    private _tsb: TypesetBot;
+    render:       TypesetBotRender;
+    tokenizer:    TypesetBotTokenizer;
+    hyphen:       TypesetBotHyphen;
+    math:         TypesetBotMath;
+    settings:     TypesetBotSettings;
 
     tokens: TypesetBotToken[];
 
-    private _tsb: TypesetBot;
-
     // Node variables.
     originalHTML: string;
-    nodes: object;
-    nodeProperties: object;
 
     // Font properties
     elemWidth: number; // In pixels
@@ -26,11 +24,9 @@ class TypesetBotTypeset {
     spaceShrink: number;
     spaceStretch: number;
 
-    lastRenderNodeIndex: number;
-    renderContent: string;
+    // Breakpoint structures.
     finalBreakpoints: TypesetBotLinebreak[];
     activeBreakpoints: TypesetBotLinebreak[];
-    isFinished: boolean;
     shortestPath: object;
 
     /**
@@ -41,6 +37,8 @@ class TypesetBotTypeset {
         this.render = new TypesetBotRender(tsb);
         this.tokenizer = new TypesetBotTokenizer(tsb, this);
         this.hyphen = new TypesetBotHyphen(tsb);
+        this.math = new TypesetBotMath(tsb);
+        this.settings = tsb.settings;
     }
 
     /**
@@ -57,7 +55,7 @@ class TypesetBotTypeset {
         // (ignore for now)
 
 
-        this._tsb.settings.loosenessParam = 0;
+        this.settings.loosenessParam = 0;
 
         // Check if node has changed content (inner nodes) since last typesetting.
         // (ignored for now)
@@ -97,9 +95,14 @@ class TypesetBotTypeset {
 
         // Get font size and calc real space properties.
         this.elemFontSize = this.render.getDefaultFontSize(node);
-        this.spaceWidth = this.elemFontSizeSize * this._tsb.settings.spaceWidth,
-        this.spaceShrink = this.elemFontSize * this._tsb.settings.spaceShrinkability,
-        this.spaceStretch = this.elemFontSize * this._tsb.settings.spaceStretchability;
+        this.spaceWidth = this.elemFontSize * this.settings.spaceWidth,
+        this.spaceShrink = this.elemFontSize * this.settings.spaceShrinkability,
+        this.spaceStretch = this.elemFontSize * this.settings.spaceStretchability;
+
+        console.log("spaceWidth " + this.spaceWidth);
+        console.log("spaceShrink " + this.spaceShrink);
+        console.log("spaceStretch " + this.spaceStretch);
+
 
         this._tsb.logger.end('---- Getting element properties');
     }
@@ -125,11 +128,12 @@ class TypesetBotTypeset {
         }
     }
 
-
     /**
-     * Calculate the valid linebreaks
+     * Preprocess element
+     *
+     * @param element
      */
-    calcLinebreaks = function(element: Element): TypesetBotLinebreak[] {
+    preprocessElement = function(element: Element) {
         this._tsb.logger.start('-- Preprocess');
 
         // Get element width.
@@ -162,12 +166,14 @@ class TypesetBotTypeset {
         this.render.getHyphenProperties(element, this.tokens);
         this._tsb.logger.end('---- Hyphen render');
 
-
-
-
         this._tsb.logger.end('-- Preprocess');
-        console.log(this.tokens);
+    }
 
+    /**
+     * Calculate the valid linebreaks
+     */
+    calcLinebreaks = function(element: Element): TypesetBotLinebreak[] {
+        this.preprocessElement(element);
 
         this._tsb.logger.start('-- Dynamic programming');
 
@@ -192,6 +198,8 @@ class TypesetBotTypeset {
 
         let isFinished = false;
         while (!isFinished) {
+            console.log('loop main');
+
             const originBreakpoint = this.activeBreakpoints.dequeue();
             // Check if there is no more element to dequeue.
             if (originBreakpoint == null) {
@@ -203,14 +211,72 @@ class TypesetBotTypeset {
 
             let lineIsFinished = false;
             while (!lineIsFinished) {
+                // console.log('loop line ' + lineProperties.tokenIndex);
+
                 const oldLineWidth = lineProperties.curWidth;
                 const wordData = this.hyphen.nextWord(element, lineProperties.tokenIndex)
-
                 if (wordData == null) {
+                    // Push final break.
+                    // this.finalBreakpoints.push(
+                    //     new TypesetBotLinebreak(
+                    //         originBreakpoint,
+                    //         lineProperties.tokenIndex,
+                    //         null,
+                    //         originBreakpoint.demerit,
+                    //         false,
+                    //         null,
+                    //         lineProperties.lineNumber + 1,
+                    //         originBreakpoint.maxLineHeight,
+                    //         originBreakpoint.curLineHeight,
+                    //     ),
+                    // );
+
                     lineIsFinished = true;
                     continue;
                 }
+                // Update token index.
+                lineProperties.tokenIndex = wordData.tokenIndex;
+                lineProperties.curWidth += wordData.width;
+                lineProperties.wordCount++;
 
+                const ratio = this.math.getRatio(
+                    this.elemWidth,
+                    lineProperties.curWidth,
+                    lineProperties.wordCount,
+                    this.spaceShrink,
+                    this.spaceStretch,
+                );
+                // console.log(ratio);
+
+
+                if (ratio <= this.settings.maxRatio + this.settings.loosenessParam) { // Valid breakpoint
+                    for (const tokenIndex of wordData.indexes) {
+                        const token = this.tokens[tokenIndex];
+
+                        // const hyphenRatio = this.math.getRatio(
+                        //     this.elemWidth,
+                        //     lineProperties.curWidth,
+                        //     lineProperties.wordCount,
+                        //     this.spaceShrink,
+                        //     this.spaceStretch,
+                        // );
+                    }
+
+                    // Check the ratio is still valid.
+                    if (ratio < this.settings.minRatio) {
+                        console.log('break min');
+
+                        lineIsFinished = true;
+                        continue; // Don't add the last node.
+                    }
+
+                    // Generate breakpoint.
+
+                    console.log(wordData);
+                }
+                console.log(ratio);
+
+                lineProperties.curWidth += this.spaceWidth;
             }
         }
 
@@ -305,15 +371,4 @@ class TypesetBotTypeset {
             0,
         );
     }
-}
-
-class TypesetBotLineProperties {
-    constructor(
-        public origin: TypesetBotLinebreak,
-        public tokenIndex: number,
-        public lineNumber: number,
-        public wordCount: number,
-        public curWidth: number,
-        public lineHeight: number,
-    ) { }
 }
