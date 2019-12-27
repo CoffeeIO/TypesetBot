@@ -22,7 +22,6 @@ class TypesetBotLinebreak {
         public fitnessClass:  number,
         public lineNumber:    number,
         public maxLineHeight: number,
-        public curLineHeight: number,
     ) { }
 }
 

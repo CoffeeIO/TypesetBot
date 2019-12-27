@@ -65,7 +65,7 @@ class TypesetBotSettings {
     hyphenRightMin: number = 2; // Minimum number of letters to keep on the right side of word
 
     // 4 classes of adjustment ratios.
-    fitnessClass: number[] = [-1, -0.5, 0.5, 1, Infinity];
+    fitnessClasses: number[] = [-1, -0.5, 0.5, 1, Infinity];
 
     // Font. ------------------------------------------------------------------
     spaceUnit          : string = 'em'; // Space width unit, em is relative to font-size

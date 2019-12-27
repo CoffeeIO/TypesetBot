@@ -178,9 +178,8 @@ class TypesetBotTypeset {
         this._tsb.logger.start('-- Dynamic programming');
 
         this.activeBreakpoints = new Queue();
-        this.shortestPath = [];
+        this.shortestPath = {};
         this.finalBreakpoints = [];
-
 
         this.activeBreakpoints.enqueue(
             new TypesetBotLinebreak(
@@ -190,7 +189,6 @@ class TypesetBotTypeset {
                 0,
                 false,
                 null,
-                0,
                 0,
                 0,
             ),
@@ -227,7 +225,6 @@ class TypesetBotTypeset {
                     //         null,
                     //         lineProperties.lineNumber + 1,
                     //         originBreakpoint.maxLineHeight,
-                    //         originBreakpoint.curLineHeight,
                     //     ),
                     // );
 
@@ -249,7 +246,7 @@ class TypesetBotTypeset {
                 // console.log(ratio);
 
 
-                if (ratio <= this.settings.maxRatio + this.settings.loosenessParam) { // Valid breakpoint
+                if (this.math.ratioIsLessThanMax(ratio)) { // Valid breakpoint
                     for (const tokenIndex of wordData.indexes) {
                         const token = this.tokens[tokenIndex];
 
@@ -263,7 +260,7 @@ class TypesetBotTypeset {
                     }
 
                     // Check the ratio is still valid.
-                    if (ratio < this.settings.minRatio) {
+                    if (!this.math.ratioIsHigherThanMin(ratio)) {
                         console.log('break min');
 
                         lineIsFinished = true;
@@ -271,6 +268,13 @@ class TypesetBotTypeset {
                     }
 
                     // Generate breakpoint.
+                    const breakpoint = this.getBreakpoint(
+                        originBreakpoint,
+                        lineProperties,
+                        ratio,
+                        lineProperties.tokenIndex,
+                    );
+                    this.updateShortestPath(breakpoint, lineProperties.tokenIndex)
 
                     console.log(wordData);
                 }
@@ -280,53 +284,37 @@ class TypesetBotTypeset {
             }
         }
 
-
-        // Create starting node.
-
-        // Loop until queue is empty.
-
-            // Init line variables.
-                // Check if shortest path is found.
-                // Get active node index.
-                // Get active hyphen index of node.
-
-            // Calculate adjustment ratio.
-
-            // Check if this is a valid breakpoint (not within min ratio).
-
-                // Loop hyphen breakpoints.
-
-                // Get hyphen adjustment ratio.
-
-                // If "valid" breaking point, generate break.
-
-                // Check if adjustment ratio is within the minimum ratio.
-
-                // Generate break.
-
-                // Add space width to current line with.
-
-                // Reset node content.
-
-                // Run linebreaking algorithm again if no solution was found.
-
-                // Increase looseness.
-
-                // Return calculated nodes and valid linebreak solutions.
-
-
         this._tsb.logger.end('-- Dynamic programming');
         return [];
     }
 
 
-    addBreakpoint = function() {
+    getBreakpoint = function(
+        origin: TypesetBotLinebreak,
+        lineProperties: TypesetBotLineProperties,
+        ratio: number,
+        tokenIndex: number,
+        hyphenIndex: number = null,
+        flag: boolean = false,
+    ) {
         // Get fitness class
-        // Check flagDemerit
-        // Calc demerit
-        // Check fitness class change.
-        // Create breakpoint object.
-        // Update shorted path.
+        const fitnessClass = this.math.getFitnessClass(ratio);
+        const consecutiveFlag = origin.flag && flag;
+        const hasHyphen = hyphenIndex != null;
+        const skippingFitnessClass = origin.fitnessClass != null && Math.abs(origin.fitnessClass - fitnessClass) > 1
+
+        const demerit = this.math.getDemerit(ratio, consecutiveFlag, hasHyphen, skippingFitnessClass);
+
+        return new TypesetBotLinebreak(
+            origin,
+            tokenIndex,
+            hyphenIndex,
+            demerit,
+            flag,
+            fitnessClass,
+            origin.lineNumber + 1,
+            lineProperties.lineHeight,
+        );
     }
 
     checkShortestPath = function() : boolean {
@@ -335,10 +323,30 @@ class TypesetBotTypeset {
         return false;
     }
 
-    updateShortestPath = function() {
+    updateShortestPath = function(
+        breakpoint: TypesetBotLinebreak,
+        lineProperties: TypesetBotLineProperties,
+        hyphenIndex: number = -1,
+    ): boolean {
         // If breakpoint has better demerit on "specific line, with specific nodex, with specific hyphen index".
         // Then update the breakpoint.
         // Append to active breakpoints queue.
+        if (this.shortestPath[lineProperties.lineNumber] == null) {
+            this.shortestPath[lineProperties.lineNumber] = {};
+        }
+        if (this.shortestPath[lineProperties.lineNumber][lineProperties.tokenIndex] == null) {
+            this.shortestPath[lineProperties.lineNumber][lineProperties.tokenIndex] = {};
+        }
+        if (
+            this.shortestPath[lineProperties.lineNumber][lineProperties.tokenIndex][hyphenIndex] == null ||
+            this.shortestPath[lineProperties.lineNumber][lineProperties.tokenIndex][hyphenIndex] > breakpoint.demerit
+        ) {
+            this.shortestPath[lineProperties.lineNumber][lineProperties.tokenIndex][hyphenIndex] = breakpoint.demerit;
+            this.activeBreakpoints.enqueue(breakpoint);
+            return true;
+        }
+
+        return false;
     }
 
     /**

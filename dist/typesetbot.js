@@ -499,7 +499,7 @@ function TypesetBotSettings(tsb) {
   this.hyphenRightMin = 2; // Minimum number of letters to keep on the right side of word
   // 4 classes of adjustment ratios.
 
-  this.fitnessClass = [-1, -0.5, 0.5, 1, Infinity]; // Font. ------------------------------------------------------------------
+  this.fitnessClasses = [-1, -0.5, 0.5, 1, Infinity]; // Font. ------------------------------------------------------------------
 
   this.spaceUnit = 'em'; // Space width unit, em is relative to font-size
 
@@ -657,11 +657,6 @@ var TypesetBotMath = function TypesetBotMath(tsb) {
    * @returns         The adjustment ratio
    */
   this.getRatio = function (idealW, actualW, wordCount, shrink, stretch) {
-    // console.log({
-    //     idealW,
-    //     actualW,
-    //     wordCount,
-    // });
     if (actualW < idealW) {
       return (idealW - actualW) / ((wordCount - 1) * stretch);
     }
@@ -693,7 +688,7 @@ var TypesetBotMath = function TypesetBotMath(tsb) {
    */
 
 
-  this.getDemerit = function (badness, penalty, flag) {
+  this.getDemeritFromBadness = function (badness, penalty, flag) {
     var flagPenalty = flag ? this.settings.flagPenalty : 0;
 
     if (penalty >= 0) {
@@ -703,6 +698,98 @@ var TypesetBotMath = function TypesetBotMath(tsb) {
     } else {
       return Math.pow(this.settings.demeritOffset + badness, 2) - Math.pow(penalty, 2) + flagPenalty;
     }
+  };
+
+  this.getDemerit = function (ratio, flag, hasHyphen, skippingFitnessClass) {
+    var badness = this.getBadness(ratio);
+    var additionalPenalty = 0;
+
+    if (hasHyphen) {
+      if (this.settings.alignment == 'justify') {
+        additionalPenalty += this.settings.hyphenPenalty;
+      } else {
+        additionalPenalty += this.settings.hyphenPenaltyRagged;
+      }
+    }
+
+    var demerit = this.getDemeritFromBadness(badness, additionalPenalty, flag);
+
+    if (skippingFitnessClass) {
+      demerit += this.settings.fitnessClassDemerit;
+    }
+
+    return demerit;
+  };
+  /**
+   * Get fitness class from adjustment ratio.
+   *
+   * @param   ratio
+   * @returns       The fitness class
+   */
+
+
+  this.getFitnessClass = function (ratio) {
+    var _iteratorNormalCompletion5 = true;
+    var _didIteratorError5 = false;
+    var _iteratorError5 = undefined;
+
+    try {
+      for (var _iterator5 = this.settings.fitnessClasses[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+        var fitnessClass = _step5.value;
+
+        if (ratio < fitnessClass) {
+          return fitnessClass;
+        }
+      }
+    } catch (err) {
+      _didIteratorError5 = true;
+      _iteratorError5 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion5 && _iterator5["return"] != null) {
+          _iterator5["return"]();
+        }
+      } finally {
+        if (_didIteratorError5) {
+          throw _iteratorError5;
+        }
+      }
+    }
+
+    return this.settings.fitnessClasses[this.settings.fitnessClasses.length - 1]; // Default for infinite ratio
+  };
+  /**
+   * Check if adjustment ratio is within a valid range.
+   *
+   * @param   ratio
+   * @returns       Return true if ratio is valid for breakpoint, otherwise false
+   */
+
+
+  this.isValidRatio = function (ratio) {
+    return this.ratioIsLessThanMax(ratio) && this.ratioIsHigherThanMin(ratio);
+  };
+  /**
+   * Check if ratio is less or equal to allowed maximum ratio.
+   *
+   * @param   ratio
+   * @returns       Return true if ratio is less than max. ratio
+   */
+
+
+  this.ratioIsLessThanMax = function (ratio) {
+    return ratio <= this.settings.maxRatio + this.settings.loosenessParam;
+  };
+  /**
+   * Check if ratio is higher or equal to allowed minimum ratio.
+   *
+   * @param   ratio
+   * @returns       Return true if ratio is higher than min. ratio
+   */
+
+
+  this.ratioIsHigherThanMin = function (ratio) {
+    return ratio >= this.settings.minRatio;
   };
 
   this._tsb = tsb;
@@ -747,13 +834,13 @@ function TypesetBotTokenizer(tsb, typesetter) {
     } // Cast childNodes to list of Elements.
 
 
-    var _iteratorNormalCompletion5 = true;
-    var _didIteratorError5 = false;
-    var _iteratorError5 = undefined;
+    var _iteratorNormalCompletion6 = true;
+    var _didIteratorError6 = false;
+    var _iteratorError6 = undefined;
 
     try {
-      for (var _iterator5 = node.childNodes[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-        var child = _step5.value;
+      for (var _iterator6 = node.childNodes[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+        var child = _step6.value;
 
         switch (child.nodeType) {
           case 1:
@@ -788,16 +875,16 @@ function TypesetBotTokenizer(tsb, typesetter) {
         }
       }
     } catch (err) {
-      _didIteratorError5 = true;
-      _iteratorError5 = err;
+      _didIteratorError6 = true;
+      _iteratorError6 = err;
     } finally {
       try {
-        if (!_iteratorNormalCompletion5 && _iterator5["return"] != null) {
-          _iterator5["return"]();
+        if (!_iteratorNormalCompletion6 && _iterator6["return"] != null) {
+          _iterator6["return"]();
         }
       } finally {
-        if (_didIteratorError5) {
-          throw _iteratorError5;
+        if (_didIteratorError6) {
+          throw _iteratorError6;
         }
       }
     }
@@ -864,13 +951,13 @@ function TypesetBotTokenizer(tsb, typesetter) {
       tokens.push(new TypesetBotSpace(nodeIndex));
     }
 
-    var _iteratorNormalCompletion6 = true;
-    var _didIteratorError6 = false;
-    var _iteratorError6 = undefined;
+    var _iteratorNormalCompletion7 = true;
+    var _didIteratorError7 = false;
+    var _iteratorError7 = undefined;
 
     try {
-      for (var _iterator6 = words[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-        var word = _step6.value;
+      for (var _iterator7 = words[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+        var word = _step7.value;
 
         if (word === '') {
           continue;
@@ -881,16 +968,16 @@ function TypesetBotTokenizer(tsb, typesetter) {
         tokens.push(new TypesetBotSpace(nodeIndex));
       }
     } catch (err) {
-      _didIteratorError6 = true;
-      _iteratorError6 = err;
+      _didIteratorError7 = true;
+      _iteratorError7 = err;
     } finally {
       try {
-        if (!_iteratorNormalCompletion6 && _iterator6["return"] != null) {
-          _iterator6["return"]();
+        if (!_iteratorNormalCompletion7 && _iterator7["return"] != null) {
+          _iterator7["return"]();
         }
       } finally {
-        if (_didIteratorError6) {
-          throw _iteratorError6;
+        if (_didIteratorError7) {
+          throw _iteratorError7;
         }
       }
     }
@@ -1195,9 +1282,9 @@ function TypesetBotTypeset(tsb) {
     this._tsb.logger.start('-- Dynamic programming');
 
     this.activeBreakpoints = new Queue();
-    this.shortestPath = [];
+    this.shortestPath = {};
     this.finalBreakpoints = [];
-    this.activeBreakpoints.enqueue(new TypesetBotLinebreak(null, 0, null, 0, false, null, 0, 0, 0));
+    this.activeBreakpoints.enqueue(new TypesetBotLinebreak(null, 0, null, 0, false, null, 0, 0));
     var isFinished = false;
 
     while (!isFinished) {
@@ -1229,7 +1316,6 @@ function TypesetBotTypeset(tsb) {
           //         null,
           //         lineProperties.lineNumber + 1,
           //         originBreakpoint.maxLineHeight,
-          //         originBreakpoint.curLineHeight,
           //     ),
           // );
           lineIsFinished = true;
@@ -1242,15 +1328,15 @@ function TypesetBotTypeset(tsb) {
         lineProperties.wordCount++;
         var ratio = this.math.getRatio(this.elemWidth, lineProperties.curWidth, lineProperties.wordCount, this.spaceShrink, this.spaceStretch); // console.log(ratio);
 
-        if (ratio <= this.settings.maxRatio + this.settings.loosenessParam) {
+        if (this.math.ratioIsLessThanMax(ratio)) {
           // Valid breakpoint
-          var _iteratorNormalCompletion7 = true;
-          var _didIteratorError7 = false;
-          var _iteratorError7 = undefined;
+          var _iteratorNormalCompletion8 = true;
+          var _didIteratorError8 = false;
+          var _iteratorError8 = undefined;
 
           try {
-            for (var _iterator7 = wordData.indexes[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-              var tokenIndex = _step7.value;
+            for (var _iterator8 = wordData.indexes[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+              var tokenIndex = _step8.value;
               var token = this.tokens[tokenIndex]; // const hyphenRatio = this.math.getRatio(
               //     this.elemWidth,
               //     lineProperties.curWidth,
@@ -1261,64 +1347,52 @@ function TypesetBotTypeset(tsb) {
             } // Check the ratio is still valid.
 
           } catch (err) {
-            _didIteratorError7 = true;
-            _iteratorError7 = err;
+            _didIteratorError8 = true;
+            _iteratorError8 = err;
           } finally {
             try {
-              if (!_iteratorNormalCompletion7 && _iterator7["return"] != null) {
-                _iterator7["return"]();
+              if (!_iteratorNormalCompletion8 && _iterator8["return"] != null) {
+                _iterator8["return"]();
               }
             } finally {
-              if (_didIteratorError7) {
-                throw _iteratorError7;
+              if (_didIteratorError8) {
+                throw _iteratorError8;
               }
             }
           }
 
-          if (ratio < this.settings.minRatio) {
+          if (!this.math.ratioIsHigherThanMin(ratio)) {
             console.log('break min');
             lineIsFinished = true;
             continue; // Don't add the last node.
           } // Generate breakpoint.
 
 
+          var breakpoint = this.getBreakpoint(originBreakpoint, lineProperties, ratio, lineProperties.tokenIndex);
+          this.updateShortestPath(breakpoint, lineProperties.tokenIndex);
           console.log(wordData);
         }
 
         console.log(ratio);
         lineProperties.curWidth += this.spaceWidth;
       }
-    } // Create starting node.
-    // Loop until queue is empty.
-    // Init line variables.
-    // Check if shortest path is found.
-    // Get active node index.
-    // Get active hyphen index of node.
-    // Calculate adjustment ratio.
-    // Check if this is a valid breakpoint (not within min ratio).
-    // Loop hyphen breakpoints.
-    // Get hyphen adjustment ratio.
-    // If "valid" breaking point, generate break.
-    // Check if adjustment ratio is within the minimum ratio.
-    // Generate break.
-    // Add space width to current line with.
-    // Reset node content.
-    // Run linebreaking algorithm again if no solution was found.
-    // Increase looseness.
-    // Return calculated nodes and valid linebreak solutions.
-
+    }
 
     this._tsb.logger.end('-- Dynamic programming');
 
     return [];
   };
 
-  this.addBreakpoint = function () {// Get fitness class
-    // Check flagDemerit
-    // Calc demerit
-    // Check fitness class change.
-    // Create breakpoint object.
-    // Update shorted path.
+  this.getBreakpoint = function (origin, lineProperties, ratio, tokenIndex) {
+    var hyphenIndex = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
+    var flag = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
+    // Get fitness class
+    var fitnessClass = this.math.getFitnessClass(ratio);
+    var consecutiveFlag = origin.flag && flag;
+    var hasHyphen = hyphenIndex != null;
+    var skippingFitnessClass = origin.fitnessClass != null && Math.abs(origin.fitnessClass - fitnessClass) > 1;
+    var demerit = this.math.getDemerit(ratio, consecutiveFlag, hasHyphen, skippingFitnessClass);
+    return new TypesetBotLinebreak(origin, tokenIndex, hyphenIndex, demerit, flag, fitnessClass, origin.lineNumber + 1, lineProperties.lineHeight);
   };
 
   this.checkShortestPath = function () {
@@ -1327,9 +1401,27 @@ function TypesetBotTypeset(tsb) {
     return false;
   };
 
-  this.updateShortestPath = function () {// If breakpoint has better demerit on "specific line, with specific nodex, with specific hyphen index".
+  this.updateShortestPath = function (breakpoint, lineProperties) {
+    var hyphenIndex = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : -1;
+
+    // If breakpoint has better demerit on "specific line, with specific nodex, with specific hyphen index".
     // Then update the breakpoint.
     // Append to active breakpoints queue.
+    if (this.shortestPath[lineProperties.lineNumber] == null) {
+      this.shortestPath[lineProperties.lineNumber] = {};
+    }
+
+    if (this.shortestPath[lineProperties.lineNumber][lineProperties.tokenIndex] == null) {
+      this.shortestPath[lineProperties.lineNumber][lineProperties.tokenIndex] = {};
+    }
+
+    if (this.shortestPath[lineProperties.lineNumber][lineProperties.tokenIndex][hyphenIndex] == null || this.shortestPath[lineProperties.lineNumber][lineProperties.tokenIndex][hyphenIndex] > breakpoint.demerit) {
+      this.shortestPath[lineProperties.lineNumber][lineProperties.tokenIndex][hyphenIndex] = breakpoint.demerit;
+      this.activeBreakpoints.enqueue(breakpoint);
+      return true;
+    }
+
+    return false;
   };
   /**
    * Add tokens to map for specific node.
@@ -1383,7 +1475,7 @@ var TypesetBotLinebreak =
  * @param maxLineHeight Max line height of current solution
  * @param curLineHeight Current height of line
  */
-function TypesetBotLinebreak(origin, tokenIndex, hyphenIndex, demerit, flag, fitnessClass, lineNumber, maxLineHeight, curLineHeight) {
+function TypesetBotLinebreak(origin, tokenIndex, hyphenIndex, demerit, flag, fitnessClass, lineNumber, maxLineHeight) {
   _classCallCheck(this, TypesetBotLinebreak);
 
   this.origin = origin;
@@ -1394,7 +1486,6 @@ function TypesetBotLinebreak(origin, tokenIndex, hyphenIndex, demerit, flag, fit
   this.fitnessClass = fitnessClass;
   this.lineNumber = lineNumber;
   this.maxLineHeight = maxLineHeight;
-  this.curLineHeight = curLineHeight;
 };
 
 var TypesetBotLineProperties =
@@ -1471,13 +1562,13 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
     this._tsb.logger.start('------ Build HTML');
 
-    var _iteratorNormalCompletion8 = true;
-    var _didIteratorError8 = false;
-    var _iteratorError8 = undefined;
+    var _iteratorNormalCompletion9 = true;
+    var _didIteratorError9 = false;
+    var _iteratorError9 = undefined;
 
     try {
-      for (var _iterator8 = tokens[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
-        var token = _step8.value;
+      for (var _iterator9 = tokens[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
+        var token = _step9.value;
 
         switch (token.type) {
           case TypesetBotToken.types.WORD:
@@ -1505,16 +1596,16 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
         }
       }
     } catch (err) {
-      _didIteratorError8 = true;
-      _iteratorError8 = err;
+      _didIteratorError9 = true;
+      _iteratorError9 = err;
     } finally {
       try {
-        if (!_iteratorNormalCompletion8 && _iterator8["return"] != null) {
-          _iterator8["return"]();
+        if (!_iteratorNormalCompletion9 && _iterator9["return"] != null) {
+          _iterator9["return"]();
         }
       } finally {
-        if (_didIteratorError8) {
-          throw _iteratorError8;
+        if (_didIteratorError9) {
+          throw _iteratorError9;
         }
       }
     }
@@ -1536,29 +1627,29 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
     this._tsb.logger.start('------ Get Properties');
 
     var renderIndex = 0;
-    var _iteratorNormalCompletion9 = true;
-    var _didIteratorError9 = false;
-    var _iteratorError9 = undefined;
+    var _iteratorNormalCompletion10 = true;
+    var _didIteratorError10 = false;
+    var _iteratorError10 = undefined;
 
     try {
-      for (var _iterator9 = renderedWordNodes[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
-        var renderedWordNode = _step9.value;
+      for (var _iterator10 = renderedWordNodes[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
+        var renderedWordNode = _step10.value;
         var wordToken = renderIndexToToken[renderIndex];
         wordToken.width = renderedWordNode.getBoundingClientRect().width;
         wordToken.height = renderedWordNode.getBoundingClientRect().height;
         renderIndex += 1;
       }
     } catch (err) {
-      _didIteratorError9 = true;
-      _iteratorError9 = err;
+      _didIteratorError10 = true;
+      _iteratorError10 = err;
     } finally {
       try {
-        if (!_iteratorNormalCompletion9 && _iterator9["return"] != null) {
-          _iterator9["return"]();
+        if (!_iteratorNormalCompletion10 && _iterator10["return"] != null) {
+          _iterator10["return"]();
         }
       } finally {
-        if (_didIteratorError9) {
-          throw _iteratorError9;
+        if (_didIteratorError10) {
+          throw _iteratorError10;
         }
       }
     }
@@ -1608,13 +1699,13 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
     var renderRequest = []; // Loop tokens to build HTML.
 
-    var _iteratorNormalCompletion10 = true;
-    var _didIteratorError10 = false;
-    var _iteratorError10 = undefined;
+    var _iteratorNormalCompletion11 = true;
+    var _didIteratorError11 = false;
+    var _iteratorError11 = undefined;
 
     try {
-      for (var _iterator10 = tokens[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
-        var token = _step10.value;
+      for (var _iterator11 = tokens[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
+        var token = _step11.value;
 
         switch (token.type) {
           case TypesetBotToken.types.WORD:
@@ -1626,13 +1717,13 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
             } // Queue hyphenation parts or word.
 
 
-            var _iteratorNormalCompletion12 = true;
-            var _didIteratorError12 = false;
-            var _iteratorError12 = undefined;
+            var _iteratorNormalCompletion13 = true;
+            var _didIteratorError13 = false;
+            var _iteratorError13 = undefined;
 
             try {
-              for (var _iterator12 = word.hyphenIndexPositions[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
-                var hyphenIndex = _step12.value;
+              for (var _iterator13 = word.hyphenIndexPositions[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
+                var hyphenIndex = _step13.value;
 
                 var _cut = word.text.substring(lastIndex, hyphenIndex + 1);
 
@@ -1645,16 +1736,16 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
               } // Queue remain (if any), fx 'phen'.
 
             } catch (err) {
-              _didIteratorError12 = true;
-              _iteratorError12 = err;
+              _didIteratorError13 = true;
+              _iteratorError13 = err;
             } finally {
               try {
-                if (!_iteratorNormalCompletion12 && _iterator12["return"] != null) {
-                  _iterator12["return"]();
+                if (!_iteratorNormalCompletion13 && _iterator13["return"] != null) {
+                  _iterator13["return"]();
                 }
               } finally {
-                if (_didIteratorError12) {
-                  throw _iteratorError12;
+                if (_didIteratorError13) {
+                  throw _iteratorError13;
                 }
               }
             }
@@ -1693,16 +1784,16 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
         }
       }
     } catch (err) {
-      _didIteratorError10 = true;
-      _iteratorError10 = err;
+      _didIteratorError11 = true;
+      _iteratorError11 = err;
     } finally {
       try {
-        if (!_iteratorNormalCompletion10 && _iterator10["return"] != null) {
-          _iterator10["return"]();
+        if (!_iteratorNormalCompletion11 && _iterator11["return"] != null) {
+          _iterator11["return"]();
         }
       } finally {
-        if (_didIteratorError10) {
-          throw _iteratorError10;
+        if (_didIteratorError11) {
+          throw _iteratorError11;
         }
       }
     }
@@ -1711,13 +1802,13 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
     var renderedHyphenNodes = element.querySelectorAll('.typeset-hyphen-check'); // Loop elements from DOM.
 
     var renderIndex = 0;
-    var _iteratorNormalCompletion11 = true;
-    var _didIteratorError11 = false;
-    var _iteratorError11 = undefined;
+    var _iteratorNormalCompletion12 = true;
+    var _didIteratorError12 = false;
+    var _iteratorError12 = undefined;
 
     try {
-      for (var _iterator11 = renderedHyphenNodes[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
-        var renderedHyphenNode = _step11.value;
+      for (var _iterator12 = renderedHyphenNodes[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
+        var renderedHyphenNode = _step12.value;
         var request = renderRequest[renderIndex++];
         var _token = request.token; // Get width of requested element and insert to correct type.
 
@@ -1743,16 +1834,16 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
         }
       }
     } catch (err) {
-      _didIteratorError11 = true;
-      _iteratorError11 = err;
+      _didIteratorError12 = true;
+      _iteratorError12 = err;
     } finally {
       try {
-        if (!_iteratorNormalCompletion11 && _iterator11["return"] != null) {
-          _iterator11["return"]();
+        if (!_iteratorNormalCompletion12 && _iterator12["return"] != null) {
+          _iterator12["return"]();
         }
       } finally {
-        if (_didIteratorError11) {
-          throw _iteratorError11;
+        if (_didIteratorError12) {
+          throw _iteratorError12;
         }
       }
     }
@@ -1787,26 +1878,26 @@ var TypesetBotHtml = function TypesetBotHtml(tsb) {
       return '</' + tagNode.tagName.toLowerCase() + '>';
     } else {
       var attrText = '';
-      var _iteratorNormalCompletion13 = true;
-      var _didIteratorError13 = false;
-      var _iteratorError13 = undefined;
+      var _iteratorNormalCompletion14 = true;
+      var _didIteratorError14 = false;
+      var _iteratorError14 = undefined;
 
       try {
-        for (var _iterator13 = tagNode.attributes[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
-          var attr = _step13.value;
+        for (var _iterator14 = tagNode.attributes[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
+          var attr = _step14.value;
           attrText += attr.name + '=' + attr.value + ' ';
         }
       } catch (err) {
-        _didIteratorError13 = true;
-        _iteratorError13 = err;
+        _didIteratorError14 = true;
+        _iteratorError14 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion13 && _iterator13["return"] != null) {
-            _iterator13["return"]();
+          if (!_iteratorNormalCompletion14 && _iterator14["return"] != null) {
+            _iterator14["return"]();
           }
         } finally {
-          if (_didIteratorError13) {
-            throw _iteratorError13;
+          if (_didIteratorError14) {
+            throw _iteratorError14;
           }
         }
       }
@@ -2003,26 +2094,26 @@ var TypesetBotHyphen = function TypesetBotHyphen(tsb) {
     var tokens = this._tsb.util.getElementTokens(element); // Set properties on tokens.
 
 
-    var _iteratorNormalCompletion14 = true;
-    var _didIteratorError14 = false;
-    var _iteratorError14 = undefined;
+    var _iteratorNormalCompletion15 = true;
+    var _didIteratorError15 = false;
+    var _iteratorError15 = undefined;
 
     try {
-      for (var _iterator14 = wordData.indexes[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
-        var tokenIndex = _step14.value;
+      for (var _iterator15 = wordData.indexes[Symbol.iterator](), _step15; !(_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done); _iteratorNormalCompletion15 = true) {
+        var tokenIndex = _step15.value;
         tokens[tokenIndex].initHyphen();
       }
     } catch (err) {
-      _didIteratorError14 = true;
-      _iteratorError14 = err;
+      _didIteratorError15 = true;
+      _iteratorError15 = err;
     } finally {
       try {
-        if (!_iteratorNormalCompletion14 && _iterator14["return"] != null) {
-          _iterator14["return"]();
+        if (!_iteratorNormalCompletion15 && _iterator15["return"] != null) {
+          _iterator15["return"]();
         }
       } finally {
-        if (_didIteratorError14) {
-          throw _iteratorError14;
+        if (_didIteratorError15) {
+          throw _iteratorError15;
         }
       }
     }
@@ -2036,13 +2127,13 @@ var TypesetBotHyphen = function TypesetBotHyphen(tsb) {
     var curHyphenLength = 0; // Add the accurate hyphen indexes to the nodes.
     // Fx: ['hyph', <tag>, 'e', <tag>, 'nation'] --> ['hyp(-)h', <tag>, 'e', </tag>, 'n(-)ation']
 
-    var _iteratorNormalCompletion15 = true;
-    var _didIteratorError15 = false;
-    var _iteratorError15 = undefined;
+    var _iteratorNormalCompletion16 = true;
+    var _didIteratorError16 = false;
+    var _iteratorError16 = undefined;
 
     try {
-      for (var _iterator15 = hyphenLengths[Symbol.iterator](), _step15; !(_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done); _iteratorNormalCompletion15 = true) {
-        var hyphenLength = _step15.value;
+      for (var _iterator16 = hyphenLengths[Symbol.iterator](), _step16; !(_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done); _iteratorNormalCompletion16 = true) {
+        var hyphenLength = _step16.value;
         curHyphenLength += hyphenLength; // Go to next token until we find a token that contains a hyphen.
 
         while (curTokenLength < curHyphenLength) {
@@ -2056,16 +2147,16 @@ var TypesetBotHyphen = function TypesetBotHyphen(tsb) {
         curToken.hyphenIndexPositions.push(hyphenIndex);
       }
     } catch (err) {
-      _didIteratorError15 = true;
-      _iteratorError15 = err;
+      _didIteratorError16 = true;
+      _iteratorError16 = err;
     } finally {
       try {
-        if (!_iteratorNormalCompletion15 && _iterator15["return"] != null) {
-          _iterator15["return"]();
+        if (!_iteratorNormalCompletion16 && _iterator16["return"] != null) {
+          _iterator16["return"]();
         }
       } finally {
-        if (_didIteratorError15) {
-          throw _iteratorError15;
+        if (_didIteratorError16) {
+          throw _iteratorError16;
         }
       }
     }
