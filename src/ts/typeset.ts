@@ -176,12 +176,39 @@ class TypesetBotTypeset {
         this.finalBreakpoints = [];
 
 
-        // Counter for last rendered node.
+        this.activeBreakpoints.enqueue(
+            new TypesetBotLinebreak(
+                null,
+                0,
+                null,
+                0,
+                false,
+                null,
+                0,
+                0,
+                0
+            ),
+        );
 
-        // Preprocess all hyphens.
-            // Loop all nodes.
-                // Find hyphens in word.
-                // Get hyphen properties of that word.
+        let isFinished = false;
+        while (!isFinished) {
+            const originBreakpoint = this.activeBreakpoints.dequeue();
+            // Check if there is no more element to dequeue.
+            if (originBreakpoint == null) {
+                isFinished = true;
+                continue;
+            }
+
+            const lineProperties = this.initLineProperties(element, originBreakpoint);
+
+            let lineIsFinished = false;
+            while (!lineIsFinished) {
+                const oldLineWidth = lineProperties.curWidth;
+                const wordData = this.hyphen.nextWord(element, lineProperties.tokenIndex)
+
+            }
+        }
+
 
         // Create starting node.
 
@@ -259,4 +286,29 @@ class TypesetBotTypeset {
         const index = this._tsb.util.getElementIndex(root);
         this._tsb.indexToTokens[index] = tokens;
     }
+
+    initLineProperties = function(elem: Element, origin: TypesetBotLinebreak): TypesetBotLineProperties {
+        // Check if origin is the current shortest path.
+        // @todo
+
+        return new TypesetBotLineProperties(
+            origin,
+            origin.tokenIndex,
+            origin.lineNumber,
+            0,
+            0,
+            0,
+        );
+    }
+}
+
+class TypesetBotLineProperties {
+    constructor(
+        public origin: TypesetBotLinebreak,
+        public tokenIndex: number,
+        public lineNumber: number,
+        public wordCount: number,
+        public curWidth: number,
+        public lineHeight: number,
+    ) { }
 }

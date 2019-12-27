@@ -2,23 +2,15 @@
  * Linebreak
  */
 class TypesetBotLinebreak {
-    private _tsb: TypesetBot;
-
-    origin: TypesetBotLinebreak;
-    nodeIndex: number;
-    hyphenIndex: number;
-
-    demerit: number;
-    flag: boolean;
-    fitnessClass: number;
-
-    lineNumber: number;
-    maxLineHeight: number;
-    curLineHeight: number;
-
-    constructor(tsb: TypesetBot) {
-        this._tsb = tsb;
-    }
-
-
+    constructor(
+        public origin:        TypesetBotLinebreak,
+        public tokenIndex:    number,
+        public hyphenIndex:   number,
+        public demerit:       number,
+        public flag:          boolean,
+        public fitnessClass:  number,
+        public lineNumber:    number,
+        public maxLineHeight: number,
+        public curLineHeight: number,
+    ) { }
 }

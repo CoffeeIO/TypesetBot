@@ -19,7 +19,7 @@ class TypesetBotHyphen {
      */
     hyphenate = function(word: string): string[] {
         const offset = this.getWordOffset(word);
-        return this.getWordParts(word, offset.right, offset.left);
+        return this.getWordParts(word, offset);
     }
 
     /**
@@ -27,12 +27,15 @@ class TypesetBotHyphen {
      * Return array of possible word hyphens.
      * Fx: hyphenation --> ["hyp", "hen", "ation"]
      *
-     * @param   word        The word to hyphen
-     * @param   rightOffset Addition offset of word on right side
-     * @param   leftOffset  Addition offset of word on left side
-     * @returns             Array of string parts
+     * @param   word   The word to hyphen
+     * @param   offset Addition offset of word
+     * @returns        Array of string parts
      */
-    getWordParts = function(word: string, rightOffset: number = 0, leftOffset: number = 0): string[] {
+    getWordParts = function(word: string, offset: TypesetBotWordOffset = null): string[] {
+        if (offset == null) {
+            offset = new TypesetBotWordOffset(0, 0);
+        }
+
         if (this._tsb.settings.hyphenLanguage.trim() === '') {
             return [word];
         }
@@ -58,8 +61,8 @@ class TypesetBotHyphen {
             return [word];
         }
 
-        (window as any).Hypher.languages[this._tsb.settings.hyphenLanguage].leftMin = this._tsb.settings.hyphenLeftMin + leftOffset;
-        (window as any).Hypher.languages[this._tsb.settings.hyphenLanguage].rightMin = this._tsb.settings.hyphenRightMin + rightOffset;
+        (window as any).Hypher.languages[this._tsb.settings.hyphenLanguage].leftMin = this._tsb.settings.hyphenLeftMin + offset.left;
+        (window as any).Hypher.languages[this._tsb.settings.hyphenLanguage].rightMin = this._tsb.settings.hyphenRightMin + offset.right;
 
         return (window as any).Hypher.languages[this._tsb.settings.hyphenLanguage].hyphenate(word);
     }
@@ -68,10 +71,10 @@ class TypesetBotHyphen {
      * Get the right and left offset of non-word characters in string.
      * Fx: ,|Hello.$. --> { left: 2, right: 3 }
      *
-     * @param   word
-     * @returns      Additional word offset { left: number, right: number }
+     * @param   word The word to check
+     * @returns      Additional word offset
      */
-    getWordOffset = function(word: string): object {
+    getWordOffset = function(word: string): TypesetBotWordOffset {
         const beginRegex = /^[\W]*/;
         const endRegex = /[\W]*$/;
 
@@ -88,10 +91,7 @@ class TypesetBotHyphen {
             right = matchesEnd[0].length;
         }
 
-        return {
-            left,
-            right,
-        };
+        return new TypesetBotWordOffset(left, right);
     };
 
     /**
@@ -103,9 +103,9 @@ class TypesetBotHyphen {
      *
      * @param   element    The element to typeset
      * @param   tokenIndex The node index to start constructing words
-     * @returns            The next word represented as one or multiple nodes { str: string, indexes: number[] }
+     * @returns            The next word represented as one or multiple nodes
      */
-    nextWord = function(element: Element, tokenIndex: number): object {
+    nextWord = function(element: Element, tokenIndex: number): TypesetBotWordData {
         let str: string = '';
         const indexes: number[] = [];
 
@@ -149,11 +149,7 @@ class TypesetBotHyphen {
             return null;
         }
 
-        return {
-            str,
-            indexes,
-            tokenIndex,
-        };
+        return new TypesetBotWordData(str, indexes, tokenIndex);
     }
 
     /**
@@ -162,7 +158,7 @@ class TypesetBotHyphen {
      * @param   element
      * @param   wordData Word string and token indexes
      */
-    calcWordHyphens = function(element: Element, wordData: any) {
+    calcWordHyphens = function(element: Element, wordData: TypesetBotWordData) {
         const hyphens = this.hyphenate(wordData.str);
 
         // If does not have any hyphens, stop execution.
@@ -199,4 +195,25 @@ class TypesetBotHyphen {
             curToken.hyphenIndexPositions.push(hyphenIndex);
         }
     }
+}
+
+/**
+ * Class representing a word as one of multiple tokens.
+ */
+class TypesetBotWordData {
+    constructor(
+        public str: string,
+        public indexes: number[],
+        public tokenIndex: number,
+    ) { }
+}
+
+/**
+ * Class representing additional offset on either side of word for hyphenation.
+ */
+class TypesetBotWordOffset {
+    constructor(
+        public left: number,
+        public right: number,
+    ) { }
 }
