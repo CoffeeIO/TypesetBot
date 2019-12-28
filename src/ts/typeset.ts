@@ -196,12 +196,19 @@ class TypesetBotTypeset {
 
         let isFinished = false;
         while (!isFinished) {
-            console.log('loop main');
+            console.log('loop main --> ' + this.activeBreakpoints.getLength());
+            // console.log(this.shortestPath);
+
 
             const originBreakpoint = this.activeBreakpoints.dequeue();
             // Check if there is no more element to dequeue.
             if (originBreakpoint == null) {
                 isFinished = true;
+                continue;
+            }
+            console.log(originBreakpoint);
+
+            if (!this.isShortestPath(originBreakpoint)) {
                 continue;
             }
 
@@ -274,15 +281,19 @@ class TypesetBotTypeset {
                         ratio,
                         lineProperties.tokenIndex,
                     );
-                    this.updateShortestPath(breakpoint, lineProperties.tokenIndex)
+                    let updatedPath = this.updateShortestPath(breakpoint, lineProperties)
 
                     console.log(wordData);
+                    console.log('Did update path line ' + lineProperties.lineNumber + ': ' + updatedPath + ' (ratio:' + ratio + ')(demerit:' + breakpoint.demerit + ')');
                 }
-                console.log(ratio);
+                // console.log(ratio);
 
                 lineProperties.curWidth += this.spaceWidth;
             }
         }
+        console.log(this.shortestPath);
+        console.log(this.finalBreakpoints);
+
 
         this._tsb.logger.end('-- Dynamic programming');
         return [];
@@ -309,7 +320,7 @@ class TypesetBotTypeset {
             origin,
             tokenIndex,
             hyphenIndex,
-            demerit,
+            origin.demerit + demerit, // Append demerit from previous line
             flag,
             fitnessClass,
             origin.lineNumber + 1,
@@ -317,9 +328,39 @@ class TypesetBotTypeset {
         );
     }
 
-    checkShortestPath = function() : boolean {
-        // Check if breakpoint if the lowest demerit on:
-        // "specific line, with specific nodex, with specific hyphen index".
+    /**
+     * Check if a certain breakpoint is the current shortest path to the break.
+     * - Checks on specific line number.
+     * - Checks on specific token index.
+     * - Checks on specific hyphenation point.
+     *
+     * @param   breakpoint
+     * @returns            Return true if the breakpoint is the shortest path, otherwise return false
+     */
+    isShortestPath = function(breakpoint: TypesetBotLinebreak) : boolean {
+        const hyphenIndex = breakpoint.hyphenIndex == null ? -1 : breakpoint.hyphenIndex;
+
+        // Safety check.
+        if (
+            this.shortestPath[breakpoint.lineNumber] != null &&
+            this.shortestPath[breakpoint.lineNumber][breakpoint.tokenIndex] != null &&
+            this.shortestPath[breakpoint.lineNumber][breakpoint.tokenIndex][hyphenIndex] != null &&
+            this.shortestPath[breakpoint.lineNumber][breakpoint.tokenIndex][hyphenIndex] > breakpoint.demerit
+        ) {
+            this._tsb.logger.error('Dynamic: Found shortest path with higher demerit than current breakpoint');
+        }
+
+        // Real check.
+        if (
+            this.shortestPath[breakpoint.lineNumber] == null ||
+            this.shortestPath[breakpoint.lineNumber][breakpoint.tokenIndex] == null ||
+            this.shortestPath[breakpoint.lineNumber][breakpoint.tokenIndex][hyphenIndex] == null ||
+            this.shortestPath[breakpoint.lineNumber][breakpoint.tokenIndex][hyphenIndex] === breakpoint.demerit
+        ) {
+
+            return true;
+        }
+
         return false;
     }
 

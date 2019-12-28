@@ -101,11 +101,12 @@ class TypesetBotHyphen {
      * - A word can have any number of tags nodes and tags don't have to end.
      * - A word ends after a space node.
      *
-     * @param   element    The element to typeset
-     * @param   tokenIndex The node index to start constructing words
-     * @returns            The next word represented as one or multiple nodes
+     * @param   element     The element to typeset
+     * @param   tokenIndex  The node index to start constructing words
+     * @param   hyphenIndex Optional hyphenIndex of first node to start from
+     * @returns             The next word represented as one or multiple nodes
      */
-    nextWord = function(element: Element, tokenIndex: number): TypesetBotWordData {
+    nextWord = function(element: Element, tokenIndex: number, hyphenIndex: number = null): TypesetBotWordData {
         let str: string = '';
         const indexes: number[] = [];
         let width: number = 0;

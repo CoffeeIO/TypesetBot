@@ -1288,11 +1288,18 @@ function TypesetBotTypeset(tsb) {
     var isFinished = false;
 
     while (!isFinished) {
-      console.log('loop main');
+      console.log('loop main --> ' + this.activeBreakpoints.getLength()); // console.log(this.shortestPath);
+
       var originBreakpoint = this.activeBreakpoints.dequeue(); // Check if there is no more element to dequeue.
 
       if (originBreakpoint == null) {
         isFinished = true;
+        continue;
+      }
+
+      console.log(originBreakpoint);
+
+      if (!this.isShortestPath(originBreakpoint)) {
         continue;
       }
 
@@ -1369,14 +1376,18 @@ function TypesetBotTypeset(tsb) {
 
 
           var breakpoint = this.getBreakpoint(originBreakpoint, lineProperties, ratio, lineProperties.tokenIndex);
-          this.updateShortestPath(breakpoint, lineProperties.tokenIndex);
+          var updatedPath = this.updateShortestPath(breakpoint, lineProperties);
           console.log(wordData);
-        }
+          console.log('Did update path line ' + lineProperties.lineNumber + ': ' + updatedPath + ' (ratio:' + ratio + ')(demerit:' + breakpoint.demerit + ')');
+        } // console.log(ratio);
 
-        console.log(ratio);
+
         lineProperties.curWidth += this.spaceWidth;
       }
     }
+
+    console.log(this.shortestPath);
+    console.log(this.finalBreakpoints);
 
     this._tsb.logger.end('-- Dynamic programming');
 
@@ -1392,12 +1403,32 @@ function TypesetBotTypeset(tsb) {
     var hasHyphen = hyphenIndex != null;
     var skippingFitnessClass = origin.fitnessClass != null && Math.abs(origin.fitnessClass - fitnessClass) > 1;
     var demerit = this.math.getDemerit(ratio, consecutiveFlag, hasHyphen, skippingFitnessClass);
-    return new TypesetBotLinebreak(origin, tokenIndex, hyphenIndex, demerit, flag, fitnessClass, origin.lineNumber + 1, lineProperties.lineHeight);
+    return new TypesetBotLinebreak(origin, tokenIndex, hyphenIndex, origin.demerit + demerit, // Append demerit from previous line
+    flag, fitnessClass, origin.lineNumber + 1, lineProperties.lineHeight);
   };
+  /**
+   * Check if a certain breakpoint is the current shortest path to the break.
+   * - Checks on specific line number.
+   * - Checks on specific token index.
+   * - Checks on specific hyphenation point.
+   *
+   * @param   breakpoint
+   * @returns            Return true if the breakpoint is the shortest path, otherwise return false
+   */
 
-  this.checkShortestPath = function () {
-    // Check if breakpoint if the lowest demerit on:
-    // "specific line, with specific nodex, with specific hyphen index".
+
+  this.isShortestPath = function (breakpoint) {
+    var hyphenIndex = breakpoint.hyphenIndex == null ? -1 : breakpoint.hyphenIndex; // Safety check.
+
+    if (this.shortestPath[breakpoint.lineNumber] != null && this.shortestPath[breakpoint.lineNumber][breakpoint.tokenIndex] != null && this.shortestPath[breakpoint.lineNumber][breakpoint.tokenIndex][hyphenIndex] != null && this.shortestPath[breakpoint.lineNumber][breakpoint.tokenIndex][hyphenIndex] > breakpoint.demerit) {
+      this._tsb.logger.error('Dynamic: Found shortest path with higher demerit than current breakpoint');
+    } // Real check.
+
+
+    if (this.shortestPath[breakpoint.lineNumber] == null || this.shortestPath[breakpoint.lineNumber][breakpoint.tokenIndex] == null || this.shortestPath[breakpoint.lineNumber][breakpoint.tokenIndex][hyphenIndex] == null || this.shortestPath[breakpoint.lineNumber][breakpoint.tokenIndex][hyphenIndex] === breakpoint.demerit) {
+      return true;
+    }
+
     return false;
   };
 
@@ -2012,13 +2043,15 @@ var TypesetBotHyphen = function TypesetBotHyphen(tsb) {
    * - A word can have any number of tags nodes and tags don't have to end.
    * - A word ends after a space node.
    *
-   * @param   element    The element to typeset
-   * @param   tokenIndex The node index to start constructing words
-   * @returns            The next word represented as one or multiple nodes
+   * @param   element     The element to typeset
+   * @param   tokenIndex  The node index to start constructing words
+   * @param   hyphenIndex Optional hyphenIndex of first node to start from
+   * @returns             The next word represented as one or multiple nodes
    */
 
 
   this.nextWord = function (element, tokenIndex) {
+    var hyphenIndex = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
     var str = '';
     var indexes = [];
     var width = 0;
