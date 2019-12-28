@@ -1288,16 +1288,14 @@ function TypesetBotTypeset(tsb) {
     var isFinished = false;
 
     while (!isFinished) {
-      console.log('loop main --> ' + this.activeBreakpoints.getLength()); // console.log(this.shortestPath);
-
+      // console.log('loop main --> ' + this.activeBreakpoints.getLength());
       var originBreakpoint = this.activeBreakpoints.dequeue(); // Check if there is no more element to dequeue.
 
       if (originBreakpoint == null) {
         isFinished = true;
         continue;
-      }
+      } // console.log(originBreakpoint);
 
-      console.log(originBreakpoint);
 
       if (!this.isShortestPath(originBreakpoint)) {
         continue;
@@ -1369,14 +1367,13 @@ function TypesetBotTypeset(tsb) {
           }
 
           if (!this.math.ratioIsHigherThanMin(ratio)) {
-            console.log('break min');
             lineIsFinished = true;
             continue; // Don't add the last node.
           } // Generate breakpoint.
 
 
           var breakpoint = this.getBreakpoint(originBreakpoint, lineProperties, ratio, lineProperties.tokenIndex);
-          var updatedPath = this.updateShortestPath(breakpoint, lineProperties);
+          var updatedPath = this.updateShortestPath(breakpoint);
           console.log(wordData);
           console.log('Did update path line ' + lineProperties.lineNumber + ': ' + updatedPath + ' (ratio:' + ratio + ')(demerit:' + breakpoint.demerit + ')');
         } // console.log(ratio);
@@ -1425,29 +1422,32 @@ function TypesetBotTypeset(tsb) {
     } // Real check.
 
 
-    if (this.shortestPath[breakpoint.lineNumber] == null || this.shortestPath[breakpoint.lineNumber][breakpoint.tokenIndex] == null || this.shortestPath[breakpoint.lineNumber][breakpoint.tokenIndex][hyphenIndex] == null || this.shortestPath[breakpoint.lineNumber][breakpoint.tokenIndex][hyphenIndex] === breakpoint.demerit) {
-      return true;
-    }
-
-    return false;
+    return this.shortestPath[breakpoint.lineNumber] == null || this.shortestPath[breakpoint.lineNumber][breakpoint.tokenIndex] == null || this.shortestPath[breakpoint.lineNumber][breakpoint.tokenIndex][hyphenIndex] == null || this.shortestPath[breakpoint.lineNumber][breakpoint.tokenIndex][hyphenIndex] === breakpoint.demerit;
   };
+  /**
+   * Update demerit if the breakpoint is the current shortest path.
+   * - Checks on specific line number.
+   * - Checks on specific token index.
+   * - Checks on specific hyphenation point.
+   *
+   * @param   breakpoint
+   * @returns            Return true if the breakpoint is the shortest path, otherwise return false
+   */
 
-  this.updateShortestPath = function (breakpoint, lineProperties) {
-    var hyphenIndex = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : -1;
 
-    // If breakpoint has better demerit on "specific line, with specific nodex, with specific hyphen index".
-    // Then update the breakpoint.
-    // Append to active breakpoints queue.
-    if (this.shortestPath[lineProperties.lineNumber] == null) {
-      this.shortestPath[lineProperties.lineNumber] = {};
+  this.updateShortestPath = function (breakpoint) {
+    var hyphenIndex = breakpoint.hyphenIndex == null ? -1 : breakpoint.hyphenIndex;
+
+    if (this.shortestPath[breakpoint.lineNumber] == null) {
+      this.shortestPath[breakpoint.lineNumber] = {};
     }
 
-    if (this.shortestPath[lineProperties.lineNumber][lineProperties.tokenIndex] == null) {
-      this.shortestPath[lineProperties.lineNumber][lineProperties.tokenIndex] = {};
+    if (this.shortestPath[breakpoint.lineNumber][breakpoint.tokenIndex] == null) {
+      this.shortestPath[breakpoint.lineNumber][breakpoint.tokenIndex] = {};
     }
 
-    if (this.shortestPath[lineProperties.lineNumber][lineProperties.tokenIndex][hyphenIndex] == null || this.shortestPath[lineProperties.lineNumber][lineProperties.tokenIndex][hyphenIndex] > breakpoint.demerit) {
-      this.shortestPath[lineProperties.lineNumber][lineProperties.tokenIndex][hyphenIndex] = breakpoint.demerit;
+    if (this.shortestPath[breakpoint.lineNumber][breakpoint.tokenIndex][hyphenIndex] == null || this.shortestPath[breakpoint.lineNumber][breakpoint.tokenIndex][hyphenIndex] > breakpoint.demerit) {
+      this.shortestPath[breakpoint.lineNumber][breakpoint.tokenIndex][hyphenIndex] = breakpoint.demerit;
       this.activeBreakpoints.enqueue(breakpoint);
       return true;
     }

@@ -196,9 +196,7 @@ class TypesetBotTypeset {
 
         let isFinished = false;
         while (!isFinished) {
-            console.log('loop main --> ' + this.activeBreakpoints.getLength());
-            // console.log(this.shortestPath);
-
+            // console.log('loop main --> ' + this.activeBreakpoints.getLength());
 
             const originBreakpoint = this.activeBreakpoints.dequeue();
             // Check if there is no more element to dequeue.
@@ -206,7 +204,7 @@ class TypesetBotTypeset {
                 isFinished = true;
                 continue;
             }
-            console.log(originBreakpoint);
+            // console.log(originBreakpoint);
 
             if (!this.isShortestPath(originBreakpoint)) {
                 continue;
@@ -268,8 +266,6 @@ class TypesetBotTypeset {
 
                     // Check the ratio is still valid.
                     if (!this.math.ratioIsHigherThanMin(ratio)) {
-                        console.log('break min');
-
                         lineIsFinished = true;
                         continue; // Don't add the last node.
                     }
@@ -281,7 +277,7 @@ class TypesetBotTypeset {
                         ratio,
                         lineProperties.tokenIndex,
                     );
-                    let updatedPath = this.updateShortestPath(breakpoint, lineProperties)
+                    let updatedPath = this.updateShortestPath(breakpoint)
 
                     console.log(wordData);
                     console.log('Did update path line ' + lineProperties.lineNumber + ': ' + updatedPath + ' (ratio:' + ratio + ')(demerit:' + breakpoint.demerit + ')');
@@ -351,38 +347,37 @@ class TypesetBotTypeset {
         }
 
         // Real check.
-        if (
+        return (
             this.shortestPath[breakpoint.lineNumber] == null ||
             this.shortestPath[breakpoint.lineNumber][breakpoint.tokenIndex] == null ||
             this.shortestPath[breakpoint.lineNumber][breakpoint.tokenIndex][hyphenIndex] == null ||
             this.shortestPath[breakpoint.lineNumber][breakpoint.tokenIndex][hyphenIndex] === breakpoint.demerit
-        ) {
-
-            return true;
-        }
-
-        return false;
+        );
     }
 
-    updateShortestPath = function(
-        breakpoint: TypesetBotLinebreak,
-        lineProperties: TypesetBotLineProperties,
-        hyphenIndex: number = -1,
-    ): boolean {
-        // If breakpoint has better demerit on "specific line, with specific nodex, with specific hyphen index".
-        // Then update the breakpoint.
-        // Append to active breakpoints queue.
-        if (this.shortestPath[lineProperties.lineNumber] == null) {
-            this.shortestPath[lineProperties.lineNumber] = {};
+    /**
+     * Update demerit if the breakpoint is the current shortest path.
+     * - Checks on specific line number.
+     * - Checks on specific token index.
+     * - Checks on specific hyphenation point.
+     *
+     * @param   breakpoint
+     * @returns            Return true if the breakpoint is the shortest path, otherwise return false
+     */
+    updateShortestPath = function(breakpoint: TypesetBotLinebreak): boolean {
+        const hyphenIndex = breakpoint.hyphenIndex == null ? -1 : breakpoint.hyphenIndex;
+
+        if (this.shortestPath[breakpoint.lineNumber] == null) {
+            this.shortestPath[breakpoint.lineNumber] = {};
         }
-        if (this.shortestPath[lineProperties.lineNumber][lineProperties.tokenIndex] == null) {
-            this.shortestPath[lineProperties.lineNumber][lineProperties.tokenIndex] = {};
+        if (this.shortestPath[breakpoint.lineNumber][breakpoint.tokenIndex] == null) {
+            this.shortestPath[breakpoint.lineNumber][breakpoint.tokenIndex] = {};
         }
         if (
-            this.shortestPath[lineProperties.lineNumber][lineProperties.tokenIndex][hyphenIndex] == null ||
-            this.shortestPath[lineProperties.lineNumber][lineProperties.tokenIndex][hyphenIndex] > breakpoint.demerit
+            this.shortestPath[breakpoint.lineNumber][breakpoint.tokenIndex][hyphenIndex] == null ||
+            this.shortestPath[breakpoint.lineNumber][breakpoint.tokenIndex][hyphenIndex] > breakpoint.demerit
         ) {
-            this.shortestPath[lineProperties.lineNumber][lineProperties.tokenIndex][hyphenIndex] = breakpoint.demerit;
+            this.shortestPath[breakpoint.lineNumber][breakpoint.tokenIndex][hyphenIndex] = breakpoint.demerit;
             this.activeBreakpoints.enqueue(breakpoint);
             return true;
         }
