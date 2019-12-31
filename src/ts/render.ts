@@ -225,4 +225,82 @@ class TypesetBotRender {
 
         element.innerHTML = backupHtml;
     }
+
+    applyLineBreaks = function(element: Element, finalBreakpoint: TypesetBotLinebreak) {
+        this._tsb.logger.start('-- Apply breakpoints');
+
+        const lines = [];
+        let isFinished = false;
+
+        let pointer = finalBreakpoint;
+        while (!isFinished) {
+            if (pointer == null) {
+                isFinished = true;
+                continue;
+            }
+
+            lines.push(pointer);
+
+            pointer = pointer.origin;
+        }
+
+        // Ignore first line element, as it's always the same.
+        lines.pop();
+        // Reverse lines, so first line appears first.
+        lines.reverse();
+
+        console.log('Constructing lines');
+
+        let html = '';
+        let curTokenIndex = 0;
+        for (const line of lines) {
+            let lineHtml = '';
+            console.log(line);
+            lineHtml += this.getHtmlFromTokensRange(element, curTokenIndex, line.tokenIndex);
+
+            curTokenIndex = line.tokenIndex;
+
+            html +=
+                '<span class="typesetbot-line" line="' + line.lineNumber + '" style="height:' + line.maxLineHeight + 'px">' +
+                    lineHtml +
+                '</span>';
+        }
+
+        element.innerHTML = html;
+        element.classList.add('typesetbot-justify');
+
+        this._tsb.logger.end('-- Apply breakpoints');
+    }
+
+    getHtmlFromTokensRange = function(element: Element, startIndex: number, endIndex: number, hyphenIndex: number = null) {
+        const tokens = this._tsb.util.getElementTokens(element);
+        let html = '';
+
+        if (endIndex == null) {
+            endIndex = tokens.length - 1;
+        }
+
+        for (let index = startIndex; index < endIndex; index++) {
+            const token = tokens[index];
+            switch (token.type) {
+                case TypesetBotToken.types.WORD:
+                    const word = token as TypesetBotWord;
+                    html += word.text;
+                    break;
+                case TypesetBotToken.types.TAG:
+                    const tag = token as TypesetBotTag;
+                    html += this.htmlGenerator.createTagHtml(element, tag);
+                    break;
+                case TypesetBotToken.types.SPACE:
+                    html += ' ';
+                    break;
+                default:
+                    // Ignore the other node types.
+                    this._tsb.logger.error('Unknown token type found: ' + token.type);
+                    break;
+            }
+        }
+
+        return html;
+    }
 }

@@ -110,6 +110,7 @@ class TypesetBotHyphen {
         let str: string = '';
         const indexes: number[] = [];
         let width: number = 0;
+        let maxHeight: number = 0;
 
         const tokens = this._tsb.util.getElementTokens(element);
 
@@ -131,6 +132,9 @@ class TypesetBotHyphen {
                     // @todo add complex hyphen cut calculation.
                     if (token.width != null) {
                         width += token.width;
+                    }
+                    if (token.height != null && maxHeight < token.height) {
+                        maxHeight = token.height;
                     }
 
                     break;
@@ -157,7 +161,7 @@ class TypesetBotHyphen {
             return null;
         }
 
-        return new TypesetBotWordData(str, indexes, tokenIndex, width);
+        return new TypesetBotWordData(str, indexes, tokenIndex, width, maxHeight);
     }
 
     /**
@@ -219,6 +223,7 @@ class TypesetBotWordData {
         public indexes: number[],
         public tokenIndex: number,
         public width: number,
+        public height: number,
     ) { }
 }
 

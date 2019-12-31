@@ -58,7 +58,8 @@ class TypesetBot {
         this.logger.diff('---- Hyphen render');
         this.logger.diff('---- other');
         this.logger.diff('-- Dynamic programming');
-
+        this.logger.diff('-- Finding solution');
+        this.logger.diff('-- Apply breakpoints');
     }
 
     /**

@@ -25,7 +25,6 @@ class TypesetBotTypeset {
     spaceStretch: number;
 
     // Breakpoint structures.
-    finalBreakpoints: TypesetBotLinebreak[];
     activeBreakpoints: TypesetBotLinebreak[];
     shortestPath: object;
 
@@ -99,11 +98,6 @@ class TypesetBotTypeset {
         this.spaceShrink = this.elemFontSize * this.settings.spaceShrinkability,
         this.spaceStretch = this.elemFontSize * this.settings.spaceStretchability;
 
-        console.log("spaceWidth " + this.spaceWidth);
-        console.log("spaceShrink " + this.spaceShrink);
-        console.log("spaceStretch " + this.spaceStretch);
-
-
         this._tsb.logger.end('---- Getting element properties');
     }
 
@@ -174,12 +168,40 @@ class TypesetBotTypeset {
      */
     calcLinebreaks = function(element: Element): TypesetBotLinebreak[] {
         this.preprocessElement(element);
+        const finalBreakpoints = this.getFinalLineBreaks(element);
 
+        const solution = this.lowestDemerit(finalBreakpoints);
+        if (solution == null) {
+            this._tsb.logger.notice('No viable solution found during typesetting. Element is skipped.');
+            return;
+        }
+
+        this.render.applyLineBreaks(element, solution);
+    }
+
+    lowestDemerit = function(finalBreakpoints: TypesetBotLinebreak[]) {
+        this._tsb.logger.start('-- Finding solution');
+        let solution = null;
+        for (const breakpoint of finalBreakpoints) {
+            if (solution == null) {
+                solution = breakpoint;
+                continue;
+            }
+            if (solution.demerit > breakpoint.demerit) {
+                solution = breakpoint;
+            }
+        }
+        this._tsb.logger.end('-- Finding solution');
+
+        return solution;
+    }
+
+    getFinalLineBreaks = function(element: Element) {
         this._tsb.logger.start('-- Dynamic programming');
 
         this.activeBreakpoints = new Queue();
         this.shortestPath = {};
-        this.finalBreakpoints = [];
+        const finalBreakpoints = [];
 
         this.activeBreakpoints.enqueue(
             new TypesetBotLinebreak(
@@ -196,42 +218,37 @@ class TypesetBotTypeset {
 
         let isFinished = false;
         while (!isFinished) {
-            // console.log('loop main --> ' + this.activeBreakpoints.getLength());
-
             const originBreakpoint = this.activeBreakpoints.dequeue();
             // Check if there is no more element to dequeue.
             if (originBreakpoint == null) {
                 isFinished = true;
                 continue;
             }
-            // console.log(originBreakpoint);
 
             if (!this.isShortestPath(originBreakpoint)) {
                 continue;
             }
 
-            const lineProperties = this.initLineProperties(element, originBreakpoint);
+            const lineProperties = this.initLineProperties(originBreakpoint);
 
             let lineIsFinished = false;
             while (!lineIsFinished) {
-                // console.log('loop line ' + lineProperties.tokenIndex);
-
                 const oldLineWidth = lineProperties.curWidth;
                 const wordData = this.hyphen.nextWord(element, lineProperties.tokenIndex)
                 if (wordData == null) {
                     // Push final break.
-                    // this.finalBreakpoints.push(
-                    //     new TypesetBotLinebreak(
-                    //         originBreakpoint,
-                    //         lineProperties.tokenIndex,
-                    //         null,
-                    //         originBreakpoint.demerit,
-                    //         false,
-                    //         null,
-                    //         lineProperties.lineNumber + 1,
-                    //         originBreakpoint.maxLineHeight,
-                    //     ),
-                    // );
+                    finalBreakpoints.push(
+                        new TypesetBotLinebreak(
+                            originBreakpoint,
+                            null,
+                            null,
+                            originBreakpoint.demerit,
+                            false,
+                            null,
+                            originBreakpoint.lineNumber + 1,
+                            lineProperties.lineHeight,
+                        ),
+                    );
 
                     lineIsFinished = true;
                     continue;
@@ -239,6 +256,7 @@ class TypesetBotTypeset {
                 // Update token index.
                 lineProperties.tokenIndex = wordData.tokenIndex;
                 lineProperties.curWidth += wordData.width;
+                lineProperties.lineHeight = wordData.height;
                 lineProperties.wordCount++;
 
                 const ratio = this.math.getRatio(
@@ -248,8 +266,6 @@ class TypesetBotTypeset {
                     this.spaceShrink,
                     this.spaceStretch,
                 );
-                // console.log(ratio);
-
 
                 if (this.math.ratioIsLessThanMax(ratio)) { // Valid breakpoint
                     for (const tokenIndex of wordData.indexes) {
@@ -277,22 +293,20 @@ class TypesetBotTypeset {
                         ratio,
                         lineProperties.tokenIndex,
                     );
-                    let updatedPath = this.updateShortestPath(breakpoint)
-
-                    console.log(wordData);
-                    console.log('Did update path line ' + lineProperties.lineNumber + ': ' + updatedPath + ' (ratio:' + ratio + ')(demerit:' + breakpoint.demerit + ')');
+                    const isUpdatedPath = this.updateShortestPath(breakpoint);
                 }
-                // console.log(ratio);
 
                 lineProperties.curWidth += this.spaceWidth;
             }
         }
-        console.log(this.shortestPath);
-        console.log(this.finalBreakpoints);
-
 
         this._tsb.logger.end('-- Dynamic programming');
-        return [];
+
+        console.log(this.shortestPath);
+        console.log(finalBreakpoints);
+        console.log('Solutions: ' + finalBreakpoints.length);
+
+        return finalBreakpoints;
     }
 
 
@@ -402,7 +416,7 @@ class TypesetBotTypeset {
         this._tsb.indexToTokens[index] = tokens;
     }
 
-    initLineProperties = function(elem: Element, origin: TypesetBotLinebreak): TypesetBotLineProperties {
+    initLineProperties = function(origin: TypesetBotLinebreak): TypesetBotLineProperties {
         // Check if origin is the current shortest path.
         // @todo
 

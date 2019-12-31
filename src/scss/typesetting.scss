@@ -1,5 +1,11 @@
-.typesetbot-justify tsb-line {
+.typesetbot-justify {
+    text-align: justify;
+}
+
+tsb-line {
     display: block;
+}
+.typesetbot-justify tsb-line {
     &:after {
         content: "";
         display: inline-block;
@@ -10,8 +16,7 @@
             display: none;
         }
     }
-}   
-
+}
 .typesetbot-right tsb-line {
     text-align: right;
 }
@@ -19,5 +24,30 @@
     text-align: left;
 }
 .typesetbot-center tsb-line {
+    text-align: center;
+}
+
+.typesetbot-line {
+    display: block;
+}
+.typesetbot-justify .typesetbot-line {
+    &:after {
+        content: "";
+        display: inline-block;
+        width: 100%;
+    }
+    &:last-of-type {
+        &:after {
+            display: none;
+        }
+    }
+}
+.typesetbot-right .typesetbot-line {
+    text-align: right;
+}
+.typesetbot-left .typesetbot-line {
+    text-align: left;
+}
+.typesetbot-center .typesetbot-line {
     text-align: center;
 }
