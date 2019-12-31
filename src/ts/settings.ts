@@ -53,7 +53,7 @@ class TypesetBotSettings {
 
     // "the value of q is increased by 1 (if q < 0) or decreased by 1 (if q > 0) until a feasible solution is
     //  found." - DT p.114
-    loosenessParam  : number = 0; // If zero we find to solution with fewest total demerits. Reffered to as 'q'
+    // loosenessParam  : number = 0; // If zero we find to solution with fewest total demerits. Reffered to as 'q'
     absoluteMaxRatio: number = 5; // Max adjustment ratio before we give up on finding solutions
 
     maxRatio: number = 2; // Maximum acceptable adjustment ratio. Referred to as 'p'

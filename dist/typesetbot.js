@@ -484,8 +484,7 @@ function TypesetBotSettings(tsb) {
   this.demeritOffset = 1; // Offset to prefer fewer lines by increasing demerit of "~zero badness lines"
   // "the value of q is increased by 1 (if q < 0) or decreased by 1 (if q > 0) until a feasible solution is
   //  found." - DT p.114
-
-  this.loosenessParam = 0; // If zero we find to solution with fewest total demerits. Reffered to as 'q'
+  // loosenessParam  : number = 0; // If zero we find to solution with fewest total demerits. Reffered to as 'q'
 
   this.absoluteMaxRatio = 5; // Max adjustment ratio before we give up on finding solutions
 
@@ -768,8 +767,8 @@ var TypesetBotMath = function TypesetBotMath(tsb) {
    */
 
 
-  this.isValidRatio = function (ratio) {
-    return this.ratioIsLessThanMax(ratio) && this.ratioIsHigherThanMin(ratio);
+  this.isValidRatio = function (ratio, looseness) {
+    return this.ratioIsLessThanMax(ratio, looseness) && this.ratioIsHigherThanMin(ratio);
   };
   /**
    * Check if ratio is less or equal to allowed maximum ratio.
@@ -779,8 +778,8 @@ var TypesetBotMath = function TypesetBotMath(tsb) {
    */
 
 
-  this.ratioIsLessThanMax = function (ratio) {
-    return ratio <= this.settings.maxRatio + this.settings.loosenessParam;
+  this.ratioIsLessThanMax = function (ratio, looseness) {
+    return ratio <= this.settings.maxRatio + looseness;
   };
   /**
    * Check if ratio is higher or equal to allowed minimum ratio.
@@ -1156,8 +1155,7 @@ function TypesetBotTypeset(tsb) {
     console.log('Typesetting:');
     console.log(node); // Apply basic reset CSS styles.
     // (ignore for now)
-
-    this.settings.loosenessParam = 0; // Check if node has changed content (inner nodes) since last typesetting.
+    // Check if node has changed content (inner nodes) since last typesetting.
     // (ignored for now)
     // Make a copy of node which can be worked on without breaking webpage.
 
@@ -1331,6 +1329,8 @@ function TypesetBotTypeset(tsb) {
   };
 
   this.getFinalLineBreaks = function (element) {
+    var looseness = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+
     this._tsb.logger.start('-- Dynamic programming');
 
     this.activeBreakpoints = new Queue();
@@ -1372,7 +1372,7 @@ function TypesetBotTypeset(tsb) {
         lineProperties.wordCount++;
         var ratio = this.math.getRatio(this.elemWidth, lineProperties.curWidth, lineProperties.wordCount, this.spaceShrink, this.spaceStretch);
 
-        if (this.math.ratioIsLessThanMax(ratio)) {
+        if (this.math.ratioIsLessThanMax(ratio, looseness)) {
           // Valid breakpoint
           var _iteratorNormalCompletion9 = true;
           var _didIteratorError9 = false;
@@ -1419,11 +1419,14 @@ function TypesetBotTypeset(tsb) {
       }
     }
 
-    this._tsb.logger.end('-- Dynamic programming');
+    this._tsb.logger.end('-- Dynamic programming'); // Run again more loose if no solution was found.
 
-    console.log(this.shortestPath);
-    console.log(finalBreakpoints);
-    console.log('Solutions: ' + finalBreakpoints.length);
+
+    if (finalBreakpoints.length === 0 && looseness <= 4) {
+      console.log('recall linebreak');
+      return this.getFinalLineBreaks(element, looseness + 1);
+    }
+
     return finalBreakpoints;
   };
 
@@ -1616,7 +1619,7 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
   this.setMinimumWordSpacing = function (node) {
     var minSpaceSize = this._tsb.settings.spaceWidth - this._tsb.settings.spaceShrinkability;
     var defaultWidth = this.getSpaceWidth(node);
-    node.style.wordSpacing = 'calc((1px * ' + minSpaceSize + ') - ' + defaultWidth + 'px)';
+    node.style.wordSpacing = 'calc((1em * ' + minSpaceSize + ') - ' + defaultWidth + 'px)';
   };
 
   this.getWordProperties = function (node) {
@@ -1939,14 +1942,12 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
     lines.pop(); // Reverse lines, so first line appears first.
 
     lines.reverse();
-    console.log('Constructing lines');
     var html = '';
     var curTokenIndex = 0;
 
     for (var _i2 = 0, _lines = lines; _i2 < _lines.length; _i2++) {
       var line = _lines[_i2];
       var lineHtml = '';
-      console.log(line);
       lineHtml += this.getHtmlFromTokensRange(element, curTokenIndex, line.tokenIndex);
       curTokenIndex = line.tokenIndex;
       html += '<span class="typesetbot-line" line="' + line.lineNumber + '" style="height:' + line.maxLineHeight + 'px">' + lineHtml + '</span>';

@@ -53,9 +53,6 @@ class TypesetBotTypeset {
         // Apply basic reset CSS styles.
         // (ignore for now)
 
-
-        this.settings.loosenessParam = 0;
-
         // Check if node has changed content (inner nodes) since last typesetting.
         // (ignored for now)
 
@@ -196,7 +193,7 @@ class TypesetBotTypeset {
         return solution;
     }
 
-    getFinalLineBreaks = function(element: Element) {
+    getFinalLineBreaks = function(element: Element, looseness: number = 0) {
         this._tsb.logger.start('-- Dynamic programming');
 
         this.activeBreakpoints = new Queue();
@@ -267,7 +264,7 @@ class TypesetBotTypeset {
                     this.spaceStretch,
                 );
 
-                if (this.math.ratioIsLessThanMax(ratio)) { // Valid breakpoint
+                if (this.math.ratioIsLessThanMax(ratio, looseness)) { // Valid breakpoint
                     for (const tokenIndex of wordData.indexes) {
                         const token = this.tokens[tokenIndex];
 
@@ -302,9 +299,12 @@ class TypesetBotTypeset {
 
         this._tsb.logger.end('-- Dynamic programming');
 
-        console.log(this.shortestPath);
-        console.log(finalBreakpoints);
-        console.log('Solutions: ' + finalBreakpoints.length);
+        // Run again more loose if no solution was found.
+        if (finalBreakpoints.length === 0 && looseness <= 4) {
+            console.log('recall linebreak');
+
+            return this.getFinalLineBreaks(element, looseness + 1);
+        }
 
         return finalBreakpoints;
     }

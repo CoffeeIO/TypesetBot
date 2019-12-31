@@ -250,13 +250,10 @@ class TypesetBotRender {
         // Reverse lines, so first line appears first.
         lines.reverse();
 
-        console.log('Constructing lines');
-
         let html = '';
         let curTokenIndex = 0;
         for (const line of lines) {
             let lineHtml = '';
-            console.log(line);
             lineHtml += this.getHtmlFromTokensRange(element, curTokenIndex, line.tokenIndex);
 
             curTokenIndex = line.tokenIndex;
