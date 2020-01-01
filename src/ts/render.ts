@@ -252,9 +252,17 @@ class TypesetBotRender {
 
         let html = '';
         let curTokenIndex = 0;
+        // Fifo stack of open html tags.
+        const tagStack: TypesetBotToken[] = [];
+
+        // Construct the lines.
         for (const line of lines) {
+            console.log(tagStack);
             let lineHtml = '';
-            lineHtml += this.getHtmlFromTokensRange(element, curTokenIndex, line.tokenIndex);
+
+            lineHtml += this.prependTagTokensOnLine(element, tagStack);
+            lineHtml += this.getHtmlFromTokensRange(element, curTokenIndex, line.tokenIndex, tagStack);
+            lineHtml += this.appendTagTokensOnLine(element, tagStack);
 
             curTokenIndex = line.tokenIndex;
 
@@ -270,7 +278,31 @@ class TypesetBotRender {
         this._tsb.logger.end('-- Apply breakpoints');
     }
 
-    getHtmlFromTokensRange = function(element: Element, startIndex: number, endIndex: number, hyphenIndex: number = null) {
+    prependTagTokensOnLine = function(element: Element, tagStack: TypesetBotToken[]): string {
+        let html = '';
+        for (const tag of tagStack) {
+            html += this.htmlGenerator.createTagHtml(element, tag);
+        }
+
+        return html;
+    }
+
+    appendTagTokensOnLine = function(element: Element, tagStack: TypesetBotToken[]) {
+        let html = '';
+        for (const tag of tagStack) {
+            html += this.htmlGenerator.createTagHtml(element, tag, true);
+        }
+
+        return html;
+    }
+
+    getHtmlFromTokensRange = function(
+        element: Element,
+        startIndex: number,
+        endIndex: number,
+        tagStack: TypesetBotToken[],
+        hyphenIndex: number = null,
+    ) {
         const tokens = this._tsb.util.getElementTokens(element);
         let html = '';
 
@@ -287,6 +319,12 @@ class TypesetBotRender {
                     break;
                 case TypesetBotToken.types.TAG:
                     const tag = token as TypesetBotTag;
+
+                    if (!tag.isEndTag) {
+                        tagStack.push(tag);
+                    } else {
+                        tagStack.pop();
+                    }
                     html += this.htmlGenerator.createTagHtml(element, tag);
                     break;
                 case TypesetBotToken.types.SPACE:

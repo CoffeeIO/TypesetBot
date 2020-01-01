@@ -15,11 +15,11 @@ class TypesetBotHtml {
      * @param   token The token representing HTML tag
      * @returns       The HTML string
      */
-    createTagHtml = function(node: Element, token: TypesetBotTag): string {
+    createTagHtml = function(node: Element, token: TypesetBotTag, forceEndTag: boolean = false): string {
         const elementNodes = this._tsb.util.getElementNodes(node);
         const tagNode = elementNodes[token.nodeIndex];
 
-        if (token.isEndTag) {
+        if (token.isEndTag || forceEndTag) {
             return '</' + tagNode.tagName.toLowerCase() + '>';
         } else {
             let attrText = '';

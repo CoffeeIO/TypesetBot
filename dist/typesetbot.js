@@ -1943,12 +1943,17 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
     lines.reverse();
     var html = '';
-    var curTokenIndex = 0;
+    var curTokenIndex = 0; // Fifo stack of open html tags.
+
+    var tagStack = []; // Construct the lines.
 
     for (var _i2 = 0, _lines = lines; _i2 < _lines.length; _i2++) {
       var line = _lines[_i2];
+      console.log(tagStack);
       var lineHtml = '';
-      lineHtml += this.getHtmlFromTokensRange(element, curTokenIndex, line.tokenIndex);
+      lineHtml += this.prependTagTokensOnLine(element, tagStack);
+      lineHtml += this.getHtmlFromTokensRange(element, curTokenIndex, line.tokenIndex, tagStack);
+      lineHtml += this.appendTagTokensOnLine(element, tagStack);
       curTokenIndex = line.tokenIndex;
       html += '<span class="typesetbot-line" line="' + line.lineNumber + '" style="height:' + line.maxLineHeight + 'px">' + lineHtml + '</span>';
     }
@@ -1959,8 +1964,66 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
     this._tsb.logger.end('-- Apply breakpoints');
   };
 
-  this.getHtmlFromTokensRange = function (element, startIndex, endIndex) {
-    var hyphenIndex = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+  this.prependTagTokensOnLine = function (element, tagStack) {
+    var html = '';
+    var _iteratorNormalCompletion15 = true;
+    var _didIteratorError15 = false;
+    var _iteratorError15 = undefined;
+
+    try {
+      for (var _iterator15 = tagStack[Symbol.iterator](), _step15; !(_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done); _iteratorNormalCompletion15 = true) {
+        var tag = _step15.value;
+        html += this.htmlGenerator.createTagHtml(element, tag);
+      }
+    } catch (err) {
+      _didIteratorError15 = true;
+      _iteratorError15 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion15 && _iterator15["return"] != null) {
+          _iterator15["return"]();
+        }
+      } finally {
+        if (_didIteratorError15) {
+          throw _iteratorError15;
+        }
+      }
+    }
+
+    return html;
+  };
+
+  this.appendTagTokensOnLine = function (element, tagStack) {
+    var html = '';
+    var _iteratorNormalCompletion16 = true;
+    var _didIteratorError16 = false;
+    var _iteratorError16 = undefined;
+
+    try {
+      for (var _iterator16 = tagStack[Symbol.iterator](), _step16; !(_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done); _iteratorNormalCompletion16 = true) {
+        var tag = _step16.value;
+        html += this.htmlGenerator.createTagHtml(element, tag, true);
+      }
+    } catch (err) {
+      _didIteratorError16 = true;
+      _iteratorError16 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion16 && _iterator16["return"] != null) {
+          _iterator16["return"]();
+        }
+      } finally {
+        if (_didIteratorError16) {
+          throw _iteratorError16;
+        }
+      }
+    }
+
+    return html;
+  };
+
+  this.getHtmlFromTokensRange = function (element, startIndex, endIndex, tagStack) {
+    var hyphenIndex = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
 
     var tokens = this._tsb.util.getElementTokens(element);
 
@@ -1981,6 +2044,13 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
         case TypesetBotToken.types.TAG:
           var tag = token;
+
+          if (!tag.isEndTag) {
+            tagStack.push(tag);
+          } else {
+            tagStack.pop();
+          }
+
           html += this.htmlGenerator.createTagHtml(element, tag);
           break;
 
@@ -2018,34 +2088,36 @@ var TypesetBotHtml = function TypesetBotHtml(tsb) {
    * @returns       The HTML string
    */
   this.createTagHtml = function (node, token) {
+    var forceEndTag = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
     var elementNodes = this._tsb.util.getElementNodes(node);
 
     var tagNode = elementNodes[token.nodeIndex];
 
-    if (token.isEndTag) {
+    if (token.isEndTag || forceEndTag) {
       return '</' + tagNode.tagName.toLowerCase() + '>';
     } else {
       var attrText = '';
-      var _iteratorNormalCompletion15 = true;
-      var _didIteratorError15 = false;
-      var _iteratorError15 = undefined;
+      var _iteratorNormalCompletion17 = true;
+      var _didIteratorError17 = false;
+      var _iteratorError17 = undefined;
 
       try {
-        for (var _iterator15 = tagNode.attributes[Symbol.iterator](), _step15; !(_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done); _iteratorNormalCompletion15 = true) {
-          var attr = _step15.value;
+        for (var _iterator17 = tagNode.attributes[Symbol.iterator](), _step17; !(_iteratorNormalCompletion17 = (_step17 = _iterator17.next()).done); _iteratorNormalCompletion17 = true) {
+          var attr = _step17.value;
           attrText += attr.name + '=' + attr.value + ' ';
         }
       } catch (err) {
-        _didIteratorError15 = true;
-        _iteratorError15 = err;
+        _didIteratorError17 = true;
+        _iteratorError17 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion15 && _iterator15["return"] != null) {
-            _iterator15["return"]();
+          if (!_iteratorNormalCompletion17 && _iterator17["return"] != null) {
+            _iterator17["return"]();
           }
         } finally {
-          if (_didIteratorError15) {
-            throw _iteratorError15;
+          if (_didIteratorError17) {
+            throw _iteratorError17;
           }
         }
       }
@@ -2249,26 +2321,26 @@ var TypesetBotHyphen = function TypesetBotHyphen(tsb) {
     var tokens = this._tsb.util.getElementTokens(element); // Set properties on tokens.
 
 
-    var _iteratorNormalCompletion16 = true;
-    var _didIteratorError16 = false;
-    var _iteratorError16 = undefined;
+    var _iteratorNormalCompletion18 = true;
+    var _didIteratorError18 = false;
+    var _iteratorError18 = undefined;
 
     try {
-      for (var _iterator16 = wordData.indexes[Symbol.iterator](), _step16; !(_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done); _iteratorNormalCompletion16 = true) {
-        var tokenIndex = _step16.value;
+      for (var _iterator18 = wordData.indexes[Symbol.iterator](), _step18; !(_iteratorNormalCompletion18 = (_step18 = _iterator18.next()).done); _iteratorNormalCompletion18 = true) {
+        var tokenIndex = _step18.value;
         tokens[tokenIndex].initHyphen();
       }
     } catch (err) {
-      _didIteratorError16 = true;
-      _iteratorError16 = err;
+      _didIteratorError18 = true;
+      _iteratorError18 = err;
     } finally {
       try {
-        if (!_iteratorNormalCompletion16 && _iterator16["return"] != null) {
-          _iterator16["return"]();
+        if (!_iteratorNormalCompletion18 && _iterator18["return"] != null) {
+          _iterator18["return"]();
         }
       } finally {
-        if (_didIteratorError16) {
-          throw _iteratorError16;
+        if (_didIteratorError18) {
+          throw _iteratorError18;
         }
       }
     }
@@ -2282,13 +2354,13 @@ var TypesetBotHyphen = function TypesetBotHyphen(tsb) {
     var curHyphenLength = 0; // Add the accurate hyphen indexes to the nodes.
     // Fx: ['hyph', <tag>, 'e', <tag>, 'nation'] --> ['hyp(-)h', <tag>, 'e', </tag>, 'n(-)ation']
 
-    var _iteratorNormalCompletion17 = true;
-    var _didIteratorError17 = false;
-    var _iteratorError17 = undefined;
+    var _iteratorNormalCompletion19 = true;
+    var _didIteratorError19 = false;
+    var _iteratorError19 = undefined;
 
     try {
-      for (var _iterator17 = hyphenLengths[Symbol.iterator](), _step17; !(_iteratorNormalCompletion17 = (_step17 = _iterator17.next()).done); _iteratorNormalCompletion17 = true) {
-        var hyphenLength = _step17.value;
+      for (var _iterator19 = hyphenLengths[Symbol.iterator](), _step19; !(_iteratorNormalCompletion19 = (_step19 = _iterator19.next()).done); _iteratorNormalCompletion19 = true) {
+        var hyphenLength = _step19.value;
         curHyphenLength += hyphenLength; // Go to next token until we find a token that contains a hyphen.
 
         while (curTokenLength < curHyphenLength) {
@@ -2302,16 +2374,16 @@ var TypesetBotHyphen = function TypesetBotHyphen(tsb) {
         curToken.hyphenIndexPositions.push(hyphenIndex);
       }
     } catch (err) {
-      _didIteratorError17 = true;
-      _iteratorError17 = err;
+      _didIteratorError19 = true;
+      _iteratorError19 = err;
     } finally {
       try {
-        if (!_iteratorNormalCompletion17 && _iterator17["return"] != null) {
-          _iterator17["return"]();
+        if (!_iteratorNormalCompletion19 && _iterator19["return"] != null) {
+          _iterator19["return"]();
         }
       } finally {
-        if (_didIteratorError17) {
-          throw _iteratorError17;
+        if (_didIteratorError19) {
+          throw _iteratorError19;
         }
       }
     }
