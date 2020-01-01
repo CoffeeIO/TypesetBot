@@ -431,7 +431,8 @@ var TypesetBotElementQuery = function TypesetBotElementQuery(tsb, query) {
  */
 
 
-var TypesetBotSettings =
+var TypesetBotSettings = // ------------------------------------------------------------------------
+
 /**
  * @param settings Optional settings object.
  */
@@ -440,55 +441,27 @@ function TypesetBotSettings(tsb) {
 
   _classCallCheck(this, TypesetBotSettings);
 
-  /**
-   * Merge custom settings with a default set of settings.
-   *
-   * @param settings The custom overwrite settings
-   */
-  this._mergeSettings = function () {
-    var settings = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-
-    if (settings == null) {
-      return;
-    }
-
-    for (var _i = 0, _Object$entries = Object.entries(settings); _i < _Object$entries.length; _i++) {
-      var _Object$entries$_i = _slicedToArray(_Object$entries[_i], 2),
-          key = _Object$entries$_i[0],
-          value = _Object$entries$_i[1];
-
-      if (this[key] === undefined) {
-        this._tsb.logger.warn('Unknown settings key "' + key + '"');
-      }
-
-      this[key] = value;
-    }
-  }; // ------------------------------------------------------------------------
+  // ------------------------------------------------------------------------
   // SETTINGS ---------------------------------------------------------------
   // ------------------------------------------------------------------------
   // Debug mode: prints performance stats.
-
-
   this.debug = true; // Algorithm. -------------------------------------------------------------
 
-  this.alignment = 'justify'; // Other options are 'ragged-right', 'ragged-left' and 'ragged-center'
+  this.alignment = 'justify'; // Other options are 'left', 'right' and 'center'.
 
   this.hyphenPenalty = 50; // Penalty for line-breaking on a hyphen
 
   this.hyphenPenaltyRagged = 500; // Penalty for line-breaking on a hyphen when using ragged text
 
-  this.flagPenalty = 3000; // Penalty when current and last line had flag value 1. Reffered to as 'α'
+  this.flagPenalty = 3000; // Penalty when current and last line had flag value 1.
 
-  this.fitnessClassDemerit = 3000; // Penalty when switching between ratio classes. Reffered to as 'γ'
+  this.fitnessClassDemerit = 3000; // Penalty when switching between ratio classes.
 
   this.demeritOffset = 1; // Offset to prefer fewer lines by increasing demerit of "~zero badness lines"
-  // "the value of q is increased by 1 (if q < 0) or decreased by 1 (if q > 0) until a feasible solution is
-  //  found." - DT p.114
-  // loosenessParam  : number = 0; // If zero we find to solution with fewest total demerits. Reffered to as 'q'
 
   this.absoluteMaxRatio = 5; // Max adjustment ratio before we give up on finding solutions
 
-  this.maxRatio = 2; // Maximum acceptable adjustment ratio. Referred to as 'p'
+  this.maxRatio = 2; // Maximum acceptable adjustment ratio.
 
   this.minRatio = -1; // Minimum acceptable adjustment ratio. Less than -1 will make the text too closely spaced.
   // Hyphen. ----------------------------------------------------------------
@@ -512,6 +485,32 @@ function TypesetBotSettings(tsb) {
   // Tags inside element that might break the typesetting algorithm
 
   this.unsupportedTags = ['BR', 'IMG'];
+  /**
+   * Merge custom settings with a default set of settings.
+   *
+   * @param settings The custom overwrite settings
+   */
+
+  this._mergeSettings = function () {
+    var settings = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+    if (settings == null) {
+      return;
+    }
+
+    for (var _i = 0, _Object$entries = Object.entries(settings); _i < _Object$entries.length; _i++) {
+      var _Object$entries$_i = _slicedToArray(_Object$entries[_i], 2),
+          key = _Object$entries$_i[0],
+          value = _Object$entries$_i[1];
+
+      if (this[key] === undefined) {
+        this._tsb.logger.warn('Unknown settings key "' + key + '"');
+      }
+
+      this[key] = value;
+    }
+  };
+
   this._tsb = tsb;
   this._customSettings = settings;
 
@@ -1151,9 +1150,9 @@ function TypesetBotTypeset(tsb) {
    *
    * @param node
    */
-  this.typeset = function (node) {
+  this.typeset = function (element) {
     console.log('Typesetting:');
-    console.log(node); // Apply basic reset CSS styles.
+    console.log(element); // Apply basic reset CSS styles.
     // (ignore for now)
     // Check if node has changed content (inner nodes) since last typesetting.
     // (ignored for now)
@@ -1161,18 +1160,21 @@ function TypesetBotTypeset(tsb) {
 
     this._tsb.logger.start('---- Clone working node');
 
-    var cloneNode = node.cloneNode(true);
+    var cloneNode = element.cloneNode(true);
 
-    this._tsb.logger.end('---- Clone working node'); // Calculate linebreaks.
+    this._tsb.logger.end('---- Clone working node');
 
+    this.preprocessElement(element);
+    var finalBreakpoints = this.getFinalLineBreaks(element);
+    var solution = this.lowestDemerit(finalBreakpoints);
 
-    var linebreaks = this.calcLinebreaks(node); // Visually apply linebreaks to original element.
-    // Loop final solutions and find the one with lowest demerit.
-    // Construct lines.
-    // Word, Tag Space
-    // Close tags after each line.
-    // Start unfinished tags at the beginning of each line.
-    // Convert to HTML.
+    if (solution == null) {
+      this._tsb.logger.notice('No viable solution found during typesetting. Element is skipped.');
+
+      return;
+    }
+
+    this.render.applyLineBreaks(element, solution);
   };
   /**
    * Get a set initial state properties of element.
@@ -1269,23 +1271,12 @@ function TypesetBotTypeset(tsb) {
     this._tsb.logger.end('-- Preprocess');
   };
   /**
-   * Calculate the valid linebreaks
+   * Get the solution with lowest demerit from array of solutions.
+   *
+   * @param   finalBreakpoints
+   * @returns                  The solution with lowest demerit
    */
 
-
-  this.calcLinebreaks = function (element) {
-    this.preprocessElement(element);
-    var finalBreakpoints = this.getFinalLineBreaks(element);
-    var solution = this.lowestDemerit(finalBreakpoints);
-
-    if (solution == null) {
-      this._tsb.logger.notice('No viable solution found during typesetting. Element is skipped.');
-
-      return;
-    }
-
-    this.render.applyLineBreaks(element, solution);
-  };
 
   this.lowestDemerit = function (finalBreakpoints) {
     this._tsb.logger.start('-- Finding solution');
@@ -1327,6 +1318,14 @@ function TypesetBotTypeset(tsb) {
 
     return solution;
   };
+  /**
+   * Get all possible solutions to break the text.
+   *
+   * @param   element
+   * @param   looseness The current lossness of the maximum allowed adjustment ratio
+   * @returns           All possible final breakpoints
+   */
+
 
   this.getFinalLineBreaks = function (element) {
     var looseness = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
@@ -1419,16 +1418,27 @@ function TypesetBotTypeset(tsb) {
       }
     }
 
-    this._tsb.logger.end('-- Dynamic programming'); // Run again more loose if no solution was found.
+    this._tsb.logger.end('-- Dynamic programming'); // Lossness is increased by 1 until a feasible solution if found.
 
 
     if (finalBreakpoints.length === 0 && looseness <= 4) {
-      console.log('recall linebreak');
       return this.getFinalLineBreaks(element, looseness + 1);
     }
 
     return finalBreakpoints;
   };
+  /**
+   * Calculate demerit and return new linebreak object.
+   *
+   * @param   origin
+   * @param   lineProperties
+   * @param   ratio
+   * @param   tokenIndex
+   * @param   hyphenIndex
+   * @param   flag
+   * @returns                The new linebreak
+   */
+
 
   this.getBreakpoint = function (origin, lineProperties, ratio, tokenIndex) {
     var hyphenIndex = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
@@ -1514,10 +1524,15 @@ function TypesetBotTypeset(tsb) {
 
     this._tsb.indexToTokens[index] = tokens;
   };
+  /**
+   * Get properties for a new line object.
+   *
+   * @param   origin
+   * @returns        Line properties object
+   */
+
 
   this.initLineProperties = function (origin) {
-    // Check if origin is the current shortest path.
-    // @todo
     return new TypesetBotLineProperties(origin, origin.tokenIndex, origin.lineNumber, 0, 0, 0);
   };
 
@@ -1949,19 +1964,44 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
     for (var _i2 = 0, _lines = lines; _i2 < _lines.length; _i2++) {
       var line = _lines[_i2];
-      console.log(tagStack);
       var lineHtml = '';
       lineHtml += this.prependTagTokensOnLine(element, tagStack);
       lineHtml += this.getHtmlFromTokensRange(element, curTokenIndex, line.tokenIndex, tagStack);
       lineHtml += this.appendTagTokensOnLine(element, tagStack);
       curTokenIndex = line.tokenIndex;
-      html += '<span class="typesetbot-line" line="' + line.lineNumber + '" style="height:' + line.maxLineHeight + 'px">' + lineHtml + '</span>';
+      html += '<tsb-line line="' + line.lineNumber + '" style="height:' + line.maxLineHeight + 'px">' + lineHtml + '</tsb-line>';
     }
 
     element.innerHTML = html;
-    element.classList.add('typesetbot-justify');
+    this.setJustificationClass(element);
 
     this._tsb.logger.end('-- Apply breakpoints');
+  };
+
+  this.setJustificationClass = function (element) {
+    // @todo : remove any existing typesetbot classes.
+    switch (this._tsb.settings.alignment) {
+      case 'justify':
+        element.classList.add('typesetbot-justify');
+        break;
+
+      case 'left':
+        element.classList.add('typesetbot-left');
+        break;
+
+      case 'right':
+        element.classList.add('typesetbot-right');
+        break;
+
+      case 'center':
+        element.classList.add('typesetbot-center');
+        break;
+
+      default:
+        this._tsb.logger.notice('Unknown alignment type: ' + this._tsb.settings.alignment);
+
+        break;
+    }
   };
 
   this.prependTagTokensOnLine = function (element, tagStack) {
@@ -2097,8 +2137,7 @@ var TypesetBotHtml = function TypesetBotHtml(tsb) {
     if (token.isEndTag || forceEndTag) {
       return '</' + tagNode.tagName.toLowerCase() + '>';
     } else {
-      var attrText = ''; // console.log(tagNode.attributes);
-
+      var attrText = '';
       var _iteratorNormalCompletion17 = true;
       var _didIteratorError17 = false;
       var _iteratorError17 = undefined;
@@ -2106,7 +2145,6 @@ var TypesetBotHtml = function TypesetBotHtml(tsb) {
       try {
         for (var _iterator17 = tagNode.attributes[Symbol.iterator](), _step17; !(_iteratorNormalCompletion17 = (_step17 = _iterator17.next()).done); _iteratorNormalCompletion17 = true) {
           var attr = _step17.value;
-          console.log(attr);
           attrText += attr.name + '="' + attr.value + '" ';
         }
       } catch (err) {
@@ -2124,7 +2162,6 @@ var TypesetBotHtml = function TypesetBotHtml(tsb) {
         }
       }
 
-      console.log('<' + tagNode.tagName.toLowerCase() + ' ' + attrText + '>');
       return '<' + tagNode.tagName.toLowerCase() + ' ' + attrText + '>';
     }
   };

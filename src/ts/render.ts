@@ -257,7 +257,6 @@ class TypesetBotRender {
 
         // Construct the lines.
         for (const line of lines) {
-            console.log(tagStack);
             let lineHtml = '';
 
             lineHtml += this.prependTagTokensOnLine(element, tagStack);
@@ -267,15 +266,39 @@ class TypesetBotRender {
             curTokenIndex = line.tokenIndex;
 
             html +=
-                '<span class="typesetbot-line" line="' + line.lineNumber + '" style="height:' + line.maxLineHeight + 'px">' +
+                '<tsb-line line="' + line.lineNumber + '" style="height:' + line.maxLineHeight + 'px">' +
                     lineHtml +
-                '</span>';
+                '</tsb-line>';
         }
 
         element.innerHTML = html;
-        element.classList.add('typesetbot-justify');
+        this.setJustificationClass(element);
+
 
         this._tsb.logger.end('-- Apply breakpoints');
+    }
+
+    setJustificationClass = function(element: Element) {
+        // @todo : remove any existing typesetbot classes.
+
+        switch (this._tsb.settings.alignment) {
+            case 'justify':
+                element.classList.add('typesetbot-justify');
+                break;
+            case 'left':
+                element.classList.add('typesetbot-left');
+                break;
+            case 'right':
+                element.classList.add('typesetbot-right');
+                break;
+            case 'center':
+                element.classList.add('typesetbot-center');
+                break;
+            default:
+                this._tsb.logger.notice('Unknown alignment type: ' + this._tsb.settings.alignment);
+                break;
+        }
+
     }
 
     prependTagTokensOnLine = function(element: Element, tagStack: TypesetBotToken[]): string {

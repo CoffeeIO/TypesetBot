@@ -1,19 +1,19 @@
-.typesetbot-justify {
-    text-align: justify;
-}
-
 tsb-line {
     display: block;
 }
-.typesetbot-justify tsb-line {
-    &:after {
-        content: "";
-        display: inline-block;
-        width: 100%;
-    }
-    &:last-of-type {
+.typesetbot-justify {
+    text-align: justify;
+
+    tsb-line {
         &:after {
-            display: none;
+            content: "";
+            display: inline-block;
+            width: 100%;
+        }
+        &:last-of-type {
+            &:after {
+                display: none;
+            }
         }
     }
 }
@@ -24,30 +24,5 @@ tsb-line {
     text-align: left;
 }
 .typesetbot-center tsb-line {
-    text-align: center;
-}
-
-.typesetbot-line {
-    display: block;
-}
-.typesetbot-justify .typesetbot-line {
-    &:after {
-        content: "";
-        display: inline-block;
-        width: 100%;
-    }
-    &:last-of-type {
-        &:after {
-            display: none;
-        }
-    }
-}
-.typesetbot-right .typesetbot-line {
-    text-align: right;
-}
-.typesetbot-left .typesetbot-line {
-    text-align: left;
-}
-.typesetbot-center .typesetbot-line {
     text-align: center;
 }

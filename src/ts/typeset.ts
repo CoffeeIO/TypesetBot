@@ -45,10 +45,9 @@ class TypesetBotTypeset {
      *
      * @param node
      */
-    typeset = function(node: Element) {
+    typeset = function(element: Element) {
         console.log('Typesetting:');
-        console.log(node);
-
+        console.log(element);
 
         // Apply basic reset CSS styles.
         // (ignore for now)
@@ -58,20 +57,19 @@ class TypesetBotTypeset {
 
         // Make a copy of node which can be worked on without breaking webpage.
         this._tsb.logger.start('---- Clone working node');
-        const cloneNode = node.cloneNode(true);
+        const cloneNode = element.cloneNode(true);
         this._tsb.logger.end('---- Clone working node');
 
+        this.preprocessElement(element);
+        const finalBreakpoints = this.getFinalLineBreaks(element);
 
-        // Calculate linebreaks.
-        const linebreaks = this.calcLinebreaks(node);
+        const solution = this.lowestDemerit(finalBreakpoints);
+        if (solution == null) {
+            this._tsb.logger.notice('No viable solution found during typesetting. Element is skipped.');
+            return;
+        }
 
-        // Visually apply linebreaks to original element.
-            // Loop final solutions and find the one with lowest demerit.
-            // Construct lines.
-                // Word, Tag Space
-                // Close tags after each line.
-                // Start unfinished tags at the beginning of each line.
-            // Convert to HTML.
+        this.render.applyLineBreaks(element, solution);
     }
 
     /**
@@ -161,22 +159,12 @@ class TypesetBotTypeset {
     }
 
     /**
-     * Calculate the valid linebreaks
+     * Get the solution with lowest demerit from array of solutions.
+     *
+     * @param   finalBreakpoints
+     * @returns                  The solution with lowest demerit
      */
-    calcLinebreaks = function(element: Element): TypesetBotLinebreak[] {
-        this.preprocessElement(element);
-        const finalBreakpoints = this.getFinalLineBreaks(element);
-
-        const solution = this.lowestDemerit(finalBreakpoints);
-        if (solution == null) {
-            this._tsb.logger.notice('No viable solution found during typesetting. Element is skipped.');
-            return;
-        }
-
-        this.render.applyLineBreaks(element, solution);
-    }
-
-    lowestDemerit = function(finalBreakpoints: TypesetBotLinebreak[]) {
+    lowestDemerit = function(finalBreakpoints: TypesetBotLinebreak[]): TypesetBotLinebreak {
         this._tsb.logger.start('-- Finding solution');
         let solution = null;
         for (const breakpoint of finalBreakpoints) {
@@ -193,12 +181,19 @@ class TypesetBotTypeset {
         return solution;
     }
 
-    getFinalLineBreaks = function(element: Element, looseness: number = 0) {
+    /**
+     * Get all possible solutions to break the text.
+     *
+     * @param   element
+     * @param   looseness The current lossness of the maximum allowed adjustment ratio
+     * @returns           All possible final breakpoints
+     */
+    getFinalLineBreaks = function(element: Element, looseness: number = 0): TypesetBotLinebreak[] {
         this._tsb.logger.start('-- Dynamic programming');
 
         this.activeBreakpoints = new Queue();
         this.shortestPath = {};
-        const finalBreakpoints = [];
+        const finalBreakpoints: TypesetBotLinebreak[] = [];
 
         this.activeBreakpoints.enqueue(
             new TypesetBotLinebreak(
@@ -299,17 +294,25 @@ class TypesetBotTypeset {
 
         this._tsb.logger.end('-- Dynamic programming');
 
-        // Run again more loose if no solution was found.
+        // Lossness is increased by 1 until a feasible solution if found.
         if (finalBreakpoints.length === 0 && looseness <= 4) {
-            console.log('recall linebreak');
-
             return this.getFinalLineBreaks(element, looseness + 1);
         }
 
         return finalBreakpoints;
     }
 
-
+    /**
+     * Calculate demerit and return new linebreak object.
+     *
+     * @param   origin
+     * @param   lineProperties
+     * @param   ratio
+     * @param   tokenIndex
+     * @param   hyphenIndex
+     * @param   flag
+     * @returns                The new linebreak
+     */
     getBreakpoint = function(
         origin: TypesetBotLinebreak,
         lineProperties: TypesetBotLineProperties,
@@ -317,7 +320,7 @@ class TypesetBotTypeset {
         tokenIndex: number,
         hyphenIndex: number = null,
         flag: boolean = false,
-    ) {
+    ): TypesetBotLinebreak {
         // Get fitness class
         const fitnessClass = this.math.getFitnessClass(ratio);
         const consecutiveFlag = origin.flag && flag;
@@ -416,10 +419,14 @@ class TypesetBotTypeset {
         this._tsb.indexToTokens[index] = tokens;
     }
 
-    initLineProperties = function(origin: TypesetBotLinebreak): TypesetBotLineProperties {
-        // Check if origin is the current shortest path.
-        // @todo
 
+    /**
+     * Get properties for a new line object.
+     *
+     * @param   origin
+     * @returns        Line properties object
+     */
+    initLineProperties = function(origin: TypesetBotLinebreak): TypesetBotLineProperties {
         return new TypesetBotLineProperties(
             origin,
             origin.tokenIndex,
