@@ -2097,7 +2097,8 @@ var TypesetBotHtml = function TypesetBotHtml(tsb) {
     if (token.isEndTag || forceEndTag) {
       return '</' + tagNode.tagName.toLowerCase() + '>';
     } else {
-      var attrText = '';
+      var attrText = ''; // console.log(tagNode.attributes);
+
       var _iteratorNormalCompletion17 = true;
       var _didIteratorError17 = false;
       var _iteratorError17 = undefined;
@@ -2105,7 +2106,8 @@ var TypesetBotHtml = function TypesetBotHtml(tsb) {
       try {
         for (var _iterator17 = tagNode.attributes[Symbol.iterator](), _step17; !(_iteratorNormalCompletion17 = (_step17 = _iterator17.next()).done); _iteratorNormalCompletion17 = true) {
           var attr = _step17.value;
-          attrText += attr.name + '=' + attr.value + ' ';
+          console.log(attr);
+          attrText += attr.name + '="' + attr.value + '" ';
         }
       } catch (err) {
         _didIteratorError17 = true;
@@ -2122,6 +2124,7 @@ var TypesetBotHtml = function TypesetBotHtml(tsb) {
         }
       }
 
+      console.log('<' + tagNode.tagName.toLowerCase() + ' ' + attrText + '>');
       return '<' + tagNode.tagName.toLowerCase() + ' ' + attrText + '>';
     }
   };

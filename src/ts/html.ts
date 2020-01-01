@@ -24,7 +24,7 @@ class TypesetBotHtml {
         } else {
             let attrText = '';
             for (const attr of tagNode.attributes) {
-                attrText += attr.name + '=' + attr.value + ' ';
+                attrText += attr.name + '="' + attr.value + '" ';
             }
 
             return '<' + tagNode.tagName.toLowerCase() + ' ' + attrText + '>';
