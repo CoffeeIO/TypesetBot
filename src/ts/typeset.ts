@@ -46,14 +46,8 @@ class TypesetBotTypeset {
      * @param node
      */
     typeset = function(element: Element) {
-        console.log('Typesetting:');
-        console.log(element);
-
-        // Apply basic reset CSS styles.
-        // (ignore for now)
-
-        // Check if node has changed content (inner nodes) since last typesetting.
-        // (ignored for now)
+        // @todo : Apply basic reset CSS styles.
+        // @todo : Check if node has changed content (inner nodes) since last typesetting.
 
         // Make a copy of node which can be worked on without breaking webpage.
         this._tsb.logger.start('---- Clone working node');

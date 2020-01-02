@@ -42,7 +42,6 @@ function TypesetBot(query, settings) {
    */
 
   this.typeset = function () {
-    console.log('typesettings init');
     this.logger.start('Typeset');
     this.typesetNodes(this.query.nodes);
     this.logger.end('Typeset'); // Log the time diffs.
@@ -1151,13 +1150,9 @@ function TypesetBotTypeset(tsb) {
    * @param node
    */
   this.typeset = function (element) {
-    console.log('Typesetting:');
-    console.log(element); // Apply basic reset CSS styles.
-    // (ignore for now)
-    // Check if node has changed content (inner nodes) since last typesetting.
-    // (ignored for now)
+    // @todo : Apply basic reset CSS styles.
+    // @todo : Check if node has changed content (inner nodes) since last typesetting.
     // Make a copy of node which can be worked on without breaking webpage.
-
     this._tsb.logger.start('---- Clone working node');
 
     var cloneNode = element.cloneNode(true);

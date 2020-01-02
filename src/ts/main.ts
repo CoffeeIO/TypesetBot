@@ -36,14 +36,11 @@ class TypesetBot {
      * Typeset all elements in query.
      */
     typeset = function()  {
-        console.log('typesettings init');
-
         this.logger.start('Typeset');
         this.typesetNodes(this.query.nodes);
         this.logger.end('Typeset');
 
         // Log the time diffs.
-
         this.logger.diff('Typeset');
         this.logger.diff('-- Preprocess');
         this.logger.diff('---- Clone working node');
