@@ -97,7 +97,8 @@ class TypesetBotMath {
      * Check if adjustment ratio is within a valid range.
      *
      * @param   ratio
-     * @returns       Return true if ratio is valid for breakpoint, otherwise false
+     * @param   looseness
+     * @returns           Return true if ratio is valid for breakpoint, otherwise false
      */
     isValidRatio = function(ratio: number, looseness: number): boolean {
         return this.ratioIsLessThanMax(ratio, looseness) && this.ratioIsHigherThanMin(ratio);

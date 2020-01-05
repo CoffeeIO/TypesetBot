@@ -8,7 +8,6 @@ var source = [
     'src/ts/math.ts',
     'src/ts/token.ts',
     'src/ts/typeset.ts',
-    'src/ts/linebreak.ts',
     'src/ts/render.ts',
     'src/ts/html.ts',
     'src/ts/hyphen.ts',

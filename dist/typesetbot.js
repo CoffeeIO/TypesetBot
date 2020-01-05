@@ -433,6 +433,7 @@ var TypesetBotElementQuery = function TypesetBotElementQuery(tsb, query) {
 var TypesetBotSettings = // ------------------------------------------------------------------------
 
 /**
+ * @param tsb
  * @param settings Optional settings object.
  */
 function TypesetBotSettings(tsb) {
@@ -761,7 +762,8 @@ var TypesetBotMath = function TypesetBotMath(tsb) {
    * Check if adjustment ratio is within a valid range.
    *
    * @param   ratio
-   * @returns       Return true if ratio is valid for breakpoint, otherwise false
+   * @param   looseness
+   * @returns           Return true if ratio is valid for breakpoint, otherwise false
    */
 
 
@@ -1162,9 +1164,11 @@ function TypesetBotTypeset(tsb) {
     this.preprocessElement(element);
     var finalBreakpoints = this.getFinalLineBreaks(element);
     var solution = this.lowestDemerit(finalBreakpoints);
+    console.log(solution);
+    return;
 
     if (solution == null) {
-      this._tsb.logger.notice('No viable solution found during typesetting. Element is skipped.');
+      this._tsb.logger.warn('No viable solution found during typesetting. Element is skipped.');
 
       return;
     }
@@ -1263,7 +1267,8 @@ function TypesetBotTypeset(tsb) {
 
     this._tsb.logger.end('---- Hyphen render');
 
-    this._tsb.logger.end('-- Preprocess');
+    this._tsb.logger.end('-- Preprocess'); // console.log(this.tokens);
+
   };
   /**
    * Get the solution with lowest demerit from array of solutions.
@@ -1350,7 +1355,8 @@ function TypesetBotTypeset(tsb) {
 
       while (!lineIsFinished) {
         var oldLineWidth = lineProperties.curWidth;
-        var wordData = this.hyphen.nextWord(element, lineProperties.tokenIndex);
+        var wordData = this.hyphen.nextWord(element, lineProperties.tokenIndex, lineProperties.firstWordHyphenIndex);
+        lineProperties.firstWordHyphenIndex = null; // Unset hyphenindex for next words.
 
         if (wordData == null) {
           // Push final break.
@@ -1368,6 +1374,8 @@ function TypesetBotTypeset(tsb) {
 
         if (this.math.ratioIsLessThanMax(ratio, looseness)) {
           // Valid breakpoint
+          // console.log('Adding word: ' + ratio + ' : ' + wordData.str);
+          // Loop all word parts in the word.
           var _iteratorNormalCompletion9 = true;
           var _didIteratorError9 = false;
           var _iteratorError9 = undefined;
@@ -1375,13 +1383,29 @@ function TypesetBotTypeset(tsb) {
           try {
             for (var _iterator9 = wordData.indexes[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
               var tokenIndex = _step9.value;
-              var token = this.tokens[tokenIndex]; // const hyphenRatio = this.math.getRatio(
-              //     this.elemWidth,
-              //     lineProperties.curWidth,
-              //     lineProperties.wordCount,
-              //     this.spaceShrink,
-              //     this.spaceStretch,
-              // );
+              var token = this.tokens[tokenIndex];
+
+              if (!token.hasHyphen) {
+                continue;
+              }
+
+              for (var index = 0; index < token.hyphenIndexWidths.length; index++) {
+                oldLineWidth += token.hyphenIndexWidths[index];
+                var hyphenRatio = this.math.getRatio(this.elemWidth, oldLineWidth + token.dashWidth, // Add with of hyphen
+                lineProperties.wordCount, this.spaceShrink, this.spaceStretch);
+
+                if (!this.math.isValidRatio(hyphenRatio, looseness)) {
+                  continue;
+                } // Generate breakpoint.
+
+
+                var hyphenBreakpoint = this.getBreakpoint(originBreakpoint, lineProperties, hyphenRatio, wordData.lastWordTokenIndex, // Offset one as the word token is not finished
+                index, true); // console.log(hyphenRatio);
+                // console.log('$ -- Creating hyphen breakpoint');
+                // console.log(hyphenBreakpoint);
+
+                this.updateShortestPath(hyphenBreakpoint);
+              }
             } // Check the ratio is still valid.
 
           } catch (err) {
@@ -1402,23 +1426,28 @@ function TypesetBotTypeset(tsb) {
           if (!this.math.ratioIsHigherThanMin(ratio)) {
             lineIsFinished = true;
             continue; // Don't add the last node.
-          } // Generate breakpoint.
+          } // console.log('-- Create regular break');
+          // Generate breakpoint.
 
 
-          var breakpoint = this.getBreakpoint(originBreakpoint, lineProperties, ratio, lineProperties.tokenIndex);
-          var isUpdatedPath = this.updateShortestPath(breakpoint);
+          var breakpoint = this.getBreakpoint(originBreakpoint, lineProperties, ratio, lineProperties.tokenIndex); // console.log(breakpoint);
+
+          this.updateShortestPath(breakpoint);
         }
 
         lineProperties.curWidth += this.spaceWidth;
       }
-    }
+    } // console.log(this.shortestPath);
+
 
     this._tsb.logger.end('-- Dynamic programming'); // Lossness is increased by 1 until a feasible solution if found.
 
 
     if (finalBreakpoints.length === 0 && looseness <= 4) {
       return this.getFinalLineBreaks(element, looseness + 1);
-    }
+    } // console.log(finalBreakpoints);
+    // return [];
+
 
     return finalBreakpoints;
   };
@@ -1528,7 +1557,7 @@ function TypesetBotTypeset(tsb) {
 
 
   this.initLineProperties = function (origin) {
-    return new TypesetBotLineProperties(origin, origin.tokenIndex, origin.lineNumber, 0, 0, 0);
+    return new TypesetBotLineProperties(origin, origin.tokenIndex, origin.hyphenIndex, origin.lineNumber, 0, 0, 0);
   };
 
   this._tsb = tsb;
@@ -1539,7 +1568,7 @@ function TypesetBotTypeset(tsb) {
   this.settings = tsb.settings;
 };
 /**
- * Linebreak
+ * Class representing a possible linebreak.
  */
 
 
@@ -1567,21 +1596,27 @@ function TypesetBotLinebreak(origin, tokenIndex, hyphenIndex, demerit, flag, fit
   this.lineNumber = lineNumber;
   this.maxLineHeight = maxLineHeight;
 };
+/**
+ * Class representing properties for each line in the dynamic programming algorithm.
+ */
+
 
 var TypesetBotLineProperties =
 /**
- * @param origin     The linebreak object for previous line
- * @param tokenIndex The index of the next token to append
- * @param lineNumber The current line number
- * @param wordCount  The number of words in line
- * @param curWidth   The current line width
- * @param lineHeight The current max line height
+ * @param origin               The linebreak object for previous line
+ * @param tokenIndex           The index of the next token to append
+ * @param firstWordHyphenIndex The hyphenIndex of the first word in the line
+ * @param lineNumber           The current line number
+ * @param wordCount            The number of words in line
+ * @param curWidth             The current line width
+ * @param lineHeight           The current max line height
  */
-function TypesetBotLineProperties(origin, tokenIndex, lineNumber, wordCount, curWidth, lineHeight) {
+function TypesetBotLineProperties(origin, tokenIndex, firstWordHyphenIndex, lineNumber, wordCount, curWidth, lineHeight) {
   _classCallCheck(this, TypesetBotLineProperties);
 
   this.origin = origin;
   this.tokenIndex = tokenIndex;
+  this.firstWordHyphenIndex = firstWordHyphenIndex;
   this.lineNumber = lineNumber;
   this.wordCount = wordCount;
   this.curWidth = curWidth;
@@ -2264,22 +2299,23 @@ var TypesetBotHyphen = function TypesetBotHyphen(tsb) {
    * Next word tokens until word is finished.
    * Definition:
    * - A word is at least 1 word node.
-   * - A word can have any number of tags nodes and tags don't have to end.
+   * - A word can have any number of tags tokens and tags don't have to end.
    * - A word ends after a space node.
    *
-   * @param   element     The element to typeset
-   * @param   tokenIndex  The node index to start constructing words
-   * @param   hyphenIndex Optional hyphenIndex of first node to start from
-   * @returns             The next word represented as one or multiple nodes
+   * @param   element              The element to typeset
+   * @param   tokenIndex           The node index to start constructing words
+   * @param   firstWordHyphenIndex Optional hyphenIndex of first node to start from
+   * @returns                      The next word represented as one or multiple tokens
    */
 
 
   this.nextWord = function (element, tokenIndex) {
-    var hyphenIndex = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+    var firstWordHyphenIndex = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
     var str = '';
     var indexes = [];
     var width = 0;
     var maxHeight = 0;
+    var lastWordTokenIndex = null;
 
     var tokens = this._tsb.util.getElementTokens(element);
 
@@ -2295,16 +2331,31 @@ var TypesetBotHyphen = function TypesetBotHyphen(tsb) {
 
       switch (token.type) {
         case TypesetBotToken.types.WORD:
-          var word = token;
-          str += word.text;
-          indexes.push(tokenIndex); // @todo add complex hyphen cut calculation.
+          var word = token; // Update last word token index.
 
-          if (token.width != null) {
-            width += token.width;
+          lastWordTokenIndex = tokenIndex;
+
+          if (firstWordHyphenIndex == null) {
+            str += word.text;
+
+            if (word.width != null) {
+              width += word.width;
+            }
+          } else {
+            // Calculate the post-hyphen word string and width.
+            var cutIndex = word.hyphenIndexPositions[firstWordHyphenIndex];
+            var cut = word.text.substr(cutIndex + 1); // Offset by 1, fx: hy[p]-hen
+
+            var cutWidth = this.getEndWidth(word.hyphenIndexWidths, firstWordHyphenIndex, word.hyphenRemainWidth);
+            str += cut;
+            width += cutWidth;
+            firstWordHyphenIndex = null; // Reset hyphenIndex
           }
 
-          if (token.height != null && maxHeight < token.height) {
-            maxHeight = token.height;
+          indexes.push(tokenIndex);
+
+          if (word.height != null && maxHeight < word.height) {
+            maxHeight = word.height;
           }
 
           break;
@@ -2336,7 +2387,31 @@ var TypesetBotHyphen = function TypesetBotHyphen(tsb) {
       return null;
     }
 
-    return new TypesetBotWordData(str, indexes, tokenIndex, width, maxHeight);
+    return new TypesetBotWordData(str, indexes, tokenIndex, width, maxHeight, lastWordTokenIndex);
+  };
+  /**
+   * Get the width from hyphen index to end of word.
+   *
+   * Given [3,4], 0, 7    --> 11
+   *
+   * Fx: hyp-{hen-ation}   from first hyphen
+   *     |3|  |4| | 7 |   --> 11
+   *
+   * @param   hyphenIndexWidths Array of width of the hyphen parts
+   * @param   startIndex        Starting hyphen index to measure width from
+   * @param   endOfWordWidth    Space between last hyphen position and end of word
+   * @returns                   Width between hyphen starting position and end of word
+   */
+
+
+  this.getEndWidth = function (hyphenIndexWidths, startIndex, endOfWordWidth) {
+    var width = 0;
+
+    for (var index = startIndex + 1; index < hyphenIndexWidths.length; index++) {
+      width += hyphenIndexWidths[index];
+    }
+
+    return width + endOfWordWidth;
   };
   /**
    * Calculate hyphens in word and attach hyphen properties to tokens.
@@ -2436,8 +2511,10 @@ var TypesetBotWordData =
  * @param str         The total string in word
  * @param indexes     Token indexes of word tokens involved in word
  * @param tokenIndex  Next token index
+ * @param width       Width of the word with one or multiple tokens
+ * @param height      Max height of all tokens involved
  */
-function TypesetBotWordData(str, indexes, tokenIndex, width, height) {
+function TypesetBotWordData(str, indexes, tokenIndex, width, height, lastWordTokenIndex) {
   _classCallCheck(this, TypesetBotWordData);
 
   this.str = str;
@@ -2445,6 +2522,7 @@ function TypesetBotWordData(str, indexes, tokenIndex, width, height) {
   this.tokenIndex = tokenIndex;
   this.width = width;
   this.height = height;
+  this.lastWordTokenIndex = lastWordTokenIndex;
 };
 /**
  * Class representing additional offset on either side of word for hyphenation.

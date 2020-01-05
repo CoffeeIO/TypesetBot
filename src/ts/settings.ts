@@ -48,6 +48,7 @@ class TypesetBotSettings {
     // ------------------------------------------------------------------------
 
     /**
+     * @param tsb
      * @param settings Optional settings object.
      */
     constructor(tsb: TypesetBot, settings: object = null) {

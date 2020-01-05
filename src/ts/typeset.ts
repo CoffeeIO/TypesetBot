@@ -58,8 +58,10 @@ class TypesetBotTypeset {
         const finalBreakpoints = this.getFinalLineBreaks(element);
 
         const solution = this.lowestDemerit(finalBreakpoints);
+        console.log(solution);
+        return;
         if (solution == null) {
-            this._tsb.logger.notice('No viable solution found during typesetting. Element is skipped.');
+            this._tsb.logger.warn('No viable solution found during typesetting. Element is skipped.');
             return;
         }
 
@@ -150,6 +152,9 @@ class TypesetBotTypeset {
         this._tsb.logger.end('---- Hyphen render');
 
         this._tsb.logger.end('-- Preprocess');
+
+        // console.log(this.tokens);
+
     }
 
     /**
@@ -219,8 +224,9 @@ class TypesetBotTypeset {
 
             let lineIsFinished = false;
             while (!lineIsFinished) {
-                const oldLineWidth = lineProperties.curWidth;
-                const wordData = this.hyphen.nextWord(element, lineProperties.tokenIndex)
+                let oldLineWidth: number = lineProperties.curWidth;
+                const wordData = this.hyphen.nextWord(element, lineProperties.tokenIndex, lineProperties.firstWordHyphenIndex) as TypesetBotWordData;
+                lineProperties.firstWordHyphenIndex = null; // Unset hyphenindex for next words.
                 if (wordData == null) {
                     // Push final break.
                     finalBreakpoints.push(
@@ -239,6 +245,9 @@ class TypesetBotTypeset {
                     lineIsFinished = true;
                     continue;
                 }
+
+
+
                 // Update token index.
                 lineProperties.tokenIndex = wordData.tokenIndex;
                 lineProperties.curWidth += wordData.width;
@@ -251,19 +260,53 @@ class TypesetBotTypeset {
                     lineProperties.wordCount,
                     this.spaceShrink,
                     this.spaceStretch,
-                );
+                    );
 
                 if (this.math.ratioIsLessThanMax(ratio, looseness)) { // Valid breakpoint
-                    for (const tokenIndex of wordData.indexes) {
-                        const token = this.tokens[tokenIndex];
+                    // console.log('Adding word: ' + ratio + ' : ' + wordData.str);
 
-                        // const hyphenRatio = this.math.getRatio(
-                        //     this.elemWidth,
-                        //     lineProperties.curWidth,
-                        //     lineProperties.wordCount,
-                        //     this.spaceShrink,
-                        //     this.spaceStretch,
-                        // );
+                    // Loop all word parts in the word.
+                    for (const tokenIndex of wordData.indexes) {
+                        const token = this.tokens[tokenIndex] as TypesetBotWord;
+
+                        if (!token.hasHyphen) {
+                            continue;
+                        }
+
+                        for (let index = 0; index < token.hyphenIndexWidths.length; index++) {
+                            oldLineWidth += token.hyphenIndexWidths[index];
+
+                            const hyphenRatio: number = this.math.getRatio(
+                                this.elemWidth,
+                                oldLineWidth + token.dashWidth, // Add with of hyphen
+                                lineProperties.wordCount,
+                                this.spaceShrink,
+                                this.spaceStretch,
+                            );
+
+
+
+                            if (!this.math.isValidRatio(hyphenRatio, looseness)) {
+                                continue;
+                            }
+
+
+
+                            // Generate breakpoint.
+                            const hyphenBreakpoint = this.getBreakpoint(
+                                originBreakpoint,
+                                lineProperties,
+                                hyphenRatio,
+                                wordData.lastWordTokenIndex, // Offset one as the word token is not finished
+                                index,
+                                true,
+                            );
+                            // console.log(hyphenRatio);
+                            // console.log('$ -- Creating hyphen breakpoint');
+                            // console.log(hyphenBreakpoint);
+
+                            this.updateShortestPath(hyphenBreakpoint);
+                        }
                     }
 
                     // Check the ratio is still valid.
@@ -272,6 +315,8 @@ class TypesetBotTypeset {
                         continue; // Don't add the last node.
                     }
 
+                    // console.log('-- Create regular break');
+
                     // Generate breakpoint.
                     const breakpoint = this.getBreakpoint(
                         originBreakpoint,
@@ -279,12 +324,16 @@ class TypesetBotTypeset {
                         ratio,
                         lineProperties.tokenIndex,
                     );
-                    const isUpdatedPath = this.updateShortestPath(breakpoint);
+                    // console.log(breakpoint);
+                    this.updateShortestPath(breakpoint);
                 }
 
                 lineProperties.curWidth += this.spaceWidth;
             }
         }
+
+        // console.log(this.shortestPath);
+
 
         this._tsb.logger.end('-- Dynamic programming');
 
@@ -293,6 +342,10 @@ class TypesetBotTypeset {
             return this.getFinalLineBreaks(element, looseness + 1);
         }
 
+        // console.log(finalBreakpoints);
+
+
+        // return [];
         return finalBreakpoints;
     }
 
@@ -424,10 +477,62 @@ class TypesetBotTypeset {
         return new TypesetBotLineProperties(
             origin,
             origin.tokenIndex,
+            origin.hyphenIndex,
             origin.lineNumber,
             0,
             0,
             0,
         );
     }
+}
+
+/**
+ * Class representing a possible linebreak.
+ */
+class TypesetBotLinebreak {
+    /**
+     * @param origin        The linebreak object for previous line
+     * @param tokenIndex    The index of token where the linebreak occured
+     * @param hyphenIndex   The index where hyphenation occured, otherwise null
+     * @param demerit       The demerit of solution
+     * @param flag          Penalty flag of current line
+     * @param fitnessClass  Fitness class of current line
+     * @param lineNumber    Line number of current line
+     * @param maxLineHeight Max line height of current solution
+     * @param curLineHeight Current height of line
+     */
+    constructor(
+        public origin:        TypesetBotLinebreak,
+        public tokenIndex:    number,
+        public hyphenIndex:   number,
+        public demerit:       number,
+        public flag:          boolean,
+        public fitnessClass:  number,
+        public lineNumber:    number,
+        public maxLineHeight: number,
+    ) { }
+}
+
+/**
+ * Class representing properties for each line in the dynamic programming algorithm.
+ */
+class TypesetBotLineProperties {
+    /**
+     * @param origin               The linebreak object for previous line
+     * @param tokenIndex           The index of the next token to append
+     * @param firstWordHyphenIndex The hyphenIndex of the first word in the line
+     * @param lineNumber           The current line number
+     * @param wordCount            The number of words in line
+     * @param curWidth             The current line width
+     * @param lineHeight           The current max line height
+     */
+    constructor(
+        public origin: TypesetBotLinebreak,
+        public tokenIndex: number,
+        public firstWordHyphenIndex: number,
+        public lineNumber: number,
+        public wordCount: number,
+        public curWidth: number,
+        public lineHeight: number,
+    ) { }
 }

@@ -98,25 +98,26 @@ class TypesetBotHyphen {
      * Next word tokens until word is finished.
      * Definition:
      * - A word is at least 1 word node.
-     * - A word can have any number of tags nodes and tags don't have to end.
+     * - A word can have any number of tags tokens and tags don't have to end.
      * - A word ends after a space node.
      *
-     * @param   element     The element to typeset
-     * @param   tokenIndex  The node index to start constructing words
-     * @param   hyphenIndex Optional hyphenIndex of first node to start from
-     * @returns             The next word represented as one or multiple nodes
+     * @param   element              The element to typeset
+     * @param   tokenIndex           The node index to start constructing words
+     * @param   firstWordHyphenIndex Optional hyphenIndex of first node to start from
+     * @returns                      The next word represented as one or multiple tokens
      */
-    nextWord = function(element: Element, tokenIndex: number, hyphenIndex: number = null): TypesetBotWordData {
+    nextWord = function(element: Element, tokenIndex: number, firstWordHyphenIndex: number = null): TypesetBotWordData {
         let str: string = '';
         const indexes: number[] = [];
         let width: number = 0;
         let maxHeight: number = 0;
+        let lastWordTokenIndex: number = null;
 
         const tokens = this._tsb.util.getElementTokens(element);
 
         let isFinished = false;
         while (!isFinished) {
-            const token = tokens[tokenIndex];
+            const token = tokens[tokenIndex] as TypesetBotToken;
             // Finish loop if there is no more tokens.
             if (token == null) {
                 isFinished = true;
@@ -126,15 +127,32 @@ class TypesetBotHyphen {
             switch (token.type) {
                 case TypesetBotToken.types.WORD:
                     const word = token as TypesetBotWord;
-                    str += word.text;
+
+                    // Update last word token index.
+                    lastWordTokenIndex = tokenIndex;
+
+                    if (firstWordHyphenIndex == null) {
+                        str += word.text;
+
+                        if (word.width != null) {
+                            width += word.width;
+                        }
+
+                    } else {
+                        // Calculate the post-hyphen word string and width.
+                        const cutIndex = word.hyphenIndexPositions[firstWordHyphenIndex];
+                        const cut = word.text.substr(cutIndex + 1); // Offset by 1, fx: hy[p]-hen
+                        const cutWidth = this.getEndWidth(word.hyphenIndexWidths, firstWordHyphenIndex, word.hyphenRemainWidth);
+
+                        str += cut;
+                        width += cutWidth;
+                        firstWordHyphenIndex = null; // Reset hyphenIndex
+                    }
+
                     indexes.push(tokenIndex);
 
-                    // @todo add complex hyphen cut calculation.
-                    if (token.width != null) {
-                        width += token.width;
-                    }
-                    if (token.height != null && maxHeight < token.height) {
-                        maxHeight = token.height;
+                    if (word.height != null && maxHeight < word.height) {
+                        maxHeight = word.height;
                     }
 
                     break;
@@ -161,7 +179,30 @@ class TypesetBotHyphen {
             return null;
         }
 
-        return new TypesetBotWordData(str, indexes, tokenIndex, width, maxHeight);
+        return new TypesetBotWordData(str, indexes, tokenIndex, width, maxHeight, lastWordTokenIndex);
+    }
+
+    /**
+     * Get the width from hyphen index to end of word.
+     *
+     * Given [3,4], 0, 7    --> 11
+     *
+     * Fx: hyp-{hen-ation}   from first hyphen
+     *     |3|  |4| | 7 |   --> 11
+     *
+     * @param   hyphenIndexWidths Array of width of the hyphen parts
+     * @param   startIndex        Starting hyphen index to measure width from
+     * @param   endOfWordWidth    Space between last hyphen position and end of word
+     * @returns                   Width between hyphen starting position and end of word
+     */
+    getEndWidth = function(hyphenIndexWidths: number[], startIndex: number, endOfWordWidth: number): number {
+        let width = 0;
+
+        for (let index = startIndex + 1; index < hyphenIndexWidths.length; index++) {
+            width += hyphenIndexWidths[index];
+        }
+
+        return width + endOfWordWidth;
     }
 
     /**
@@ -217,6 +258,8 @@ class TypesetBotWordData {
      * @param str         The total string in word
      * @param indexes     Token indexes of word tokens involved in word
      * @param tokenIndex  Next token index
+     * @param width       Width of the word with one or multiple tokens
+     * @param height      Max height of all tokens involved
      */
     constructor(
         public str: string,
@@ -224,6 +267,7 @@ class TypesetBotWordData {
         public tokenIndex: number,
         public width: number,
         public height: number,
+        public lastWordTokenIndex: number,
     ) { }
 }
 
