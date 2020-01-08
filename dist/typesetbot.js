@@ -1073,7 +1073,7 @@ function (_TypesetBotToken) {
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(TypesetBotWord).call(this, nodeIndex, TypesetBotToken.types.WORD)); // Hyphen properties.
 
-    _this.hasHyphen = false;
+    _this.hasHyphen = false; // Example: hyphenation --> true
 
     _this.initHyphen = function () {
       this.hasHyphen = true;
@@ -1164,8 +1164,7 @@ function TypesetBotTypeset(tsb) {
     this.preprocessElement(element);
     var finalBreakpoints = this.getFinalLineBreaks(element);
     var solution = this.lowestDemerit(finalBreakpoints);
-    console.log(solution);
-    return;
+    console.log(solution); // return;
 
     if (solution == null) {
       this._tsb.logger.warn('No viable solution found during typesetting. Element is skipped.');
@@ -1267,8 +1266,9 @@ function TypesetBotTypeset(tsb) {
 
     this._tsb.logger.end('---- Hyphen render');
 
-    this._tsb.logger.end('-- Preprocess'); // console.log(this.tokens);
+    this._tsb.logger.end('-- Preprocess');
 
+    console.log(this.tokens);
   };
   /**
    * Get the solution with lowest demerit from array of solutions.
@@ -1988,17 +1988,20 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
     lines.reverse();
     var html = '';
-    var curTokenIndex = 0; // Fifo stack of open html tags.
+    var curTokenIndex = 0;
+    var lastHyphenIndex = null; // Fifo stack of open html tags.
 
     var tagStack = []; // Construct the lines.
 
     for (var _i2 = 0, _lines = lines; _i2 < _lines.length; _i2++) {
       var line = _lines[_i2];
       var lineHtml = '';
+      console.log(line.tokenIndex + ' : ' + line.hyphenIndex);
       lineHtml += this.prependTagTokensOnLine(element, tagStack);
-      lineHtml += this.getHtmlFromTokensRange(element, curTokenIndex, line.tokenIndex, tagStack);
+      lineHtml += this.getHtmlFromTokensRange(element, curTokenIndex, lastHyphenIndex, line.tokenIndex, tagStack, line.hyphenIndex);
       lineHtml += this.appendTagTokensOnLine(element, tagStack);
       curTokenIndex = line.tokenIndex;
+      lastHyphenIndex = line.hyphenIndex;
       html += '<tsb-line line="' + line.lineNumber + '" style="height:' + line.maxLineHeight + 'px">' + lineHtml + '</tsb-line>';
     }
 
@@ -2092,8 +2095,8 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
     return html;
   };
 
-  this.getHtmlFromTokensRange = function (element, startIndex, endIndex, tagStack) {
-    var hyphenIndex = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
+  this.getHtmlFromTokensRange = function (element, startIndex, startHyphenIndex, endIndex, tagStack) {
+    var endHyphenIndex = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
 
     var tokens = this._tsb.util.getElementTokens(element);
 
@@ -2103,12 +2106,29 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
       endIndex = tokens.length - 1;
     }
 
+    var isFirstToken = true;
+
     for (var index = startIndex; index < endIndex; index++) {
+      console.log('-->' + index);
       var token = tokens[index];
 
       switch (token.type) {
         case TypesetBotToken.types.WORD:
           var word = token;
+
+          if (isFirstToken && startHyphenIndex != null) {
+            // Calculate the post-hyphen word string and width.
+            var cutIndex = word.hyphenIndexPositions[startHyphenIndex];
+            var cut = word.text.substr(cutIndex + 1); // Offset by 1, fx: hy[p]-hen
+
+            html += cut;
+            isFirstToken = false;
+            continue;
+          } // if (index === (endIndex - 1) && endHyphenIndex != null) {
+          //     continue;
+          // }
+
+
           html += word.text;
           break;
 
@@ -2134,6 +2154,16 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
           break;
       }
+    }
+
+    if (endHyphenIndex != null) {
+      var _word = tokens[endIndex];
+      var _cutIndex = _word.hyphenIndexPositions[endHyphenIndex];
+
+      var _cut2 = _word.text.substr(0, _cutIndex + 1);
+
+      console.log('Cut: ' + _cut2);
+      html += _cut2 + '-'; // Add dash to html
     }
 
     return html;

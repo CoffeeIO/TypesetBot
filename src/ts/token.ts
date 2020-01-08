@@ -197,11 +197,11 @@ class TypesetBotWord extends TypesetBotToken {
     width: number;
     height: number;
     // Hyphen properties.
-    hasHyphen: boolean = false;
-    hyphenIndexPositions: number[];
-    hyphenIndexWidths: number[];
-    hyphenRemainWidth: number;
-    dashWidth: number;
+    hasHyphen: boolean = false;     // Example: hyphenation --> true
+    hyphenIndexPositions: number[]; // hy-phen-ation        --> [1, 5]
+    hyphenIndexWidths: number[];    // hy: 16, phen: 31.1   --> [16, 31.1]
+    hyphenRemainWidth: number;      // ation: 32            --> 32
+    dashWidth: number;              // "-" : 5.3            --> 5.3
 
     /**
      * @param text The text of the word

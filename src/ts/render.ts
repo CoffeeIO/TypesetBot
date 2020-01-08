@@ -252,6 +252,7 @@ class TypesetBotRender {
 
         let html = '';
         let curTokenIndex = 0;
+        let lastHyphenIndex = null;
         // Fifo stack of open html tags.
         const tagStack: TypesetBotToken[] = [];
 
@@ -259,11 +260,22 @@ class TypesetBotRender {
         for (const line of lines) {
             let lineHtml = '';
 
+            console.log(line.tokenIndex + ' : ' + line.hyphenIndex);
+
+
             lineHtml += this.prependTagTokensOnLine(element, tagStack);
-            lineHtml += this.getHtmlFromTokensRange(element, curTokenIndex, line.tokenIndex, tagStack);
+            lineHtml += this.getHtmlFromTokensRange(
+                element,
+                curTokenIndex,
+                lastHyphenIndex,
+                line.tokenIndex,
+                tagStack,
+                line.hyphenIndex,
+            );
             lineHtml += this.appendTagTokensOnLine(element, tagStack);
 
             curTokenIndex = line.tokenIndex;
+            lastHyphenIndex = line.hyphenIndex;
 
             html +=
                 '<tsb-line line="' + line.lineNumber + '" style="height:' + line.maxLineHeight + 'px">' +
@@ -322,9 +334,10 @@ class TypesetBotRender {
     getHtmlFromTokensRange = function(
         element: Element,
         startIndex: number,
+        startHyphenIndex: number,
         endIndex: number,
         tagStack: TypesetBotToken[],
-        hyphenIndex: number = null,
+        endHyphenIndex: number = null,
     ) {
         const tokens = this._tsb.util.getElementTokens(element);
         let html = '';
@@ -333,11 +346,34 @@ class TypesetBotRender {
             endIndex = tokens.length - 1;
         }
 
+        let isFirstToken = true;
+
+
         for (let index = startIndex; index < endIndex; index++) {
+            console.log('-->' + index);
+
+
             const token = tokens[index];
             switch (token.type) {
                 case TypesetBotToken.types.WORD:
                     const word = token as TypesetBotWord;
+                    if (isFirstToken && startHyphenIndex != null) {
+                        // Calculate the post-hyphen word string and width.
+                        const cutIndex = word.hyphenIndexPositions[startHyphenIndex];
+                        const cut = word.text.substr(cutIndex + 1); // Offset by 1, fx: hy[p]-hen
+                        html += cut;
+
+                        isFirstToken = false;
+                        continue;
+                    }
+
+
+                    // if (index === (endIndex - 1) && endHyphenIndex != null) {
+
+
+                    //     continue;
+                    // }
+
                     html += word.text;
                     break;
                 case TypesetBotToken.types.TAG:
@@ -358,6 +394,17 @@ class TypesetBotRender {
                     this._tsb.logger.error('Unknown token type found: ' + token.type);
                     break;
             }
+        }
+
+        if (endHyphenIndex != null) {
+            const word = tokens[endIndex];
+            const cutIndex = word.hyphenIndexPositions[endHyphenIndex];
+            let cut = word.text.substr(0, cutIndex + 1);
+
+            console.log('Cut: ' + cut);
+
+
+            html += cut + '-'; // Add dash to html
         }
 
         return html;
