@@ -643,6 +643,57 @@ TypesetBotUtils.getArrayIndexes = function (arr) {
   return indexes;
 };
 
+window['typesetbot--ready'] = false;
+window['typesetbot--onload'] = false;
+
+(function () {
+  window['typesetbot--ready'] = true;
+})();
+
+window.onload = function () {
+  window['typesetbot--onload'] = true;
+}; // Check for when user stops resizing viewport.
+// **MODIFIED**
+// http://stackoverflow.com/a/5926068/2741279
+
+
+window['typesetbot-viewport--lastWidth'] = window.innerWidth;
+window['typesetbot-viewport--delta'] = 200;
+window['typesetbot-viewport--rtime'] = null;
+window['typesetbot-viewport--timeout'] = false;
+window.onresize = typesetbotCheckResize;
+
+function typesetbotCheckResize() {
+  // console.log('Resizing: ' + (window as any).innerWidth + ' --- ' + this.lastWidth);
+  if (window['typesetbot-viewport--lastWidth'] !== window.innerWidth) {
+    document.body.classList.add('typesetbot-viewport');
+    window['typesetbot-viewport--rtime'] = new Date().getTime();
+
+    if (window['typesetbot-viewport--timeout'] === false) {
+      // console.log('step2');
+      window['typesetbot-viewport--timeout'] = true;
+      setTimeout(function () {
+        // console.log('timeout');
+        typesetbotEndResize();
+      }, window['typesetbot-viewport--delta']);
+    }
+
+    window['typesetbot-viewport--lastWidth'] = window.innerWidth;
+  }
+}
+
+function typesetbotEndResize() {
+  // console.log('Called resize end');
+  if (new Date().getTime() - window['typesetbot-viewport--rtime'] < window['typesetbot-viewport--delta']) {
+    setTimeout(typesetbotEndResize, window['typesetbot-viewport--delta']);
+    return;
+  }
+
+  console.log('Call resize on text');
+  window['typesetbot-viewport--timeout'] = false;
+  document.body.classList.remove('typeset-viewport'); // TypesetBot.runAllAttached();
+}
+
 var TypesetBotMath = function TypesetBotMath(tsb) {
   _classCallCheck(this, TypesetBotMath);
 
@@ -1163,8 +1214,8 @@ function TypesetBotTypeset(tsb) {
 
     this.preprocessElement(element);
     var finalBreakpoints = this.getFinalLineBreaks(element);
-    var solution = this.lowestDemerit(finalBreakpoints);
-    console.log(solution); // return;
+    var solution = this.lowestDemerit(finalBreakpoints); // console.log(solution);
+    // return;
 
     if (solution == null) {
       this._tsb.logger.warn('No viable solution found during typesetting. Element is skipped.');
@@ -1266,9 +1317,8 @@ function TypesetBotTypeset(tsb) {
 
     this._tsb.logger.end('---- Hyphen render');
 
-    this._tsb.logger.end('-- Preprocess');
+    this._tsb.logger.end('-- Preprocess'); // console.log(this.tokens);
 
-    console.log(this.tokens);
   };
   /**
    * Get the solution with lowest demerit from array of solutions.
@@ -1995,8 +2045,8 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
     for (var _i2 = 0, _lines = lines; _i2 < _lines.length; _i2++) {
       var line = _lines[_i2];
-      var lineHtml = '';
-      console.log(line.tokenIndex + ' : ' + line.hyphenIndex);
+      var lineHtml = ''; // console.log(line.tokenIndex + ' : ' + line.hyphenIndex);
+
       lineHtml += this.prependTagTokensOnLine(element, tagStack);
       lineHtml += this.getHtmlFromTokensRange(element, curTokenIndex, lastHyphenIndex, line.tokenIndex, tagStack, line.hyphenIndex);
       lineHtml += this.appendTagTokensOnLine(element, tagStack);
@@ -2109,7 +2159,7 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
     var isFirstToken = true;
 
     for (var index = startIndex; index < endIndex; index++) {
-      console.log('-->' + index);
+      // console.log('-->' + index);
       var token = tokens[index];
 
       switch (token.type) {
@@ -2160,9 +2210,9 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
       var _word = tokens[endIndex];
       var _cutIndex = _word.hyphenIndexPositions[endHyphenIndex];
 
-      var _cut2 = _word.text.substr(0, _cutIndex + 1);
+      var _cut2 = _word.text.substr(0, _cutIndex + 1); // console.log('Cut: ' + cut);
 
-      console.log('Cut: ' + _cut2);
+
       html += _cut2 + '-'; // Add dash to html
     }
 

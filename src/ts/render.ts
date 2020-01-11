@@ -260,7 +260,7 @@ class TypesetBotRender {
         for (const line of lines) {
             let lineHtml = '';
 
-            console.log(line.tokenIndex + ' : ' + line.hyphenIndex);
+            // console.log(line.tokenIndex + ' : ' + line.hyphenIndex);
 
 
             lineHtml += this.prependTagTokensOnLine(element, tagStack);
@@ -350,7 +350,7 @@ class TypesetBotRender {
 
 
         for (let index = startIndex; index < endIndex; index++) {
-            console.log('-->' + index);
+            // console.log('-->' + index);
 
 
             const token = tokens[index];
@@ -401,7 +401,7 @@ class TypesetBotRender {
             const cutIndex = word.hyphenIndexPositions[endHyphenIndex];
             let cut = word.text.substr(0, cutIndex + 1);
 
-            console.log('Cut: ' + cut);
+            // console.log('Cut: ' + cut);
 
 
             html += cut + '-'; // Add dash to html

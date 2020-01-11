@@ -58,7 +58,7 @@ class TypesetBotTypeset {
         const finalBreakpoints = this.getFinalLineBreaks(element);
 
         const solution = this.lowestDemerit(finalBreakpoints);
-        console.log(solution);
+        // console.log(solution);
         // return;
         if (solution == null) {
             this._tsb.logger.warn('No viable solution found during typesetting. Element is skipped.');
@@ -153,7 +153,7 @@ class TypesetBotTypeset {
 
         this._tsb.logger.end('-- Preprocess');
 
-        console.log(this.tokens);
+        // console.log(this.tokens);
 
     }
 
