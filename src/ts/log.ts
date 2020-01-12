@@ -119,6 +119,10 @@ class TypesetBotLog {
         }
         return output;
     }
+
+    resetTime = function() {
+        this._performanceMap = {};
+    }
 }
 
 /**

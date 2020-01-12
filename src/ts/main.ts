@@ -14,6 +14,7 @@ class TypesetBot {
     isTypesetting: boolean;
     indexToNodes: { [index: number] : Element[]; } = {};
     indexToTokens: { [index: number]: TypesetBotToken[] } = {};
+    indexToTypesetInstance: { [index: number] : TypesetBotTypeset } = {};
 
     /**
      * Constructor of new TypesetBot objects.
@@ -38,6 +39,8 @@ class TypesetBot {
      * Typeset all elements in query.
      */
     typeset = function()  {
+        this.logger.resetTime();
+
         this.logger.start('Typeset');
         this.typesetNodes(this.query.nodes);
         this.logger.end('Typeset');
@@ -62,6 +65,7 @@ class TypesetBot {
     }
 
     addEventListeners = function() {
+        // Store instances in window to allow eventlisteners access.
         if ((window as any)['typesetbot--instances'] == null) {
             (window as any)['typesetbot--instances'] = [];
         }
@@ -70,8 +74,6 @@ class TypesetBot {
         const index = (window as any)['typesetbot--instances'].length - 1;
 
         document.body.addEventListener('typesetbot-viewport--reize', function() {
-            console.log('caught event');
-
             (window as any)['typesetbot--instances'][index].typeset();
         }, false);
     }
@@ -88,7 +90,7 @@ class TypesetBot {
         }
         this.isTypesetting = true;
         for (const node of nodes) {
-            const typesetter = new TypesetBotTypeset(this);
+            const typesetter = this.util.getTypesetInstance(node) as TypesetBotTypeset;
             typesetter.typeset(node);
         }
         this.isTypesetting = false;

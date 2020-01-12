@@ -93,6 +93,7 @@ class TypesetBotUtils {
         const index = this.getElementIndex(node);
         if (isNaN(index)) {
             this._tsb.logger.error('Could not find nodes to element.');
+            return null;
         }
         return this._tsb.indexToTokens[index];
     }
@@ -110,4 +111,19 @@ class TypesetBotUtils {
 
         return indexes;
     };
+
+    getTypesetInstance = function(node: Element) {
+        const index = this.getElementIndex(node);
+
+        if (index == null) {
+            return null;
+        }
+
+        if (this._tsb.indexToTypesetInstance[index] == null) {
+            const typeset = new TypesetBotTypeset(this._tsb);
+            this._tsb.indexToTypesetInstance[index] = typeset;
+        }
+
+        return this._tsb.indexToTypesetInstance[index];
+    }
 }

@@ -37,11 +37,13 @@ function TypesetBot(query, settings) {
 
   this.indexToNodes = {};
   this.indexToTokens = {};
+  this.indexToTypesetInstance = {};
   /**
    * Typeset all elements in query.
    */
 
   this.typeset = function () {
+    this.logger.resetTime();
     this.logger.start('Typeset');
     this.typesetNodes(this.query.nodes);
     this.logger.end('Typeset'); // Log the time diffs.
@@ -65,6 +67,7 @@ function TypesetBot(query, settings) {
   };
 
   this.addEventListeners = function () {
+    // Store instances in window to allow eventlisteners access.
     if (window['typesetbot--instances'] == null) {
       window['typesetbot--instances'] = [];
     }
@@ -72,7 +75,6 @@ function TypesetBot(query, settings) {
     window['typesetbot--instances'].push(this);
     var index = window['typesetbot--instances'].length - 1;
     document.body.addEventListener('typesetbot-viewport--reize', function () {
-      console.log('caught event');
       window['typesetbot--instances'][index].typeset();
     }, false);
   };
@@ -97,7 +99,7 @@ function TypesetBot(query, settings) {
     try {
       for (var _iterator = nodes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
         var node = _step.value;
-        var typesetter = new TypesetBotTypeset(this);
+        var typesetter = this.util.getTypesetInstance(node);
         typesetter.typeset(node);
       }
     } catch (err) {
@@ -259,6 +261,10 @@ function TypesetBotLog(tsb) {
     }
 
     return output;
+  };
+
+  this.resetTime = function () {
+    this._performanceMap = {};
   };
 
   this._tsb = tsb;
@@ -615,9 +621,26 @@ function TypesetBotUtils(tsb) {
 
     if (isNaN(index)) {
       this._tsb.logger.error('Could not find nodes to element.');
+
+      return null;
     }
 
     return this._tsb.indexToTokens[index];
+  };
+
+  this.getTypesetInstance = function (node) {
+    var index = this.getElementIndex(node);
+
+    if (index == null) {
+      return null;
+    }
+
+    if (this._tsb.indexToTypesetInstance[index] == null) {
+      var typeset = new TypesetBotTypeset(this._tsb);
+      this._tsb.indexToTypesetInstance[index] = typeset;
+    }
+
+    return this._tsb.indexToTypesetInstance[index];
   };
 
   this._tsb = tsb;
@@ -686,16 +709,13 @@ window['typesetbot-viewport--timeout'] = false;
 window.onresize = typesetbotCheckResize;
 
 function typesetbotCheckResize() {
-  // console.log('Resizing: ' + (window as any).innerWidth + ' --- ' + this.lastWidth);
   if (window['typesetbot-viewport--lastWidth'] !== window.innerWidth) {
     document.body.classList.add('typesetbot-viewport');
     window['typesetbot-viewport--rtime'] = new Date().getTime();
 
     if (window['typesetbot-viewport--timeout'] === false) {
-      // console.log('step2');
       window['typesetbot-viewport--timeout'] = true;
       setTimeout(function () {
-        // console.log('timeout');
         typesetbotEndResize();
       }, window['typesetbot-viewport--delta']);
     }
@@ -1228,17 +1248,18 @@ function TypesetBotTypeset(tsb) {
   this.typeset = function (element) {
     // @todo : Apply basic reset CSS styles.
     // @todo : Check if node has changed content (inner nodes) since last typesetting.
-    // Make a copy of node which can be worked on without breaking webpage.
-    this._tsb.logger.start('---- Clone working node');
+    // Reset HTML of node if the typesetting has run before.
+    if (this.originalHTML != null) {
+      element.innerHTML = this.originalHTML;
+    } // Make a copy of node which can be worked on without breaking webpage.
+    // this._tsb.logger.start('---- Clone working node');
+    // const cloneNode = element.cloneNode(true);
+    // this._tsb.logger.end('---- Clone working node');
 
-    var cloneNode = element.cloneNode(true);
-
-    this._tsb.logger.end('---- Clone working node');
 
     this.preprocessElement(element);
     var finalBreakpoints = this.getFinalLineBreaks(element);
     var solution = this.lowestDemerit(finalBreakpoints); // console.log(solution);
-    // return;
 
     if (solution == null) {
       this._tsb.logger.warn('No viable solution found during typesetting. Element is skipped.');
@@ -1258,7 +1279,7 @@ function TypesetBotTypeset(tsb) {
   this.getElementProperties = function (node) {
     this._tsb.logger.start('---- Getting element properties');
 
-    this.originalHTML = node.outerHTML; // Set space width based on settings.
+    this.originalHTML = node.innerHTML; // Set space width based on settings.
 
     this.render.setMinimumWordSpacing(node);
     this.elemWidth = this.render.getNodeWidth(node); // Get font size and calc real space properties.
@@ -1340,8 +1361,7 @@ function TypesetBotTypeset(tsb) {
 
     this._tsb.logger.end('---- Hyphen render');
 
-    this._tsb.logger.end('-- Preprocess'); // console.log(this.tokens);
-
+    this._tsb.logger.end('-- Preprocess');
   };
   /**
    * Get the solution with lowest demerit from array of solutions.
@@ -1447,7 +1467,6 @@ function TypesetBotTypeset(tsb) {
 
         if (this.math.ratioIsLessThanMax(ratio, looseness)) {
           // Valid breakpoint
-          // console.log('Adding word: ' + ratio + ' : ' + wordData.str);
           // Loop all word parts in the word.
           var _iteratorNormalCompletion9 = true;
           var _didIteratorError9 = false;
@@ -1473,10 +1492,7 @@ function TypesetBotTypeset(tsb) {
 
 
                 var hyphenBreakpoint = this.getBreakpoint(originBreakpoint, lineProperties, hyphenRatio, wordData.lastWordTokenIndex, // Offset one as the word token is not finished
-                index, true); // console.log(hyphenRatio);
-                // console.log('$ -- Creating hyphen breakpoint');
-                // console.log(hyphenBreakpoint);
-
+                index, true);
                 this.updateShortestPath(hyphenBreakpoint);
               }
             } // Check the ratio is still valid.
@@ -1499,28 +1515,23 @@ function TypesetBotTypeset(tsb) {
           if (!this.math.ratioIsHigherThanMin(ratio)) {
             lineIsFinished = true;
             continue; // Don't add the last node.
-          } // console.log('-- Create regular break');
-          // Generate breakpoint.
+          } // Generate breakpoint.
 
 
-          var breakpoint = this.getBreakpoint(originBreakpoint, lineProperties, ratio, lineProperties.tokenIndex); // console.log(breakpoint);
-
+          var breakpoint = this.getBreakpoint(originBreakpoint, lineProperties, ratio, lineProperties.tokenIndex);
           this.updateShortestPath(breakpoint);
         }
 
         lineProperties.curWidth += this.spaceWidth;
       }
-    } // console.log(this.shortestPath);
-
+    }
 
     this._tsb.logger.end('-- Dynamic programming'); // Lossness is increased by 1 until a feasible solution if found.
 
 
     if (finalBreakpoints.length === 0 && looseness <= 4) {
       return this.getFinalLineBreaks(element, looseness + 1);
-    } // console.log(finalBreakpoints);
-    // return [];
-
+    }
 
     return finalBreakpoints;
   };
@@ -2068,8 +2079,7 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
     for (var _i2 = 0, _lines = lines; _i2 < _lines.length; _i2++) {
       var line = _lines[_i2];
-      var lineHtml = ''; // console.log(line.tokenIndex + ' : ' + line.hyphenIndex);
-
+      var lineHtml = '';
       lineHtml += this.prependTagTokensOnLine(element, tagStack);
       lineHtml += this.getHtmlFromTokensRange(element, curTokenIndex, lastHyphenIndex, line.tokenIndex, tagStack, line.hyphenIndex);
       lineHtml += this.appendTagTokensOnLine(element, tagStack);
@@ -2182,7 +2192,6 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
     var isFirstToken = true;
 
     for (var index = startIndex; index < endIndex; index++) {
-      // console.log('-->' + index);
       var token = tokens[index];
 
       switch (token.type) {
@@ -2233,8 +2242,7 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
       var _word = tokens[endIndex];
       var _cutIndex = _word.hyphenIndexPositions[endHyphenIndex];
 
-      var _cut2 = _word.text.substr(0, _cutIndex + 1); // console.log('Cut: ' + cut);
-
+      var _cut2 = _word.text.substr(0, _cutIndex + 1);
 
       html += _cut2 + '-'; // Add dash to html
     }

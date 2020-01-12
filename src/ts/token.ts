@@ -27,6 +27,7 @@ class TypesetBotTokenizer {
         if (node == null) {
             node = root;
         }
+
         if (!('childNodes' in node)) {
             return [];
         }

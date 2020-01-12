@@ -49,17 +49,21 @@ class TypesetBotTypeset {
         // @todo : Apply basic reset CSS styles.
         // @todo : Check if node has changed content (inner nodes) since last typesetting.
 
+        // Reset HTML of node if the typesetting has run before.
+        if (this.originalHTML != null) {
+            element.innerHTML = this.originalHTML;
+        }
+
         // Make a copy of node which can be worked on without breaking webpage.
-        this._tsb.logger.start('---- Clone working node');
-        const cloneNode = element.cloneNode(true);
-        this._tsb.logger.end('---- Clone working node');
+        // this._tsb.logger.start('---- Clone working node');
+        // const cloneNode = element.cloneNode(true);
+        // this._tsb.logger.end('---- Clone working node');
 
         this.preprocessElement(element);
         const finalBreakpoints = this.getFinalLineBreaks(element);
 
         const solution = this.lowestDemerit(finalBreakpoints);
         // console.log(solution);
-        // return;
         if (solution == null) {
             this._tsb.logger.warn('No viable solution found during typesetting. Element is skipped.');
             return;
@@ -76,7 +80,7 @@ class TypesetBotTypeset {
     getElementProperties = function(node: Element) {
         this._tsb.logger.start('---- Getting element properties');
 
-        this.originalHTML = node.outerHTML;
+        this.originalHTML = node.innerHTML;
 
         // Set space width based on settings.
         this.render.setMinimumWordSpacing(node);
@@ -152,9 +156,6 @@ class TypesetBotTypeset {
         this._tsb.logger.end('---- Hyphen render');
 
         this._tsb.logger.end('-- Preprocess');
-
-        // console.log(this.tokens);
-
     }
 
     /**
@@ -263,8 +264,6 @@ class TypesetBotTypeset {
                     );
 
                 if (this.math.ratioIsLessThanMax(ratio, looseness)) { // Valid breakpoint
-                    // console.log('Adding word: ' + ratio + ' : ' + wordData.str);
-
                     // Loop all word parts in the word.
                     for (const tokenIndex of wordData.indexes) {
                         const token = this.tokens[tokenIndex] as TypesetBotWord;
@@ -301,9 +300,6 @@ class TypesetBotTypeset {
                                 index,
                                 true,
                             );
-                            // console.log(hyphenRatio);
-                            // console.log('$ -- Creating hyphen breakpoint');
-                            // console.log(hyphenBreakpoint);
 
                             this.updateShortestPath(hyphenBreakpoint);
                         }
@@ -315,8 +311,6 @@ class TypesetBotTypeset {
                         continue; // Don't add the last node.
                     }
 
-                    // console.log('-- Create regular break');
-
                     // Generate breakpoint.
                     const breakpoint = this.getBreakpoint(
                         originBreakpoint,
@@ -324,16 +318,12 @@ class TypesetBotTypeset {
                         ratio,
                         lineProperties.tokenIndex,
                     );
-                    // console.log(breakpoint);
                     this.updateShortestPath(breakpoint);
                 }
 
                 lineProperties.curWidth += this.spaceWidth;
             }
         }
-
-        // console.log(this.shortestPath);
-
 
         this._tsb.logger.end('-- Dynamic programming');
 
@@ -342,10 +332,6 @@ class TypesetBotTypeset {
             return this.getFinalLineBreaks(element, looseness + 1);
         }
 
-        // console.log(finalBreakpoints);
-
-
-        // return [];
         return finalBreakpoints;
     }
 

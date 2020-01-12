@@ -24,20 +24,14 @@
 (window as any).onresize = typesetbotCheckResize;
 
 function typesetbotCheckResize() {
-
-    // console.log('Resizing: ' + (window as any).innerWidth + ' --- ' + this.lastWidth);
-
     if ((window as any)['typesetbot-viewport--lastWidth'] !== (window as any).innerWidth) {
 
         document.body.classList.add('typesetbot-viewport');
 
         (window as any)['typesetbot-viewport--rtime'] = new Date().getTime();
         if ((window as any)['typesetbot-viewport--timeout'] === false) {
-            // console.log('step2');
-
             (window as any)['typesetbot-viewport--timeout'] = true;
             setTimeout(function() {
-                // console.log('timeout');
 
                 typesetbotEndResize();
             }, (window as any)['typesetbot-viewport--delta']);
