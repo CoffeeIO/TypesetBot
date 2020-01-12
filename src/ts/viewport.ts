@@ -48,19 +48,18 @@ function typesetbotCheckResize() {
 }
 
 function typesetbotEndResize() {
-    // console.log('Called resize end');
-
     if ((new Date().getTime() - (window as any)['typesetbot-viewport--rtime']) < (window as any)['typesetbot-viewport--delta']) {
         setTimeout(typesetbotEndResize, (window as any)['typesetbot-viewport--delta']);
         return;
     }
 
-    console.log('Call resize on text');
-
-
     (window as any)['typesetbot-viewport--timeout'] = false;
     document.body.classList.remove('typeset-viewport');
-    // TypesetBot.runAllAttached();
+
+    const event = new Event('typesetbot-viewport--reize');
+
+    // Dispatch the event to all TSB instances.
+    document.body.dispatchEvent(event);
 }
 
 

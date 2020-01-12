@@ -11,6 +11,7 @@ class TypesetBot {
 
     // Variables.
     uuid: string;
+    isTypesetting: boolean;
     indexToNodes: { [index: number] : Element[]; } = {};
     indexToTokens: { [index: number]: TypesetBotToken[] } = {};
 
@@ -29,6 +30,7 @@ class TypesetBot {
         this.query = new TypesetBotElementQuery(this, query);
         this.typesetter = new TypesetBotTypeset(this);
 
+        this.addEventListeners();
         this.typeset();
     }
 
@@ -59,15 +61,36 @@ class TypesetBot {
         this.logger.diff('-- Apply breakpoints');
     }
 
+    addEventListeners = function() {
+        if ((window as any)['typesetbot--instances'] == null) {
+            (window as any)['typesetbot--instances'] = [];
+        }
+        (window as any)['typesetbot--instances'].push(this);
+
+        const index = (window as any)['typesetbot--instances'].length - 1;
+
+        document.body.addEventListener('typesetbot-viewport--reize', function() {
+            console.log('caught event');
+
+            (window as any)['typesetbot--instances'][index].typeset();
+        }, false);
+    }
+
     /**
      * Typeset multiple nodes.
      *
      * @parma nodes
      */
     typesetNodes = function(nodes: Element[]) {
+        if (this.isTypesetting) {
+            this.logger.warn('Cannot typeset paragraph before calculations are done.');
+            return;
+        }
+        this.isTypesetting = true;
         for (const node of nodes) {
             const typesetter = new TypesetBotTypeset(this);
             typesetter.typeset(node);
         }
+        this.isTypesetting = false;
     }
 }

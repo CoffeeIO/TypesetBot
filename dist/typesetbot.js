@@ -63,6 +63,19 @@ function TypesetBot(query, settings) {
     this.logger.diff('-- Finding solution');
     this.logger.diff('-- Apply breakpoints');
   };
+
+  this.addEventListeners = function () {
+    if (window['typesetbot--instances'] == null) {
+      window['typesetbot--instances'] = [];
+    }
+
+    window['typesetbot--instances'].push(this);
+    var index = window['typesetbot--instances'].length - 1;
+    document.body.addEventListener('typesetbot-viewport--reize', function () {
+      console.log('caught event');
+      window['typesetbot--instances'][index].typeset();
+    }, false);
+  };
   /**
    * Typeset multiple nodes.
    *
@@ -71,6 +84,12 @@ function TypesetBot(query, settings) {
 
 
   this.typesetNodes = function (nodes) {
+    if (this.isTypesetting) {
+      this.logger.warn('Cannot typeset paragraph before calculations are done.');
+      return;
+    }
+
+    this.isTypesetting = true;
     var _iteratorNormalCompletion = true;
     var _didIteratorError = false;
     var _iteratorError = undefined;
@@ -95,6 +114,8 @@ function TypesetBot(query, settings) {
         }
       }
     }
+
+    this.isTypesetting = false;
   };
 
   this.util = new TypesetBotUtils(this);
@@ -103,6 +124,7 @@ function TypesetBot(query, settings) {
   this.uuid = TypesetBotUtils.createUUID();
   this.query = new TypesetBotElementQuery(this, query);
   this.typesetter = new TypesetBotTypeset(this);
+  this.addEventListeners();
   this.typeset();
 };
 /**
@@ -683,15 +705,16 @@ function typesetbotCheckResize() {
 }
 
 function typesetbotEndResize() {
-  // console.log('Called resize end');
   if (new Date().getTime() - window['typesetbot-viewport--rtime'] < window['typesetbot-viewport--delta']) {
     setTimeout(typesetbotEndResize, window['typesetbot-viewport--delta']);
     return;
   }
 
-  console.log('Call resize on text');
   window['typesetbot-viewport--timeout'] = false;
-  document.body.classList.remove('typeset-viewport'); // TypesetBot.runAllAttached();
+  document.body.classList.remove('typeset-viewport');
+  var event = new Event('typesetbot-viewport--reize'); // Dispatch the event to all TSB instances.
+
+  document.body.dispatchEvent(event);
 }
 
 var TypesetBotMath = function TypesetBotMath(tsb) {
