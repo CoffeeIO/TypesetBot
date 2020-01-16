@@ -67,15 +67,9 @@ function TypesetBot(query, settings) {
   };
 
   this.addEventListeners = function () {
-    // Store instances in window to allow eventlisteners access.
-    if (window['typesetbot--instances'] == null) {
-      window['typesetbot--instances'] = [];
-    }
-
-    window['typesetbot--instances'].push(this);
-    var index = window['typesetbot--instances'].length - 1;
+    var instance = this;
     document.body.addEventListener('typesetbot-viewport--reize', function () {
-      window['typesetbot--instances'][index].typeset();
+      instance.typeset();
     }, false);
   };
   /**

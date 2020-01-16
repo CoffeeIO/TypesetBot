@@ -65,16 +65,9 @@ class TypesetBot {
     }
 
     addEventListeners = function() {
-        // Store instances in window to allow eventlisteners access.
-        if ((window as any)['typesetbot--instances'] == null) {
-            (window as any)['typesetbot--instances'] = [];
-        }
-        (window as any)['typesetbot--instances'].push(this);
-
-        const index = (window as any)['typesetbot--instances'].length - 1;
-
+        const instance = this;
         document.body.addEventListener('typesetbot-viewport--reize', function() {
-            (window as any)['typesetbot--instances'][index].typeset();
+            instance.typeset();
         }, false);
     }
 
