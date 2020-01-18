@@ -93,8 +93,9 @@ class TypesetBotLog {
     /**
      * Get formatted string of total performance time of specific key.
      *
-     * @param key
-     * @returns   Formatted string in ms and number of calls.
+     * @param key       Key of the time log
+     * @param logOutput Should output be logged in console
+     * @returns         Formatted string in ms and number of calls.
      */
     diff = function(key: string, logOutput: boolean = true): string {
         if (!this.debug) {

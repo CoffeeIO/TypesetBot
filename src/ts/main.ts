@@ -64,6 +64,9 @@ class TypesetBot {
         this.logger.diff('-- Apply breakpoints');
     }
 
+    /**
+     * Add event listeners to typesetbot instance.
+     */
     addEventListeners = function() {
         const instance = this;
         document.body.addEventListener('typesetbot-viewport--reize', function() {

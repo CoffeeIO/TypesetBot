@@ -255,11 +255,12 @@ class TypesetBotHyphen {
  */
 class TypesetBotWordData {
     /**
-     * @param str         The total string in word
-     * @param indexes     Token indexes of word tokens involved in word
-     * @param tokenIndex  Next token index
-     * @param width       Width of the word with one or multiple tokens
-     * @param height      Max height of all tokens involved
+     * @param str                The total string in word
+     * @param indexes            Token indexes of word tokens involved in word
+     * @param tokenIndex         Next token index
+     * @param width              Width of the word with one or multiple tokens
+     * @param height             Max height of all tokens involved
+     * @param lastWordTokenIndex Index of the last word token in the full appended word, needed for hyphenation
      */
     constructor(
         public str: string,

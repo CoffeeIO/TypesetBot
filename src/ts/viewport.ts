@@ -1,53 +1,57 @@
-(window as any)['typesetbot--ready'] = false;
-(window as any)['typesetbot--onload'] = false;
+/**
+ * Check for when user stops resizing viewport and fires event to all running typesetbot instances.
+ */
+
+ // Initialize ready and onload variables.
+typesetbotWindowSet('ready', false);
+typesetbotWindowSet('onload', false);
 
 (function() {
-    (window as any)['typesetbot--ready'] = true;
+    typesetbotWindowSet('ready', true);
 })();
 
 (window as any).onload = function() {
-    (window as any)['typesetbot--onload'] = true;
+    typesetbotWindowSet('onload', true);
 };
 
-// Check for when user stops resizing viewport.
-// **MODIFIED**
-// http://stackoverflow.com/a/5926068/2741279
-
-
-
-(window as any)['typesetbot-viewport--lastWidth'] = (window as any).innerWidth;
-(window as any)['typesetbot-viewport--delta'] = 200;
-(window as any)['typesetbot-viewport--rtime'] = null;
-(window as any)['typesetbot-viewport--timeout'] = false;
-
+// Set global typesetbot variables in window
+typesetbotWindowSet('viewport--lastWidth', (window as any).innerWidth);
+typesetbotWindowSet('viewport--delta', 200);
+typesetbotWindowSet('viewport--rtime', null);
+typesetbotWindowSet('viewport--timeout', false);
 
 (window as any).onresize = typesetbotCheckResize;
 
+/**
+ * Indicate that viewport is being resize and start checking when resize is ended.
+ */
 function typesetbotCheckResize() {
-    if ((window as any)['typesetbot-viewport--lastWidth'] !== (window as any).innerWidth) {
+    if (typesetbotWindowGet('viewport--lastWidth') !== (window as any).innerWidth) {
 
         document.body.classList.add('typesetbot-viewport');
 
-        (window as any)['typesetbot-viewport--rtime'] = new Date().getTime();
-        if ((window as any)['typesetbot-viewport--timeout'] === false) {
-            (window as any)['typesetbot-viewport--timeout'] = true;
+        typesetbotWindowSet('viewport--rtime', new Date().getTime());
+        if (typesetbotWindowGet('viewport--timeout') === false) {
+            typesetbotWindowSet('viewport--timeout', true);
             setTimeout(function() {
-
                 typesetbotEndResize();
-            }, (window as any)['typesetbot-viewport--delta']);
+            }, typesetbotWindowGet('viewport--delta'));
         }
 
-        (window as any)['typesetbot-viewport--lastWidth'] = (window as any).innerWidth;
+        typesetbotWindowSet('viewport--lastWidth', (window as any).innerWidth);
     }
 }
 
+/**
+ * Check if enough time has passed to end resize.
+ */
 function typesetbotEndResize() {
-    if ((new Date().getTime() - (window as any)['typesetbot-viewport--rtime']) < (window as any)['typesetbot-viewport--delta']) {
-        setTimeout(typesetbotEndResize, (window as any)['typesetbot-viewport--delta']);
+    if ((new Date().getTime() - typesetbotWindowGet('viewport--rtime')) < typesetbotWindowGet('viewport--delta')) {
+        setTimeout(typesetbotEndResize, typesetbotWindowGet('viewport--delta'));
         return;
     }
 
-    (window as any)['typesetbot-viewport--timeout'] = false;
+    typesetbotWindowSet('viewport--timeout', false);
     document.body.classList.remove('typeset-viewport');
 
     const event = new Event('typesetbot-viewport--reize');
@@ -56,5 +60,30 @@ function typesetbotEndResize() {
     document.body.dispatchEvent(event);
 }
 
+/**
+ * Get variable from window.
+ *
+ * @param   key Some key
+ * @returns     Some value
+ */
+function typesetbotWindowGet(key: string): any {
+    if ((window as any).typesetbot == null) {
+        (window as any).typesetbot = {};
+    }
 
+    return (window as any).typesetbot[key];
+}
 
+/**
+ * Set variable in window.
+ *
+ * @param key   Some key
+ * @param value Some value
+ */
+function typesetbotWindowSet(key: string, value: any) {
+    if ((window as any).typesetbot == null) {
+        (window as any).typesetbot = {};
+    }
+
+    (window as any).typesetbot[key] = value;
+}

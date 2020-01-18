@@ -14,10 +14,10 @@ class TypesetBotRender {
     /**
      * Get default word space of node.
      *
-     * @param node The node to check
-     * @returns    The default word spacing in pixels
+     * @param   element The node to check
+     * @returns         The default word spacing in pixels
      */
-    getSpaceWidth = function(node: Element): number {
+    getSpaceWidth = function(element: Element): number {
         const spanNode = document.createElement('SPAN');
         const preTextNode = document.createTextNode('1');
         const postTextNode = document.createTextNode('1');
@@ -28,7 +28,7 @@ class TypesetBotRender {
         spanNode.appendChild(preTextNode);
         spanNode.appendChild(spaceContainer);
         spanNode.appendChild(postTextNode);
-        node.appendChild(spanNode);
+        element.appendChild(spanNode);
 
         const rect = spaceContainer.getBoundingClientRect();
         const width = rect.right - rect.left;
@@ -42,18 +42,23 @@ class TypesetBotRender {
      * This will setup the code for checking how many words can possibly be on a line.
      * This does not reflect how many words should be on any given line.
      *
-     * @param node
+     * @param element
      */
-    setMinimumWordSpacing = function(node: HTMLElement) {
+    setMinimumWordSpacing = function(element: HTMLElement) {
         const minSpaceSize = this._tsb.settings.spaceWidth - this._tsb.settings.spaceShrinkability;
-        const defaultWidth = this.getSpaceWidth(node);
+        const defaultWidth = this.getSpaceWidth(element);
 
-        node.style.wordSpacing = 'calc((1em * ' + minSpaceSize + ') - ' + defaultWidth + 'px)';
+        element.style.wordSpacing = 'calc((1em * ' + minSpaceSize + ') - ' + defaultWidth + 'px)';
     }
 
-    getWordProperties = function(node: HTMLElement) {
-        const tokens = this._tsb.util.getElementTokens(node);
-        const backupHtml = node.innerHTML;
+    /**
+     * Get rendering dimensions of words in element.
+     *
+     * @param element
+     */
+    getWordProperties = function(element: HTMLElement) {
+        const tokens = this._tsb.util.getElementTokens(element);
+        const backupHtml = element.innerHTML;
         const renderIndexToToken: { [index: number] : TypesetBotToken; } = {};
         let html = '';
         let currentIndex = 0;
@@ -63,14 +68,14 @@ class TypesetBotRender {
             switch (token.type) {
                 case TypesetBotToken.types.WORD:
                     const word = token as TypesetBotWord;
-                    // const wordNode = elementNodes[token.nodeIndex];
+
                     renderIndexToToken[currentIndex] = token;
                     currentIndex += 1;
                     html += '<span class="typeset-word-node">' + word.text + '</span>';
                     break;
                 case TypesetBotToken.types.TAG:
                     const tag = token as TypesetBotTag;
-                    html += this.htmlGenerator.createTagHtml(node, tag);
+                    html += this.htmlGenerator.createTagHtml(element, tag);
                     break;
                 case TypesetBotToken.types.SPACE:
                     html += ' ';
@@ -85,11 +90,11 @@ class TypesetBotRender {
 
 
         this._tsb.logger.start('------ Update DOM');
-        node.innerHTML = html;
+        element.innerHTML = html;
         this._tsb.logger.end('------ Update DOM');
 
         this._tsb.logger.start('------ Query DOM');
-        const renderedWordNodes = node.querySelectorAll('.typeset-word-node');
+        const renderedWordNodes = element.querySelectorAll('.typeset-word-node');
         this._tsb.logger.end('------ Query DOM');
 
         this._tsb.logger.start('------ Get Properties');
@@ -105,7 +110,7 @@ class TypesetBotRender {
 
 
         this._tsb.logger.start('------ Update DOM');
-        node.innerHTML = backupHtml;
+        element.innerHTML = backupHtml;
         this._tsb.logger.end('------ Update DOM');
 
     }
@@ -113,11 +118,11 @@ class TypesetBotRender {
     /**
      * Get default font size of element.
      *
-     * @param   node
-     * @returns      The font size in pixels as number
+     * @param   element
+     * @returns         The font size in pixels as number
      */
-    getDefaultFontSize = function(node: HTMLElement) : number {
-        const fontSize = window.getComputedStyle(node).fontSize;
+    getDefaultFontSize = function(element: HTMLElement) : number {
+        const fontSize = window.getComputedStyle(element).fontSize;
 
         // Remove pixels from output and convert to number.
         return Number(fontSize.replace('px', ''));
@@ -126,15 +131,17 @@ class TypesetBotRender {
     /**
      * Get width of node.
      *
-     * @param   node
-     * @returns      The width of node in pixels as number
+     * @param   element
+     * @returns         The width of node in pixels as number
      */
-    getNodeWidth = function(node: HTMLElement): number {
-        return node.getBoundingClientRect().width;
+    getNodeWidth = function(element: HTMLElement): number {
+        return element.getBoundingClientRect().width;
     }
 
     /**
+     * Get rendering dimensions of words and word parts for hyphenation.
      *
+     * @param element
      */
     getHyphenProperties = function(element: HTMLElement) {
         const tokens = this._tsb.util.getElementTokens(element);
@@ -227,13 +234,20 @@ class TypesetBotRender {
         element.innerHTML = backupHtml;
     }
 
+    /**
+     * Apply linebreaks of solution to element.
+     *
+     * @param element
+     * @param finalBreakpoint The breakpoint of the final line in solution
+     */
     applyLineBreaks = function(element: Element, finalBreakpoint: TypesetBotLinebreak) {
         this._tsb.logger.start('-- Apply breakpoints');
 
         const lines = [];
-        let isFinished = false;
-
         let pointer = finalBreakpoint;
+
+        let isFinished = false;
+        // Construct array of all lines.
         while (!isFinished) {
             if (pointer == null) {
                 isFinished = true;
@@ -266,8 +280,8 @@ class TypesetBotRender {
                 curTokenIndex,
                 lastHyphenIndex,
                 line.tokenIndex,
-                tagStack,
                 line.hyphenIndex,
+                tagStack,
             );
             lineHtml += this.appendTagTokensOnLine(element, tagStack);
 
@@ -287,6 +301,9 @@ class TypesetBotRender {
         this._tsb.logger.end('-- Apply breakpoints');
     }
 
+    /**
+     * Add text justification class to element.
+     */
     setJustificationClass = function(element: Element) {
         // @todo : remove any existing typesetbot classes.
 
@@ -310,32 +327,64 @@ class TypesetBotRender {
 
     }
 
+    /**
+     * Get HTMl string of prepended tags on line.
+     *
+     * @param   element
+     * @param   tagStack Array of open tags to repeat
+     * @returns          The HTML of tag code
+     */
     prependTagTokensOnLine = function(element: Element, tagStack: TypesetBotToken[]): string {
+        return this.getTagTokensOnLine(element, tagStack, false);
+    }
+
+    /**
+     * Get HTML string of appended closing tags on line.
+     *
+     * @param   element
+     * @param   tagStack Array of open tags to close
+     * @returns          The HTML of closing tags
+     */
+    appendTagTokensOnLine = function(element: Element, tagStack: TypesetBotToken[]): string {
+        return this.getTagTokensOnLine(element, tagStack, true);
+    }
+
+    /**
+     * Get HTML string of tags on line.
+     *
+     * @param   element
+     * @param   tagStack     Array of open tags
+     * @param   isClosingTag Get the HTML of the closing or opening tags
+     * @returns              The HTML of tags
+     */
+    getTagTokensOnLine = function(element: Element, tagStack: TypesetBotToken[], isClosingTag: boolean): string {
         let html = '';
         for (const tag of tagStack) {
-            html += this.htmlGenerator.createTagHtml(element, tag);
+            html += this.htmlGenerator.createTagHtml(element, tag, isClosingTag);
         }
 
         return html;
     }
 
-    appendTagTokensOnLine = function(element: Element, tagStack: TypesetBotToken[]) {
-        let html = '';
-        for (const tag of tagStack) {
-            html += this.htmlGenerator.createTagHtml(element, tag, true);
-        }
-
-        return html;
-    }
-
+    /**
+     * Get HTML of token range.
+     *
+     * @param   element
+     * @param   startIndex       Index of first token
+     * @param   startHyphenIndex Hyphenation index for the first word token
+     * @param   endIndex         Index of last token
+     * @param   endHyphenIndex   Hyphenation index for the last word token
+     * @param   tagStack         Stack of open tags
+     * @returns                  The HTML string
+     */
     getHtmlFromTokensRange = function(
         element: Element,
         startIndex: number,
         startHyphenIndex: number,
         endIndex: number,
+        endHyphenIndex: number,
         tagStack: TypesetBotToken[],
-        endHyphenIndex: number = null,
-    ) {
+    ): string {
         const tokens = this._tsb.util.getElementTokens(element);
         let html = '';
 
@@ -343,9 +392,10 @@ class TypesetBotRender {
             endIndex = tokens.length - 1;
         }
 
+        // Only the first word token can be hyphenated.
         let isFirstToken = true;
 
-
+        // Loop all tokens between start and end token.
         for (let index = startIndex; index < endIndex; index++) {
             const token = tokens[index];
             switch (token.type) {
@@ -361,23 +411,16 @@ class TypesetBotRender {
                         continue;
                     }
 
-
-                    // if (index === (endIndex - 1) && endHyphenIndex != null) {
-
-
-                    //     continue;
-                    // }
-
                     html += word.text;
                     break;
                 case TypesetBotToken.types.TAG:
                     const tag = token as TypesetBotTag;
-
                     if (!tag.isEndTag) {
                         tagStack.push(tag);
                     } else {
                         tagStack.pop();
                     }
+
                     html += this.htmlGenerator.createTagHtml(element, tag);
                     break;
                 case TypesetBotToken.types.SPACE:
@@ -390,6 +433,7 @@ class TypesetBotRender {
             }
         }
 
+        // Get the HTML of the hyphenated word.
         if (endHyphenIndex != null) {
             const word = tokens[endIndex];
             const cutIndex = word.hyphenIndexPositions[endHyphenIndex];

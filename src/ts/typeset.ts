@@ -12,10 +12,10 @@ class TypesetBotTypeset {
     math:         TypesetBotMath;
     settings:     TypesetBotSettings;
 
-    tokens: TypesetBotToken[];
 
     // Node variables.
-    originalHTML: string;
+    backupInnerHtml: string;
+    tokens: TypesetBotToken[];
 
     // Font properties
     elemWidth: number; // In pixels
@@ -27,6 +27,7 @@ class TypesetBotTypeset {
     // Breakpoint structures.
     activeBreakpoints: TypesetBotLinebreak[];
     shortestPath: object;
+    finalBreakpoints: TypesetBotLinebreak[];
 
     /**
      * @param tsb Instance of main class
@@ -41,54 +42,50 @@ class TypesetBotTypeset {
     }
 
     /**
-     * Typeset single node.
+     * Typeset single element.
      *
-     * @param node
+     * @param element
      */
     typeset = function(element: Element) {
-        // @todo : Apply basic reset CSS styles.
-        // @todo : Check if node has changed content (inner nodes) since last typesetting.
-
         // Reset HTML of node if the typesetting has run before.
-        if (this.originalHTML != null) {
-            element.innerHTML = this.originalHTML;
+        if (this.backupInnerHtml != null) {
+            element.innerHTML = this.backupInnerHtml;
         }
 
-        // Make a copy of node which can be worked on without breaking webpage.
-        // this._tsb.logger.start('---- Clone working node');
-        // const cloneNode = element.cloneNode(true);
-        // this._tsb.logger.end('---- Clone working node');
-
+        // Preprocess hyphenations and rendering dimensions.
         this.preprocessElement(element);
+
+        // Calculate all feasible linebreak solutions.
         const finalBreakpoints = this.getFinalLineBreaks(element);
 
+        // Get best solution.
         const solution = this.lowestDemerit(finalBreakpoints);
-        // console.log(solution);
         if (solution == null) {
             this._tsb.logger.warn('No viable solution found during typesetting. Element is skipped.');
             return;
         }
 
+        // Render solution to DOM.
         this.render.applyLineBreaks(element, solution);
     }
 
     /**
      * Get a set initial state properties of element.
      *
-     * @param node
+     * @param element
      */
-    getElementProperties = function(node: Element) {
+    getElementProperties = function(element: Element) {
         this._tsb.logger.start('---- Getting element properties');
 
-        this.originalHTML = node.innerHTML;
+        this.backupInnerHtml = element.innerHTML;
 
         // Set space width based on settings.
-        this.render.setMinimumWordSpacing(node);
+        this.render.setMinimumWordSpacing(element);
 
-        this.elemWidth = this.render.getNodeWidth(node);
+        this.elemWidth = this.render.getNodeWidth(element);
 
         // Get font size and calc real space properties.
-        this.elemFontSize = this.render.getDefaultFontSize(node);
+        this.elemFontSize = this.render.getDefaultFontSize(element);
         this.spaceWidth = this.elemFontSize * this.settings.spaceWidth,
         this.spaceShrink = this.elemFontSize * this.settings.spaceShrinkability,
         this.spaceStretch = this.elemFontSize * this.settings.spaceStretchability;
@@ -125,12 +122,10 @@ class TypesetBotTypeset {
     preprocessElement = function(element: Element) {
         this._tsb.logger.start('-- Preprocess');
 
-        // Get element width.
-        // Init paragraph variables.
-        // Copy content.
+        // Analyse working element.
         this.getElementProperties(element);
 
-        // Tokenize nodes and store them.
+        // Tokenize element for words, space and tags.
         this._tsb.logger.start('---- Tokenize text');
         this.tokens = this.tokenizer.tokenize(element);
         this._tsb.logger.end('---- Tokenize text');
@@ -193,7 +188,7 @@ class TypesetBotTypeset {
 
         this.activeBreakpoints = new Queue();
         this.shortestPath = {};
-        const finalBreakpoints: TypesetBotLinebreak[] = [];
+        this.finalBreakpoints = [];
 
         this.activeBreakpoints.enqueue(
             new TypesetBotLinebreak(
@@ -226,28 +221,19 @@ class TypesetBotTypeset {
             let lineIsFinished = false;
             while (!lineIsFinished) {
                 let oldLineWidth: number = lineProperties.curWidth;
-                const wordData = this.hyphen.nextWord(element, lineProperties.tokenIndex, lineProperties.firstWordHyphenIndex) as TypesetBotWordData;
+                const wordData = this.hyphen.nextWord(
+                    element,
+                    lineProperties.tokenIndex,
+                    lineProperties.firstWordHyphenIndex,
+                ) as TypesetBotWordData;
+
                 lineProperties.firstWordHyphenIndex = null; // Unset hyphenindex for next words.
                 if (wordData == null) {
-                    // Push final break.
-                    finalBreakpoints.push(
-                        new TypesetBotLinebreak(
-                            originBreakpoint,
-                            null,
-                            null,
-                            originBreakpoint.demerit,
-                            false,
-                            null,
-                            originBreakpoint.lineNumber + 1,
-                            lineProperties.lineHeight,
-                        ),
-                    );
-
+                    // No more words are available in element, possible solution.
+                    this.pushFinalBreakpoint(originBreakpoint, lineProperties);
                     lineIsFinished = true;
                     continue;
                 }
-
-
 
                 // Update token index.
                 lineProperties.tokenIndex = wordData.tokenIndex;
@@ -261,7 +247,7 @@ class TypesetBotTypeset {
                     lineProperties.wordCount,
                     this.spaceShrink,
                     this.spaceStretch,
-                    );
+                );
 
                 if (this.math.ratioIsLessThanMax(ratio, looseness)) { // Valid breakpoint
                     // Loop all word parts in the word.
@@ -283,13 +269,9 @@ class TypesetBotTypeset {
                                 this.spaceStretch,
                             );
 
-
-
                             if (!this.math.isValidRatio(hyphenRatio, looseness)) {
                                 continue;
                             }
-
-
 
                             // Generate breakpoint.
                             const hyphenBreakpoint = this.getBreakpoint(
@@ -328,22 +310,43 @@ class TypesetBotTypeset {
         this._tsb.logger.end('-- Dynamic programming');
 
         // Lossness is increased by 1 until a feasible solution if found.
-        if (finalBreakpoints.length === 0 && looseness <= 4) {
+        if (this.finalBreakpoints.length === 0 && looseness <= 4) {
             return this.getFinalLineBreaks(element, looseness + 1);
         }
 
-        return finalBreakpoints;
+        return this.finalBreakpoints;
+    }
+
+    /**
+     * Push a breakpoint for a final solution.
+     *
+     * @param originBreakpoint
+     * @param lineProperties
+     */
+    pushFinalBreakpoint = function(originBreakpoint: TypesetBotLinebreak, lineProperties: TypesetBotLineProperties) {
+        this.finalBreakpoints.push(
+            new TypesetBotLinebreak(
+                originBreakpoint,
+                null,
+                null,
+                originBreakpoint.demerit,
+                false,
+                null,
+                originBreakpoint.lineNumber + 1,
+                lineProperties.lineHeight,
+            ),
+        );
     }
 
     /**
      * Calculate demerit and return new linebreak object.
      *
-     * @param   origin
-     * @param   lineProperties
-     * @param   ratio
-     * @param   tokenIndex
-     * @param   hyphenIndex
-     * @param   flag
+     * @param   origin         The breakpoint of previous line
+     * @param   lineProperties The properties of current line
+     * @param   ratio          The current adjustment ratio
+     * @param   tokenIndex     The current token index
+     * @param   hyphenIndex    The current hyphenation index on token
+     * @param   flag           Flag if there is some kind of penalty
      * @returns                The new linebreak
      */
     getBreakpoint = function(
@@ -485,7 +488,6 @@ class TypesetBotLinebreak {
      * @param fitnessClass  Fitness class of current line
      * @param lineNumber    Line number of current line
      * @param maxLineHeight Max line height of current solution
-     * @param curLineHeight Current height of line
      */
     constructor(
         public origin:        TypesetBotLinebreak,

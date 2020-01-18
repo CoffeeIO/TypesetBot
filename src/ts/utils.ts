@@ -101,8 +101,11 @@ class TypesetBotUtils {
     /**
      * Take a string array and return array of string length and ignore last element.
      * Fx: ["hyp", "hen", "ation"] --> [3, 3].
+     *
+     * @param   arr Array of word parts
+     * @returns     Array of word parts length
      */
-    static getArrayIndexes = function(arr: string[]) {
+    static getArrayIndexes = function(arr: string[]): number[] {
         const indexes = [];
 
         for (let i = 0; i < arr.length - 1; i++) {
@@ -112,9 +115,14 @@ class TypesetBotUtils {
         return indexes;
     };
 
-    getTypesetInstance = function(node: Element) {
+    /**
+     * Get existing instance of typesetting for particular element.
+     *
+     * @param   element
+     * @returns         Existing typset instance, otherwise return new instance
+     */
+    getTypesetInstance = function(node: Element): TypesetBotTypeset {
         const index = this.getElementIndex(node);
-
         if (index == null) {
             return null;
         }

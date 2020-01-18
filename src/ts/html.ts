@@ -11,9 +11,10 @@ class TypesetBotHtml {
     /**
      * Create HTML code from HTML tag object.
      *
-     * @param   node  The element to typeset
-     * @param   token The token representing HTML tag
-     * @returns       The HTML string
+     * @param   node        The element to typeset
+     * @param   token       The token representing HTML tag
+     * @param   forceEndTag Get HTML of end tag, disregarding any tag properties
+     * @returns             The HTML string
      */
     createTagHtml = function(node: Element, token: TypesetBotTag, forceEndTag: boolean = false): string {
         const elementNodes = this._tsb.util.getElementNodes(node);

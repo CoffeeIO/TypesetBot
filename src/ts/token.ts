@@ -212,6 +212,9 @@ class TypesetBotWord extends TypesetBotToken {
         this.text = text;
     }
 
+    /**
+     * Initialize hyphen properties on words that need it.
+     */
     initHyphen = function() {
         this.hasHyphen = true;
         this.hyphenIndexPositions = [];

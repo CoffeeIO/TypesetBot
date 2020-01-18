@@ -65,6 +65,10 @@ function TypesetBot(query, settings) {
     this.logger.diff('-- Finding solution');
     this.logger.diff('-- Apply breakpoints');
   };
+  /**
+   * Add event listeners to typesetbot instance.
+   */
+
 
   this.addEventListeners = function () {
     var instance = this;
@@ -222,8 +226,9 @@ function TypesetBotLog(tsb) {
   /**
    * Get formatted string of total performance time of specific key.
    *
-   * @param key
-   * @returns   Formatted string in ms and number of calls.
+   * @param key       Key of the time log
+   * @param logOutput Should output be logged in console
+   * @returns         Formatted string in ms and number of calls.
    */
 
 
@@ -621,6 +626,13 @@ function TypesetBotUtils(tsb) {
 
     return this._tsb.indexToTokens[index];
   };
+  /**
+   * Get existing instance of typesetting for particular element.
+   *
+   * @param   element
+   * @returns         Existing typset instance, otherwise return new instance
+   */
+
 
   this.getTypesetInstance = function (node) {
     var index = this.getElementIndex(node);
@@ -669,6 +681,9 @@ TypesetBotUtils.isVisible = function (node) {
 /**
  * Take a string array and return array of string length and ignore last element.
  * Fx: ["hyp", "hen", "ation"] --> [3, 3].
+ *
+ * @param   arr Array of word parts
+ * @returns     Array of word parts length
  */
 
 
@@ -681,54 +696,94 @@ TypesetBotUtils.getArrayIndexes = function (arr) {
 
   return indexes;
 };
+/**
+ * Check for when user stops resizing viewport and fires event to all running typesetbot instances.
+ */
+// Initialize ready and onload variables.
 
-window['typesetbot--ready'] = false;
-window['typesetbot--onload'] = false;
+
+typesetbotWindowSet('ready', false);
+typesetbotWindowSet('onload', false);
 
 (function () {
-  window['typesetbot--ready'] = true;
+  typesetbotWindowSet('ready', true);
 })();
 
 window.onload = function () {
-  window['typesetbot--onload'] = true;
-}; // Check for when user stops resizing viewport.
-// **MODIFIED**
-// http://stackoverflow.com/a/5926068/2741279
+  typesetbotWindowSet('onload', true);
+}; // Set global typesetbot variables in window
 
 
-window['typesetbot-viewport--lastWidth'] = window.innerWidth;
-window['typesetbot-viewport--delta'] = 200;
-window['typesetbot-viewport--rtime'] = null;
-window['typesetbot-viewport--timeout'] = false;
+typesetbotWindowSet('viewport--lastWidth', window.innerWidth);
+typesetbotWindowSet('viewport--delta', 200);
+typesetbotWindowSet('viewport--rtime', null);
+typesetbotWindowSet('viewport--timeout', false);
 window.onresize = typesetbotCheckResize;
+/**
+ * Indicate that viewport is being resize and start checking when resize is ended.
+ */
 
 function typesetbotCheckResize() {
-  if (window['typesetbot-viewport--lastWidth'] !== window.innerWidth) {
+  if (typesetbotWindowGet('viewport--lastWidth') !== window.innerWidth) {
     document.body.classList.add('typesetbot-viewport');
-    window['typesetbot-viewport--rtime'] = new Date().getTime();
+    typesetbotWindowSet('viewport--rtime', new Date().getTime());
 
-    if (window['typesetbot-viewport--timeout'] === false) {
-      window['typesetbot-viewport--timeout'] = true;
+    if (typesetbotWindowGet('viewport--timeout') === false) {
+      typesetbotWindowSet('viewport--timeout', true);
       setTimeout(function () {
         typesetbotEndResize();
-      }, window['typesetbot-viewport--delta']);
+      }, typesetbotWindowGet('viewport--delta'));
     }
 
-    window['typesetbot-viewport--lastWidth'] = window.innerWidth;
+    typesetbotWindowSet('viewport--lastWidth', window.innerWidth);
   }
 }
+/**
+ * Check if enough time has passed to end resize.
+ */
+
 
 function typesetbotEndResize() {
-  if (new Date().getTime() - window['typesetbot-viewport--rtime'] < window['typesetbot-viewport--delta']) {
-    setTimeout(typesetbotEndResize, window['typesetbot-viewport--delta']);
+  if (new Date().getTime() - typesetbotWindowGet('viewport--rtime') < typesetbotWindowGet('viewport--delta')) {
+    setTimeout(typesetbotEndResize, typesetbotWindowGet('viewport--delta'));
     return;
   }
 
-  window['typesetbot-viewport--timeout'] = false;
+  typesetbotWindowSet('viewport--timeout', false);
   document.body.classList.remove('typeset-viewport');
   var event = new Event('typesetbot-viewport--reize'); // Dispatch the event to all TSB instances.
 
   document.body.dispatchEvent(event);
+}
+/**
+ * Get variable from window.
+ *
+ * @param   key Some key
+ * @returns     Some value
+ */
+
+
+function typesetbotWindowGet(key) {
+  if (window.typesetbot == null) {
+    window.typesetbot = {};
+  }
+
+  return window.typesetbot[key];
+}
+/**
+ * Set variable in window.
+ *
+ * @param key   Some key
+ * @param value Some value
+ */
+
+
+function typesetbotWindowSet(key, value) {
+  if (window.typesetbot == null) {
+    window.typesetbot = {};
+  }
+
+  window.typesetbot[key] = value;
 }
 
 var TypesetBotMath = function TypesetBotMath(tsb) {
@@ -737,11 +792,11 @@ var TypesetBotMath = function TypesetBotMath(tsb) {
   /**
    * Calculate adjustment ratio.
    *
-   * @param idealW
-   * @param actualW
-   * @param wordCount
-   * @param shrink
-   * @param stretch
+   * @param idealW    The ideal line width
+   * @param actualW   The current width of the line
+   * @param wordCount The current word count on the line
+   * @param shrink    The shrinkability of the word spacing
+   * @param stretch   The stretchability of the word spacing
    * @returns         The adjustment ratio
    */
   this.getRatio = function (idealW, actualW, wordCount, shrink, stretch) {
@@ -769,9 +824,9 @@ var TypesetBotMath = function TypesetBotMath(tsb) {
   /**
    * Calculate the demerit.
    *
-   * @param badness
-   * @param penalty
-   * @param flag
+   * @param badness The badness
+   * @param penalty The additional penalty to add
+   * @param flag    Indicator if flag penalty shound be added
    * @returns       The line demerit
    */
 
@@ -783,19 +838,30 @@ var TypesetBotMath = function TypesetBotMath(tsb) {
       return Math.pow(this.settings.demeritOffset + badness + penalty, 2) + flagPenalty;
     } else if (penalty === -Infinity) {
       return Math.pow(this.settings.demeritOffset + badness, 2) + flagPenalty;
-    } else {
-      return Math.pow(this.settings.demeritOffset + badness, 2) - Math.pow(penalty, 2) + flagPenalty;
     }
+
+    return Math.pow(this.settings.demeritOffset + badness, 2) - Math.pow(penalty, 2) + flagPenalty;
   };
+  /**
+   * Get demerit from properties.
+   *
+   * @param ratio                The adjustment ratio
+   * @param flag                 Does the linebreak have a penalty flag
+   * @param hasHyphen            Does the line have a hyphen
+   * @param skippingFitnessClass Does the line skip more than one fitness class
+   * @returns                    The demerit
+   */
+
 
   this.getDemerit = function (ratio, flag, hasHyphen, skippingFitnessClass) {
     var badness = this.getBadness(ratio);
     var additionalPenalty = 0;
 
     if (hasHyphen) {
-      if (this.settings.alignment == 'justify') {
+      if (this.settings.alignment === 'justify') {
         additionalPenalty += this.settings.hyphenPenalty;
       } else {
+        // Left, right, center
         additionalPenalty += this.settings.hyphenPenaltyRagged;
       }
     }
@@ -811,7 +877,7 @@ var TypesetBotMath = function TypesetBotMath(tsb) {
   /**
    * Get fitness class from adjustment ratio.
    *
-   * @param   ratio
+   * @param   ratio The adjustment ratio
    * @returns       The fitness class
    */
 
@@ -849,8 +915,8 @@ var TypesetBotMath = function TypesetBotMath(tsb) {
   /**
    * Check if adjustment ratio is within a valid range.
    *
-   * @param   ratio
-   * @param   looseness
+   * @param   ratio     The adjustment ratio
+   * @param   looseness The loosness to add the maximum allowed adjustment ratio
    * @returns           Return true if ratio is valid for breakpoint, otherwise false
    */
 
@@ -861,8 +927,9 @@ var TypesetBotMath = function TypesetBotMath(tsb) {
   /**
    * Check if ratio is less or equal to allowed maximum ratio.
    *
-   * @param   ratio
-   * @returns       Return true if ratio is less than max. ratio
+   * @param   ratio     The adjustment ratio
+   * @param   looseness The loosness to add the maximum allowed adjustment ratio
+   * @returns           Return true if ratio is less than max. ratio
    */
 
 
@@ -872,7 +939,7 @@ var TypesetBotMath = function TypesetBotMath(tsb) {
   /**
    * Check if ratio is higher or equal to allowed minimum ratio.
    *
-   * @param   ratio
+   * @param   ratio The adjustment ratio
    * @returns       Return true if ratio is higher than min. ratio
    */
 
@@ -1163,6 +1230,10 @@ function (_TypesetBotToken) {
 
     _this.hasHyphen = false; // Example: hyphenation --> true
 
+    /**
+     * Initialize hyphen properties on words that need it.
+     */
+
     _this.initHyphen = function () {
       this.hasHyphen = true;
       this.hyphenIndexPositions = [];
@@ -1235,50 +1306,48 @@ function TypesetBotTypeset(tsb) {
   _classCallCheck(this, TypesetBotTypeset);
 
   /**
-   * Typeset single node.
+   * Typeset single element.
    *
-   * @param node
+   * @param element
    */
   this.typeset = function (element) {
-    // @todo : Apply basic reset CSS styles.
-    // @todo : Check if node has changed content (inner nodes) since last typesetting.
     // Reset HTML of node if the typesetting has run before.
-    if (this.originalHTML != null) {
-      element.innerHTML = this.originalHTML;
-    } // Make a copy of node which can be worked on without breaking webpage.
-    // this._tsb.logger.start('---- Clone working node');
-    // const cloneNode = element.cloneNode(true);
-    // this._tsb.logger.end('---- Clone working node');
+    if (this.backupInnerHtml != null) {
+      element.innerHTML = this.backupInnerHtml;
+    } // Preprocess hyphenations and rendering dimensions.
 
 
-    this.preprocessElement(element);
-    var finalBreakpoints = this.getFinalLineBreaks(element);
-    var solution = this.lowestDemerit(finalBreakpoints); // console.log(solution);
+    this.preprocessElement(element); // Calculate all feasible linebreak solutions.
+
+    var finalBreakpoints = this.getFinalLineBreaks(element); // Get best solution.
+
+    var solution = this.lowestDemerit(finalBreakpoints);
 
     if (solution == null) {
       this._tsb.logger.warn('No viable solution found during typesetting. Element is skipped.');
 
       return;
-    }
+    } // Render solution to DOM.
+
 
     this.render.applyLineBreaks(element, solution);
   };
   /**
    * Get a set initial state properties of element.
    *
-   * @param node
+   * @param element
    */
 
 
-  this.getElementProperties = function (node) {
+  this.getElementProperties = function (element) {
     this._tsb.logger.start('---- Getting element properties');
 
-    this.originalHTML = node.innerHTML; // Set space width based on settings.
+    this.backupInnerHtml = element.innerHTML; // Set space width based on settings.
 
-    this.render.setMinimumWordSpacing(node);
-    this.elemWidth = this.render.getNodeWidth(node); // Get font size and calc real space properties.
+    this.render.setMinimumWordSpacing(element);
+    this.elemWidth = this.render.getNodeWidth(element); // Get font size and calc real space properties.
 
-    this.elemFontSize = this.render.getDefaultFontSize(node);
+    this.elemFontSize = this.render.getDefaultFontSize(element);
     this.spaceWidth = this.elemFontSize * this.settings.spaceWidth, this.spaceShrink = this.elemFontSize * this.settings.spaceShrinkability, this.spaceStretch = this.elemFontSize * this.settings.spaceStretchability;
 
     this._tsb.logger.end('---- Getting element properties');
@@ -1314,12 +1383,10 @@ function TypesetBotTypeset(tsb) {
 
 
   this.preprocessElement = function (element) {
-    this._tsb.logger.start('-- Preprocess'); // Get element width.
-    // Init paragraph variables.
-    // Copy content.
+    this._tsb.logger.start('-- Preprocess'); // Analyse working element.
 
 
-    this.getElementProperties(element); // Tokenize nodes and store them.
+    this.getElementProperties(element); // Tokenize element for words, space and tags.
 
     this._tsb.logger.start('---- Tokenize text');
 
@@ -1421,7 +1488,7 @@ function TypesetBotTypeset(tsb) {
 
     this.activeBreakpoints = new Queue();
     this.shortestPath = {};
-    var finalBreakpoints = [];
+    this.finalBreakpoints = [];
     this.activeBreakpoints.enqueue(new TypesetBotLinebreak(null, 0, null, 0, false, null, 0, 0));
     var isFinished = false;
 
@@ -1446,8 +1513,8 @@ function TypesetBotTypeset(tsb) {
         lineProperties.firstWordHyphenIndex = null; // Unset hyphenindex for next words.
 
         if (wordData == null) {
-          // Push final break.
-          finalBreakpoints.push(new TypesetBotLinebreak(originBreakpoint, null, null, originBreakpoint.demerit, false, null, originBreakpoint.lineNumber + 1, lineProperties.lineHeight));
+          // No more words are available in element, possible solution.
+          this.pushFinalBreakpoint(originBreakpoint, lineProperties);
           lineIsFinished = true;
           continue;
         } // Update token index.
@@ -1523,21 +1590,32 @@ function TypesetBotTypeset(tsb) {
     this._tsb.logger.end('-- Dynamic programming'); // Lossness is increased by 1 until a feasible solution if found.
 
 
-    if (finalBreakpoints.length === 0 && looseness <= 4) {
+    if (this.finalBreakpoints.length === 0 && looseness <= 4) {
       return this.getFinalLineBreaks(element, looseness + 1);
     }
 
-    return finalBreakpoints;
+    return this.finalBreakpoints;
+  };
+  /**
+   * Push a breakpoint for a final solution.
+   *
+   * @param originBreakpoint
+   * @param lineProperties
+   */
+
+
+  this.pushFinalBreakpoint = function (originBreakpoint, lineProperties) {
+    this.finalBreakpoints.push(new TypesetBotLinebreak(originBreakpoint, null, null, originBreakpoint.demerit, false, null, originBreakpoint.lineNumber + 1, lineProperties.lineHeight));
   };
   /**
    * Calculate demerit and return new linebreak object.
    *
-   * @param   origin
-   * @param   lineProperties
-   * @param   ratio
-   * @param   tokenIndex
-   * @param   hyphenIndex
-   * @param   flag
+   * @param   origin         The breakpoint of previous line
+   * @param   lineProperties The properties of current line
+   * @param   ratio          The current adjustment ratio
+   * @param   tokenIndex     The current token index
+   * @param   hyphenIndex    The current hyphenation index on token
+   * @param   flag           Flag if there is some kind of penalty
    * @returns                The new linebreak
    */
 
@@ -1660,7 +1738,6 @@ var TypesetBotLinebreak =
  * @param fitnessClass  Fitness class of current line
  * @param lineNumber    Line number of current line
  * @param maxLineHeight Max line height of current solution
- * @param curLineHeight Current height of line
  */
 function TypesetBotLinebreak(origin, tokenIndex, hyphenIndex, demerit, flag, fitnessClass, lineNumber, maxLineHeight) {
   _classCallCheck(this, TypesetBotLinebreak);
@@ -1711,10 +1788,10 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
   /**
    * Get default word space of node.
    *
-   * @param node The node to check
-   * @returns    The default word spacing in pixels
+   * @param   element The node to check
+   * @returns         The default word spacing in pixels
    */
-  this.getSpaceWidth = function (node) {
+  this.getSpaceWidth = function (element) {
     var spanNode = document.createElement('SPAN');
     var preTextNode = document.createTextNode('1');
     var postTextNode = document.createTextNode('1');
@@ -1724,7 +1801,7 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
     spanNode.appendChild(preTextNode);
     spanNode.appendChild(spaceContainer);
     spanNode.appendChild(postTextNode);
-    node.appendChild(spanNode);
+    element.appendChild(spanNode);
     var rect = spaceContainer.getBoundingClientRect();
     var width = rect.right - rect.left;
     spanNode.remove();
@@ -1735,20 +1812,26 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
    * This will setup the code for checking how many words can possibly be on a line.
    * This does not reflect how many words should be on any given line.
    *
-   * @param node
+   * @param element
    */
 
 
-  this.setMinimumWordSpacing = function (node) {
+  this.setMinimumWordSpacing = function (element) {
     var minSpaceSize = this._tsb.settings.spaceWidth - this._tsb.settings.spaceShrinkability;
-    var defaultWidth = this.getSpaceWidth(node);
-    node.style.wordSpacing = 'calc((1em * ' + minSpaceSize + ') - ' + defaultWidth + 'px)';
+    var defaultWidth = this.getSpaceWidth(element);
+    element.style.wordSpacing = 'calc((1em * ' + minSpaceSize + ') - ' + defaultWidth + 'px)';
   };
+  /**
+   * Get rendering dimensions of words in element.
+   *
+   * @param element
+   */
 
-  this.getWordProperties = function (node) {
-    var tokens = this._tsb.util.getElementTokens(node);
 
-    var backupHtml = node.innerHTML;
+  this.getWordProperties = function (element) {
+    var tokens = this._tsb.util.getElementTokens(element);
+
+    var backupHtml = element.innerHTML;
     var renderIndexToToken = {};
     var html = '';
     var currentIndex = 0;
@@ -1765,8 +1848,7 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
         switch (token.type) {
           case TypesetBotToken.types.WORD:
-            var word = token; // const wordNode = elementNodes[token.nodeIndex];
-
+            var word = token;
             renderIndexToToken[currentIndex] = token;
             currentIndex += 1;
             html += '<span class="typeset-word-node">' + word.text + '</span>';
@@ -1774,7 +1856,7 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
           case TypesetBotToken.types.TAG:
             var tag = token;
-            html += this.htmlGenerator.createTagHtml(node, tag);
+            html += this.htmlGenerator.createTagHtml(element, tag);
             break;
 
           case TypesetBotToken.types.SPACE:
@@ -1807,13 +1889,13 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
     this._tsb.logger.start('------ Update DOM');
 
-    node.innerHTML = html;
+    element.innerHTML = html;
 
     this._tsb.logger.end('------ Update DOM');
 
     this._tsb.logger.start('------ Query DOM');
 
-    var renderedWordNodes = node.querySelectorAll('.typeset-word-node');
+    var renderedWordNodes = element.querySelectorAll('.typeset-word-node');
 
     this._tsb.logger.end('------ Query DOM');
 
@@ -1851,36 +1933,38 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
     this._tsb.logger.start('------ Update DOM');
 
-    node.innerHTML = backupHtml;
+    element.innerHTML = backupHtml;
 
     this._tsb.logger.end('------ Update DOM');
   };
   /**
    * Get default font size of element.
    *
-   * @param   node
-   * @returns      The font size in pixels as number
+   * @param   element
+   * @returns         The font size in pixels as number
    */
 
 
-  this.getDefaultFontSize = function (node) {
-    var fontSize = window.getComputedStyle(node).fontSize; // Remove pixels from output and convert to number.
+  this.getDefaultFontSize = function (element) {
+    var fontSize = window.getComputedStyle(element).fontSize; // Remove pixels from output and convert to number.
 
     return Number(fontSize.replace('px', ''));
   };
   /**
    * Get width of node.
    *
-   * @param   node
-   * @returns      The width of node in pixels as number
+   * @param   element
+   * @returns         The width of node in pixels as number
    */
 
 
-  this.getNodeWidth = function (node) {
-    return node.getBoundingClientRect().width;
+  this.getNodeWidth = function (element) {
+    return element.getBoundingClientRect().width;
   };
   /**
+   * Get rendering dimensions of words and word parts for hyphenation.
    *
+   * @param element
    */
 
 
@@ -2043,13 +2127,20 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
     element.innerHTML = backupHtml;
   };
+  /**
+   * Apply linebreaks of solution to element.
+   *
+   * @param element
+   * @param finalBreakpoint The breakpoint of the final line in solution
+   */
+
 
   this.applyLineBreaks = function (element, finalBreakpoint) {
     this._tsb.logger.start('-- Apply breakpoints');
 
     var lines = [];
-    var isFinished = false;
     var pointer = finalBreakpoint;
+    var isFinished = false; // Construct array of all lines.
 
     while (!isFinished) {
       if (pointer == null) {
@@ -2075,7 +2166,7 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
       var line = _lines[_i2];
       var lineHtml = '';
       lineHtml += this.prependTagTokensOnLine(element, tagStack);
-      lineHtml += this.getHtmlFromTokensRange(element, curTokenIndex, lastHyphenIndex, line.tokenIndex, tagStack, line.hyphenIndex);
+      lineHtml += this.getHtmlFromTokensRange(element, curTokenIndex, lastHyphenIndex, line.tokenIndex, line.hyphenIndex, tagStack);
       lineHtml += this.appendTagTokensOnLine(element, tagStack);
       curTokenIndex = line.tokenIndex;
       lastHyphenIndex = line.hyphenIndex;
@@ -2087,6 +2178,10 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
     this._tsb.logger.end('-- Apply breakpoints');
   };
+  /**
+   * Add text justification class to element.
+   */
+
 
   this.setJustificationClass = function (element) {
     // @todo : remove any existing typesetbot classes.
@@ -2113,8 +2208,41 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
         break;
     }
   };
+  /**
+   * Get HTMl string of prepended tags on line.
+   *
+   * @param   element
+   * @param   tagStack Array of open tags to repeat
+   * @returns          The HTML of tag code
+   */
+
 
   this.prependTagTokensOnLine = function (element, tagStack) {
+    return this.getTagTokensOnLine(element, tagStack, false);
+  };
+  /**
+   * Get HTML string of appended closing tags on line.
+   *
+   * @param   element
+   * @param   tagStack Array of open tags to close
+   * @returns          The HTML of closing tags
+   */
+
+
+  this.appendTagTokensOnLine = function (element, tagStack) {
+    return this.getTagTokensOnLine(element, tagStack, true);
+  };
+  /**
+   * Get HTML string of tags on line.
+   *
+   * @param   element
+   * @param   tagStack     Array of open tags
+   * @param   isClosingTag Get the HTML of the closing or opening tags
+   * @returns              The HTML of tags
+   */
+
+
+  this.getTagTokensOnLine = function (element, tagStack, isClosingTag) {
     var html = '';
     var _iteratorNormalCompletion15 = true;
     var _didIteratorError15 = false;
@@ -2123,7 +2251,7 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
     try {
       for (var _iterator15 = tagStack[Symbol.iterator](), _step15; !(_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done); _iteratorNormalCompletion15 = true) {
         var tag = _step15.value;
-        html += this.htmlGenerator.createTagHtml(element, tag);
+        html += this.htmlGenerator.createTagHtml(element, tag, isClosingTag);
       }
     } catch (err) {
       _didIteratorError15 = true;
@@ -2142,48 +2270,30 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
     return html;
   };
+  /**
+   * Get HTML of token range.
+   *
+   * @param   element
+   * @param   startIndex       Index of first token
+   * @param   startHyphenIndex Hyphenation index for the first word token
+   * @param   endIndex         Index of last token
+   * @param   endHyphenIndex   Hyphenation index for the last word token
+   * @param   tagStack         Stack of open tags
+   * @returns                  The HTML string
+   */
 
-  this.appendTagTokensOnLine = function (element, tagStack) {
-    var html = '';
-    var _iteratorNormalCompletion16 = true;
-    var _didIteratorError16 = false;
-    var _iteratorError16 = undefined;
 
-    try {
-      for (var _iterator16 = tagStack[Symbol.iterator](), _step16; !(_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done); _iteratorNormalCompletion16 = true) {
-        var tag = _step16.value;
-        html += this.htmlGenerator.createTagHtml(element, tag, true);
-      }
-    } catch (err) {
-      _didIteratorError16 = true;
-      _iteratorError16 = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion16 && _iterator16["return"] != null) {
-          _iterator16["return"]();
-        }
-      } finally {
-        if (_didIteratorError16) {
-          throw _iteratorError16;
-        }
-      }
-    }
-
-    return html;
-  };
-
-  this.getHtmlFromTokensRange = function (element, startIndex, startHyphenIndex, endIndex, tagStack) {
-    var endHyphenIndex = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
-
+  this.getHtmlFromTokensRange = function (element, startIndex, startHyphenIndex, endIndex, endHyphenIndex, tagStack) {
     var tokens = this._tsb.util.getElementTokens(element);
 
     var html = '';
 
     if (endIndex == null) {
       endIndex = tokens.length - 1;
-    }
+    } // Only the first word token can be hyphenated.
 
-    var isFirstToken = true;
+
+    var isFirstToken = true; // Loop all tokens between start and end token.
 
     for (var index = startIndex; index < endIndex; index++) {
       var token = tokens[index];
@@ -2200,10 +2310,7 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
             html += cut;
             isFirstToken = false;
             continue;
-          } // if (index === (endIndex - 1) && endHyphenIndex != null) {
-          //     continue;
-          // }
-
+          }
 
           html += word.text;
           break;
@@ -2230,7 +2337,8 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
           break;
       }
-    }
+    } // Get the HTML of the hyphenated word.
+
 
     if (endHyphenIndex != null) {
       var _word = tokens[endIndex];
@@ -2258,9 +2366,10 @@ var TypesetBotHtml = function TypesetBotHtml(tsb) {
   /**
    * Create HTML code from HTML tag object.
    *
-   * @param   node  The element to typeset
-   * @param   token The token representing HTML tag
-   * @returns       The HTML string
+   * @param   node        The element to typeset
+   * @param   token       The token representing HTML tag
+   * @param   forceEndTag Get HTML of end tag, disregarding any tag properties
+   * @returns             The HTML string
    */
   this.createTagHtml = function (node, token) {
     var forceEndTag = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
@@ -2273,26 +2382,26 @@ var TypesetBotHtml = function TypesetBotHtml(tsb) {
       return '</' + tagNode.tagName.toLowerCase() + '>';
     } else {
       var attrText = '';
-      var _iteratorNormalCompletion17 = true;
-      var _didIteratorError17 = false;
-      var _iteratorError17 = undefined;
+      var _iteratorNormalCompletion16 = true;
+      var _didIteratorError16 = false;
+      var _iteratorError16 = undefined;
 
       try {
-        for (var _iterator17 = tagNode.attributes[Symbol.iterator](), _step17; !(_iteratorNormalCompletion17 = (_step17 = _iterator17.next()).done); _iteratorNormalCompletion17 = true) {
-          var attr = _step17.value;
+        for (var _iterator16 = tagNode.attributes[Symbol.iterator](), _step16; !(_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done); _iteratorNormalCompletion16 = true) {
+          var attr = _step16.value;
           attrText += attr.name + '="' + attr.value + '" ';
         }
       } catch (err) {
-        _didIteratorError17 = true;
-        _iteratorError17 = err;
+        _didIteratorError16 = true;
+        _iteratorError16 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion17 && _iterator17["return"] != null) {
-            _iterator17["return"]();
+          if (!_iteratorNormalCompletion16 && _iterator16["return"] != null) {
+            _iterator16["return"]();
           }
         } finally {
-          if (_didIteratorError17) {
-            throw _iteratorError17;
+          if (_didIteratorError16) {
+            throw _iteratorError16;
           }
         }
       }
@@ -2536,14 +2645,57 @@ var TypesetBotHyphen = function TypesetBotHyphen(tsb) {
     var tokens = this._tsb.util.getElementTokens(element); // Set properties on tokens.
 
 
+    var _iteratorNormalCompletion17 = true;
+    var _didIteratorError17 = false;
+    var _iteratorError17 = undefined;
+
+    try {
+      for (var _iterator17 = wordData.indexes[Symbol.iterator](), _step17; !(_iteratorNormalCompletion17 = (_step17 = _iterator17.next()).done); _iteratorNormalCompletion17 = true) {
+        var tokenIndex = _step17.value;
+        tokens[tokenIndex].initHyphen();
+      }
+    } catch (err) {
+      _didIteratorError17 = true;
+      _iteratorError17 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion17 && _iterator17["return"] != null) {
+          _iterator17["return"]();
+        }
+      } finally {
+        if (_didIteratorError17) {
+          throw _iteratorError17;
+        }
+      }
+    }
+
+    var hyphenLengths = TypesetBotUtils.getArrayIndexes(hyphens); // First word token.
+
+    var curTokenIndex = 0;
+    var curToken = tokens[wordData.indexes[curTokenIndex++]];
+    var curTokenLength = curToken.text.length;
+    var prevLength = 0;
+    var curHyphenLength = 0; // Add the accurate hyphen indexes to the nodes.
+    // Fx: ['hyph', <tag>, 'e', <tag>, 'nation'] --> ['hyp(-)h', <tag>, 'e', </tag>, 'n(-)ation']
+
     var _iteratorNormalCompletion18 = true;
     var _didIteratorError18 = false;
     var _iteratorError18 = undefined;
 
     try {
-      for (var _iterator18 = wordData.indexes[Symbol.iterator](), _step18; !(_iteratorNormalCompletion18 = (_step18 = _iterator18.next()).done); _iteratorNormalCompletion18 = true) {
-        var tokenIndex = _step18.value;
-        tokens[tokenIndex].initHyphen();
+      for (var _iterator18 = hyphenLengths[Symbol.iterator](), _step18; !(_iteratorNormalCompletion18 = (_step18 = _iterator18.next()).done); _iteratorNormalCompletion18 = true) {
+        var hyphenLength = _step18.value;
+        curHyphenLength += hyphenLength; // Go to next token until we find a token that contains a hyphen.
+
+        while (curTokenLength < curHyphenLength) {
+          prevLength = curTokenLength;
+          curToken = tokens[wordData.indexes[curTokenIndex++]];
+          curTokenLength += curToken.text.length;
+        }
+
+        var hyphenIndex = curHyphenLength - prevLength - 1; // 1 for index offset
+
+        curToken.hyphenIndexPositions.push(hyphenIndex);
       }
     } catch (err) {
       _didIteratorError18 = true;
@@ -2559,49 +2711,6 @@ var TypesetBotHyphen = function TypesetBotHyphen(tsb) {
         }
       }
     }
-
-    var hyphenLengths = TypesetBotUtils.getArrayIndexes(hyphens); // First word token.
-
-    var curTokenIndex = 0;
-    var curToken = tokens[wordData.indexes[curTokenIndex++]];
-    var curTokenLength = curToken.text.length;
-    var prevLength = 0;
-    var curHyphenLength = 0; // Add the accurate hyphen indexes to the nodes.
-    // Fx: ['hyph', <tag>, 'e', <tag>, 'nation'] --> ['hyp(-)h', <tag>, 'e', </tag>, 'n(-)ation']
-
-    var _iteratorNormalCompletion19 = true;
-    var _didIteratorError19 = false;
-    var _iteratorError19 = undefined;
-
-    try {
-      for (var _iterator19 = hyphenLengths[Symbol.iterator](), _step19; !(_iteratorNormalCompletion19 = (_step19 = _iterator19.next()).done); _iteratorNormalCompletion19 = true) {
-        var hyphenLength = _step19.value;
-        curHyphenLength += hyphenLength; // Go to next token until we find a token that contains a hyphen.
-
-        while (curTokenLength < curHyphenLength) {
-          prevLength = curTokenLength;
-          curToken = tokens[wordData.indexes[curTokenIndex++]];
-          curTokenLength += curToken.text.length;
-        }
-
-        var hyphenIndex = curHyphenLength - prevLength - 1; // 1 for index offset
-
-        curToken.hyphenIndexPositions.push(hyphenIndex);
-      }
-    } catch (err) {
-      _didIteratorError19 = true;
-      _iteratorError19 = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion19 && _iterator19["return"] != null) {
-          _iterator19["return"]();
-        }
-      } finally {
-        if (_didIteratorError19) {
-          throw _iteratorError19;
-        }
-      }
-    }
   };
 
   this._tsb = tsb;
@@ -2613,11 +2722,12 @@ var TypesetBotHyphen = function TypesetBotHyphen(tsb) {
 
 var TypesetBotWordData =
 /**
- * @param str         The total string in word
- * @param indexes     Token indexes of word tokens involved in word
- * @param tokenIndex  Next token index
- * @param width       Width of the word with one or multiple tokens
- * @param height      Max height of all tokens involved
+ * @param str                The total string in word
+ * @param indexes            Token indexes of word tokens involved in word
+ * @param tokenIndex         Next token index
+ * @param width              Width of the word with one or multiple tokens
+ * @param height             Max height of all tokens involved
+ * @param lastWordTokenIndex Index of the last word token in the full appended word, needed for hyphenation
  */
 function TypesetBotWordData(str, indexes, tokenIndex, width, height, lastWordTokenIndex) {
   _classCallCheck(this, TypesetBotWordData);
