@@ -42,13 +42,27 @@ class TypesetBotRender {
      * This will setup the code for checking how many words can possibly be on a line.
      * This does not reflect how many words should be on any given line.
      *
-     * @param element
+     * @param   element
+     * @returns         The new word spacing
      */
-    setMinimumWordSpacing = function(element: HTMLElement) {
+    setMinimumWordSpacing = function(element: HTMLElement, defaultWidth: number = null): string {
         const minSpaceSize = this._tsb.settings.spaceWidth - this._tsb.settings.spaceShrinkability;
-        const defaultWidth = this.getSpaceWidth(element);
 
+        this._tsb.logger.start('------ Word spacing get');
+        if (defaultWidth == null) {
+            defaultWidth = this.getSpaceWidth(element);
+        }
+
+        this._tsb.logger.end('------ Word spacing get');
+
+
+        this._tsb.logger.start('------ Word spacing set');
+
+        // return 'calc((1em * ' + minSpaceSize + ') - ' + defaultWidth + 'px)';
         element.style.wordSpacing = 'calc((1em * ' + minSpaceSize + ') - ' + defaultWidth + 'px)';
+        this._tsb.logger.end('------ Word spacing set');
+
+        return '';
     }
 
     /**
@@ -56,64 +70,64 @@ class TypesetBotRender {
      *
      * @param element
      */
-    getWordProperties = function(element: HTMLElement) {
-        const tokens = this._tsb.util.getElementTokens(element);
-        const backupHtml = element.innerHTML;
-        const renderIndexToToken: { [index: number] : TypesetBotToken; } = {};
-        let html = '';
-        let currentIndex = 0;
+    // getWordProperties = function(element: HTMLElement) {
+    //     const tokens = this._tsb.util.getElementTokens(element);
+    //     const backupHtml = element.innerHTML;
+    //     const renderIndexToToken: { [index: number] : TypesetBotToken; } = {};
+    //     let html = '';
+    //     let currentIndex = 0;
 
-        this._tsb.logger.start('------ Build HTML');
-        for (const token of tokens) {
-            switch (token.type) {
-                case TypesetBotToken.types.WORD:
-                    const word = token as TypesetBotWord;
+    //     this._tsb.logger.start('------ Build HTML');
+    //     for (const token of tokens) {
+    //         switch (token.type) {
+    //             case TypesetBotToken.types.WORD:
+    //                 const word = token as TypesetBotWord;
 
-                    renderIndexToToken[currentIndex] = token;
-                    currentIndex += 1;
-                    html += '<span class="typeset-word-node">' + word.text + '</span>';
-                    break;
-                case TypesetBotToken.types.TAG:
-                    const tag = token as TypesetBotTag;
-                    html += this.htmlGenerator.createTagHtml(element, tag);
-                    break;
-                case TypesetBotToken.types.SPACE:
-                    html += ' ';
-                    break;
-                default:
-                    // Ignore the other node types.
-                    this._tsb.logger.error('Unknown token type found: ' + token.type);
-                    break;
-            }
-        }
-        this._tsb.logger.end('------ Build HTML');
-
-
-        this._tsb.logger.start('------ Update DOM');
-        element.innerHTML = html;
-        this._tsb.logger.end('------ Update DOM');
-
-        this._tsb.logger.start('------ Query DOM');
-        const renderedWordNodes = element.querySelectorAll('.typeset-word-node');
-        this._tsb.logger.end('------ Query DOM');
-
-        this._tsb.logger.start('------ Get Properties');
-        let renderIndex = 0;
-        for (const renderedWordNode of renderedWordNodes) {
-            const wordToken = renderIndexToToken[renderIndex] as TypesetBotWord;
-            wordToken.width = renderedWordNode.getBoundingClientRect().width;
-            wordToken.height = renderedWordNode.getBoundingClientRect().height;
-
-            renderIndex += 1;
-        }
-        this._tsb.logger.end('------ Get Properties');
+    //                 renderIndexToToken[currentIndex] = token;
+    //                 currentIndex += 1;
+    //                 html += '<span class="typeset-word-node">' + word.text + '</span>';
+    //                 break;
+    //             case TypesetBotToken.types.TAG:
+    //                 const tag = token as TypesetBotTag;
+    //                 html += this.htmlGenerator.createTagHtml(element, tag);
+    //                 break;
+    //             case TypesetBotToken.types.SPACE:
+    //                 html += ' ';
+    //                 break;
+    //             default:
+    //                 // Ignore the other node types.
+    //                 this._tsb.logger.error('Unknown token type found: ' + token.type);
+    //                 break;
+    //         }
+    //     }
+    //     this._tsb.logger.end('------ Build HTML');
 
 
-        this._tsb.logger.start('------ Update DOM');
-        element.innerHTML = backupHtml;
-        this._tsb.logger.end('------ Update DOM');
+    //     this._tsb.logger.start('------ Update DOM');
+    //     element.innerHTML = html;
+    //     this._tsb.logger.end('------ Update DOM');
 
-    }
+    //     this._tsb.logger.start('------ Query DOM');
+    //     const renderedWordNodes = element.querySelectorAll('.typeset-word-node');
+    //     this._tsb.logger.end('------ Query DOM');
+
+    //     this._tsb.logger.start('------ Get Properties');
+    //     let renderIndex = 0;
+    //     for (const renderedWordNode of renderedWordNodes) {
+    //         const wordToken = renderIndexToToken[renderIndex] as TypesetBotWord;
+    //         wordToken.width = renderedWordNode.getBoundingClientRect().width;
+    //         wordToken.height = renderedWordNode.getBoundingClientRect().height;
+
+    //         renderIndex += 1;
+    //     }
+    //     this._tsb.logger.end('------ Get Properties');
+
+
+    //     this._tsb.logger.start('------ Update DOM');
+    //     element.innerHTML = backupHtml;
+    //     this._tsb.logger.end('------ Update DOM');
+
+    // }
 
     /**
      * Get default font size of element.
@@ -150,6 +164,14 @@ class TypesetBotRender {
         // Array of objects in dom to inspect.
         const renderRequest: any[] = [];
 
+        const seenNodes: { [index: number] : number; } = {};
+
+        html += '<span>1</span><span class="typeset-hyphen-check"> </span><span>1</span>';
+        renderRequest.push({
+            token: null,
+            type: 'word',
+        });
+
         // Loop tokens to build HTML.
         for (const token of tokens) {
             switch (token.type) {
@@ -166,6 +188,16 @@ class TypesetBotRender {
                     // Skip if word has not hyphens
                     if (!word.hasHyphen) {
                         continue;
+                    }
+
+                    // Queue dash, '-'.
+                    if (seenNodes[token.nodeIndex] == null) {
+                        html += '<span class="typeset-hyphen-check">-</span>';
+                        renderRequest.push({
+                            token,
+                            type: 'dash',
+                        });
+                        seenNodes[token.nodeIndex] = 0;
                     }
 
                     // Queue hyphenation parts or word.
@@ -189,13 +221,6 @@ class TypesetBotRender {
                         });
                     }
 
-                    // Queue dash, '-'.
-                    html += '<span class="typeset-hyphen-check">-</span>';
-                    renderRequest.push({
-                        token,
-                        type: 'dash',
-                    });
-
                     break;
                 case TypesetBotToken.types.TAG:
                     const tag = token as TypesetBotTag;
@@ -215,32 +240,43 @@ class TypesetBotRender {
 
         const renderedHyphenNodes = element.querySelectorAll('.typeset-hyphen-check');
 
-        // Loop elements from DOM.
         let renderIndex = 0;
+        // Loop elements from DOM and check their rendering dimensions.
         for (const renderedHyphenNode of renderedHyphenNodes) {
             const request = renderRequest[renderIndex++];
             const token = request.token as TypesetBotWord;
 
+            // Initial space width.
+            if (token == null) {
+                this.setMinimumWordSpacing(element, renderedHyphenNode.getBoundingClientRect().width);
+                continue;
+            }
+
             // Get width of requested element and insert to correct type.
-            const width = renderedHyphenNode.getBoundingClientRect().width;
+            let width: number = null;
             switch (request.type) {
                 case 'word':
-                    // if (token.width != renderedHyphenNode.getBoundingClientRect().width) {
-                    //     console.log('Reee: %s -- %s', token.width, renderedHyphenNode.getBoundingClientRect().width);
-                    // }
-                    // if (token.height != renderedHyphenNode.getBoundingClientRect().height) {
-                    //     console.log('Reee: %s -- %s', token.height, renderedHyphenNode.getBoundingClientRect().height);
-                    // }
+                    width = renderedHyphenNode.getBoundingClientRect().width;
                     token.width = renderedHyphenNode.getBoundingClientRect().width;
                     token.height = renderedHyphenNode.getBoundingClientRect().height;
                     break;
                 case 'hyphen':
+                    width = renderedHyphenNode.getBoundingClientRect().width;
                     token.hyphenIndexWidths.push(width);
                     break;
                 case 'remain':
+                    width = renderedHyphenNode.getBoundingClientRect().width;
                     token.hyphenRemainWidth = width;
                 case 'dash':
-                    token.dashWidth = width;
+                    if (seenNodes[token.nodeIndex] == null) {
+                        console.error('Something went wrong');
+                    }
+
+                    if (seenNodes[token.nodeIndex] === 0) {
+                        seenNodes[token.nodeIndex] = renderedHyphenNode.getBoundingClientRect().width
+                    }
+
+                    token.dashWidth = seenNodes[token.nodeIndex];
                     break;
                 default:
                     this._tsb.logger.error('Unknown request object type found: ' + request.type);

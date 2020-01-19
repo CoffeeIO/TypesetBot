@@ -77,26 +77,26 @@ class TypesetBotTypeset {
     getElementProperties = function(element: Element) {
         this._tsb.logger.start('---- Getting element properties');
 
-        this._tsb.logger.start('------ Other');
+        this._tsb.logger.start('------ Other 1');
         this.backupInnerHtml = element.innerHTML;
-        this._tsb.logger.end('------ Other');
+        this._tsb.logger.end('------ Other 1');
 
 
         this._tsb.logger.start('------ Word spacing');
         // Set space width based on settings.
-        this.render.setMinimumWordSpacing(element);
+        // this.render.setMinimumWordSpacing(element);
         this._tsb.logger.end('------ Word spacing');
 
 
-        this._tsb.logger.start('------ Other');
-        this.elemWidth = this.render.getNodeWidth(element);
+        this._tsb.logger.start('------ Other 2');
 
         // Get font size and calc real space properties.
+        this.elemWidth = this.render.getNodeWidth(element);
         this.elemFontSize = this.render.getDefaultFontSize(element);
         this.spaceWidth = this.elemFontSize * this.settings.spaceWidth,
         this.spaceShrink = this.elemFontSize * this.settings.spaceShrinkability,
         this.spaceStretch = this.elemFontSize * this.settings.spaceStretchability;
-        this._tsb.logger.end('------ Other');
+        this._tsb.logger.end('------ Other 2');
 
 
         this._tsb.logger.end('---- Getting element properties');
@@ -131,12 +131,13 @@ class TypesetBotTypeset {
     preprocessElement = function(element: Element) {
         this._tsb.logger.start('-- Preprocess');
 
-        // Analyse working element.
-        this.getElementProperties(element);
+
 
         // Tokenize element for words, space and tags.
         this._tsb.logger.start('---- Tokenize text');
         this.tokens = this.tokenizer.tokenize(element);
+        // console.log(this.tokens);
+
         this._tsb.logger.end('---- Tokenize text');
 
         this._tsb.logger.start('---- other');
@@ -144,13 +145,8 @@ class TypesetBotTypeset {
         this.appendToTokenMap(element, this.tokens);
         this._tsb.logger.end('---- other');
 
-        this._tsb.logger.start('---- Get render size of words');
-        // Get render sizes of nodes.
-        // this.render.getWordProperties(element);
-        this._tsb.logger.end('---- Get render size of words');
-
         this._tsb.logger.start('---- Hyphen calc');
-        // Calculate hyphens on tokens.
+        // Calculate hyphens and words on tokens.
         this.setWordHyphens(element);
         this._tsb.logger.end('---- Hyphen calc');
 
@@ -158,6 +154,9 @@ class TypesetBotTypeset {
         // Calculate hyphens on tokens.
         this.render.getHyphenProperties(element, this.tokens);
         this._tsb.logger.end('---- Hyphen render');
+
+        // Analyse working element.
+        this.getElementProperties(element);
 
         this._tsb.logger.end('-- Preprocess');
     }
