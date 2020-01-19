@@ -124,7 +124,8 @@ class TypesetBotTypeset {
     preprocessElement = function(element: Element) {
         this._tsb.logger.start('-- Preprocess');
 
-
+        // Analyse working element.
+        this.getElementProperties(element);
 
         // Tokenize element for words, space and tags.
         this._tsb.logger.start('---- Tokenize text');
@@ -148,8 +149,7 @@ class TypesetBotTypeset {
         this.render.getHyphenProperties(element, this.tokens);
         this._tsb.logger.end('---- Hyphen render');
 
-        // Analyse working element.
-        this.getElementProperties(element);
+
 
         this._tsb.logger.end('-- Preprocess');
     }

@@ -22,6 +22,14 @@ class TypesetBotHyphen {
         return this.getWordParts(word, offset);
     }
 
+    getHyphen = function(word: string): string[] {
+        return (window as any).typesetbot[word];
+    }
+
+    setHyphen = function(word: string, parts: string[]) {
+        (window as any).typesetbot[word] = parts;
+    }
+
     /**
      * Hyphen word with specific settings.
      * Return array of possible word hyphens.
@@ -32,6 +40,12 @@ class TypesetBotHyphen {
      * @returns        Array of string parts
      */
     getWordParts = function(word: string, offset: TypesetBotWordOffset = null): string[] {
+        // Return found result.
+        let result = this.getHyphen(word);
+        if (result != null) {
+            return result;
+        }
+
         if (offset == null) {
             offset = new TypesetBotWordOffset(0, 0);
         }
@@ -64,7 +78,9 @@ class TypesetBotHyphen {
         (window as any).Hypher.languages[this._tsb.settings.hyphenLanguage].leftMin = this._tsb.settings.hyphenLeftMin + offset.left;
         (window as any).Hypher.languages[this._tsb.settings.hyphenLanguage].rightMin = this._tsb.settings.hyphenRightMin + offset.right;
 
-        return (window as any).Hypher.languages[this._tsb.settings.hyphenLanguage].hyphenate(word);
+        result = (window as any).Hypher.languages[this._tsb.settings.hyphenLanguage].hyphenate(word)
+        this.setHyphen(word, result);
+        return result;
     }
 
     /**
