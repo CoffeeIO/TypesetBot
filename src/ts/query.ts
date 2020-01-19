@@ -85,11 +85,11 @@ class TypesetBotElementQuery {
             return;
         }
         // Mark node to avoid look at the same element twice.
-        if (TypesetBotUtils.getElementIndex(node) != null) {
+        if (this._tsb.util.getElementIndex(node) != null) {
             return;
         }
 
-        TypesetBotUtils.setElementIndex(node, this._index);
+        this._tsb.util.setElementIndex(node, this._index);
         node.setAttribute('data-tsb-uuid', this._tsb.uuid);
         this.nodes.push(node);
         this._nodeMap[this._index] = node;

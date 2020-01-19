@@ -7,11 +7,14 @@ class TypesetBot {
     settings:   TypesetBotSettings;
     query:      TypesetBotElementQuery;
     typesetter: TypesetBotTypeset;
+    util:       TypesetBotUtils;
 
     // Variables.
     uuid: string;
+    isTypesetting: boolean;
     indexToNodes: { [index: number] : Element[]; } = {};
     indexToTokens: { [index: number]: TypesetBotToken[] } = {};
+    indexToTypesetInstance: { [index: number] : TypesetBotTypeset } = {};
 
     /**
      * Constructor of new TypesetBot objects.
@@ -20,13 +23,15 @@ class TypesetBot {
      * @param settings? Custom settings object
      */
     constructor(query?: any, settings?: object) {
+        this.util = new TypesetBotUtils(this);
+        this.settings = new TypesetBotSettings(this, settings);
         this.logger = new TypesetBotLog(this);
         this.uuid = TypesetBotUtils.createUUID();
 
-        this.settings = new TypesetBotSettings(this, settings);
         this.query = new TypesetBotElementQuery(this, query);
         this.typesetter = new TypesetBotTypeset(this);
 
+        this.addEventListeners();
         this.typeset();
     }
 
@@ -34,6 +39,56 @@ class TypesetBot {
      * Typeset all elements in query.
      */
     typeset = function()  {
-        this.typesetter.typesetNodes(this.query.nodes);
+        this.logger.resetTime();
+
+        this.logger.start('Typeset');
+        this.typesetNodes(this.query.nodes);
+        this.logger.end('Typeset');
+
+        // Log the time diffs.
+        this.logger.diff('Typeset');
+        this.logger.diff('-- Preprocess');
+        this.logger.diff('---- Clone working node');
+        this.logger.diff('---- Tokenize text');
+        this.logger.diff('---- Get render size of words');
+        this.logger.diff('------ Build HTML');
+        this.logger.diff('------ Update DOM');
+        this.logger.diff('------ Query DOM');
+        this.logger.diff('------ Get Properties');
+        this.logger.diff('---- Getting element properties');
+        this.logger.diff('---- Hyphen calc');
+        this.logger.diff('---- Hyphen render');
+        this.logger.diff('---- other');
+        this.logger.diff('-- Dynamic programming');
+        this.logger.diff('-- Finding solution');
+        this.logger.diff('-- Apply breakpoints');
+    }
+
+    /**
+     * Add event listeners to typesetbot instance.
+     */
+    addEventListeners = function() {
+        const instance = this;
+        document.body.addEventListener('typesetbot-viewport--reize', function() {
+            instance.typeset();
+        }, false);
+    }
+
+    /**
+     * Typeset multiple nodes.
+     *
+     * @parma nodes
+     */
+    typesetNodes = function(nodes: Element[]) {
+        if (this.isTypesetting) {
+            this.logger.warn('Cannot typeset paragraph before calculations are done.');
+            return;
+        }
+        this.isTypesetting = true;
+        for (const node of nodes) {
+            const typesetter = this.util.getTypesetInstance(node) as TypesetBotTypeset;
+            typesetter.typeset(node);
+        }
+        this.isTypesetting = false;
     }
 }

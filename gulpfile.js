@@ -5,8 +5,13 @@ var source = [
     'src/ts/query.ts',
     'src/ts/settings.ts',
     'src/ts/utils.ts',
+    'src/ts/viewport.ts',
+    'src/ts/math.ts',
     'src/ts/token.ts',
     'src/ts/typeset.ts',
+    'src/ts/render.ts',
+    'src/ts/html.ts',
+    'src/ts/hyphen.ts',
 ];
 // ----------------------------------------------------------------------------
 
@@ -74,4 +79,4 @@ gulp.task('watch', gulp.series('compile', 'watch-src'));
 
 gulp.task("default", gulp.series('compile'));
 
- 
+

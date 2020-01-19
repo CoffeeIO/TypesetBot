@@ -2,6 +2,7 @@
  * Class for tokenizing DOM nodes.
  */
 class TypesetBotTokenizer {
+    typesetter: TypesetBotTypeset;
     private _tsb: TypesetBot;
 
     /**
@@ -9,8 +10,9 @@ class TypesetBotTokenizer {
      *
      * @param tsb Instance of main class
      */
-    constructor(tsb: TypesetBot) {
+    constructor(tsb: TypesetBot, typesetter: TypesetBotTypeset) {
         this._tsb = tsb;
+        this.typesetter = typesetter;
     }
 
     /**
@@ -25,6 +27,7 @@ class TypesetBotTokenizer {
         if (node == null) {
             node = root;
         }
+
         if (!('childNodes' in node)) {
             return [];
         }
@@ -139,13 +142,13 @@ class TypesetBotTokenizer {
      * @returns    The index of appended node
      */
     appendToNodeMap = function(root: Element, node: Element): number {
-        if (TypesetBotUtils.getElementIndex(root) == null) {
+        if (this._tsb.util.getElementIndex(root) == null) {
             this._tsb.logger.error('Root node is not indexed');
             this._tsb.logger.error(root);
             return null;
         }
 
-        const index = TypesetBotUtils.getElementIndex(root);
+        const index = this._tsb.util.getElementIndex(root);
         if (!(index in this._tsb.indexToNodes)) {
             this._tsb.indexToNodes[index] = [];
         }
@@ -192,6 +195,14 @@ class TypesetBotToken {
  */
 class TypesetBotWord extends TypesetBotToken {
     text: string;
+    width: number;
+    height: number;
+    // Hyphen properties.
+    hasHyphen: boolean = false;     // Example: hyphenation --> true
+    hyphenIndexPositions: number[]; // hy-phen-ation        --> [1, 5]
+    hyphenIndexWidths: number[];    // hy: 16, phen: 31.1   --> [16, 31.1]
+    hyphenRemainWidth: number;      // ation: 32            --> 32
+    dashWidth: number;              // "-" : 5.3            --> 5.3
 
     /**
      * @param text The text of the word
@@ -200,6 +211,17 @@ class TypesetBotWord extends TypesetBotToken {
         super(nodeIndex, TypesetBotToken.types.WORD);
         this.text = text;
     }
+
+    /**
+     * Initialize hyphen properties on words that need it.
+     */
+    initHyphen = function() {
+        this.hasHyphen = true;
+        this.hyphenIndexPositions = [];
+        this.hyphenIndexWidths = [];
+        this.hyphenRemainWidth = 0;
+        this.dashWidth = 0;
+    }
 }
 
 /**
@@ -207,7 +229,7 @@ class TypesetBotWord extends TypesetBotToken {
  */
 class TypesetBotSpace extends TypesetBotToken {
     constructor(nodeIndex: number) {
-        super(nodeIndex, TypesetBotToken.types.TAG);
+        super(nodeIndex, TypesetBotToken.types.SPACE);
     }
 }
 
