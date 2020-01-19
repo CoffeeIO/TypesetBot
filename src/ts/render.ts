@@ -303,6 +303,8 @@ class TypesetBotRender {
 
     /**
      * Add text justification class to element.
+     *
+     * @param element
      */
     setJustificationClass = function(element: Element) {
         // @todo : remove any existing typesetbot classes.
@@ -433,7 +435,7 @@ class TypesetBotRender {
             }
         }
 
-        // Get the HTML of the hyphenated word.
+        // Calculate the pre-hyphen word string and width.
         if (endHyphenIndex != null) {
             const word = tokens[endIndex];
             const cutIndex = word.hyphenIndexPositions[endHyphenIndex];

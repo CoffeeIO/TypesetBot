@@ -2180,6 +2180,8 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
   };
   /**
    * Add text justification class to element.
+   *
+   * @param element
    */
 
 
@@ -2337,7 +2339,7 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
           break;
       }
-    } // Get the HTML of the hyphenated word.
+    } // Calculate the pre-hyphen word string and width.
 
 
     if (endHyphenIndex != null) {
