@@ -25,7 +25,8 @@ class TypesetBotLog {
      */
     log = function(message: any) {
         if (this.debug) {
-            console.log('TypesetBot: %s', message);
+            // console.log('TypesetBot: %s', message);
+            console.log('%s', message);
             if (typeof message === 'object') {
                 console.log(message);
             }
@@ -114,7 +115,8 @@ class TypesetBotLog {
             endTotal += entry.end[i];
         }
         // Substract combined timestamps and round to 2 decimal.
-        const output = key + ' ' + (endTotal - startTotal).toFixed(2) + 'ms --- (calls: ' + entry.start.length + ')';
+        // const output = key + ' ' + (endTotal - startTotal).toFixed(2) + 'ms --- (calls: ' + entry.start.length + ')';
+        const output = (endTotal - startTotal).toFixed(0);
         if (logOutput) {
             this.log(output);
         }

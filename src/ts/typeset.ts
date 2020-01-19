@@ -81,13 +81,6 @@ class TypesetBotTypeset {
         this.backupInnerHtml = element.innerHTML;
         this._tsb.logger.end('------ Other 1');
 
-
-        this._tsb.logger.start('------ Word spacing');
-        // Set space width based on settings.
-        // this.render.setMinimumWordSpacing(element);
-        this._tsb.logger.end('------ Word spacing');
-
-
         this._tsb.logger.start('------ Other 2');
 
         // Get font size and calc real space properties.
