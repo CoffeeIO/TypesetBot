@@ -252,10 +252,9 @@ function TypesetBotLog(tsb) {
       startTotal += entry.start[i];
       endTotal += entry.end[i];
     } // Substract combined timestamps and round to 2 decimal.
-    // const output = key + ' ' + (endTotal - startTotal).toFixed(2) + 'ms --- (calls: ' + entry.start.length + ')';
 
 
-    var output = (endTotal - startTotal).toFixed(0);
+    var output = key + ' ' + (endTotal - startTotal).toFixed(2) + 'ms --- (calls: ' + entry.start.length + ')';
 
     if (logOutput) {
       this.log(output);
@@ -2429,11 +2428,19 @@ var TypesetBotHyphen = function TypesetBotHyphen(tsb) {
   };
 
   this.getHyphen = function (word) {
-    return window.typesetbot[word];
+    if (window.typesetbot.hyphenation == null) {
+      window.typesetbot.hyphenation = {};
+    }
+
+    return window.typesetbot.hyphenation[word];
   };
 
   this.setHyphen = function (word, parts) {
-    window.typesetbot[word] = parts;
+    if (window.typesetbot.hyphenation == null) {
+      window.typesetbot.hyphenation = {};
+    }
+
+    window.typesetbot.hyphenation[word] = parts;
   };
   /**
    * Hyphen word with specific settings.

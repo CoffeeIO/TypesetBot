@@ -23,11 +23,17 @@ class TypesetBotHyphen {
     }
 
     getHyphen = function(word: string): string[] {
-        return (window as any).typesetbot[word];
+        if ((window as any).typesetbot.hyphenation == null) {
+            (window as any).typesetbot.hyphenation = {};
+        }
+        return (window as any).typesetbot.hyphenation[word];
     }
 
     setHyphen = function(word: string, parts: string[]) {
-        (window as any).typesetbot[word] = parts;
+        if ((window as any).typesetbot.hyphenation == null) {
+            (window as any).typesetbot.hyphenation = {};
+        }
+        (window as any).typesetbot.hyphenation[word] = parts;
     }
 
     /**

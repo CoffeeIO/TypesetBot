@@ -115,8 +115,7 @@ class TypesetBotLog {
             endTotal += entry.end[i];
         }
         // Substract combined timestamps and round to 2 decimal.
-        // const output = key + ' ' + (endTotal - startTotal).toFixed(2) + 'ms --- (calls: ' + entry.start.length + ')';
-        const output = (endTotal - startTotal).toFixed(0);
+        const output = key + ' ' + (endTotal - startTotal).toFixed(2) + 'ms --- (calls: ' + entry.start.length + ')';
         if (logOutput) {
             this.log(output);
         }
