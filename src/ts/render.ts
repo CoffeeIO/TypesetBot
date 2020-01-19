@@ -157,10 +157,17 @@ class TypesetBotRender {
                     const word = token as TypesetBotWord;
                     let lastIndex = 0;
 
+                    html += '<span class="typeset-hyphen-check">' + word.text + '</span>';
+                    renderRequest.push({
+                        token,
+                        type: 'word',
+                    });
+
                     // Skip if word has not hyphens
                     if (!word.hasHyphen) {
                         continue;
                     }
+
                     // Queue hyphenation parts or word.
                     for (const hyphenIndex of word.hyphenIndexPositions) {
                         const cut = word.text.substring(lastIndex, hyphenIndex + 1);
@@ -217,6 +224,16 @@ class TypesetBotRender {
             // Get width of requested element and insert to correct type.
             const width = renderedHyphenNode.getBoundingClientRect().width;
             switch (request.type) {
+                case 'word':
+                    // if (token.width != renderedHyphenNode.getBoundingClientRect().width) {
+                    //     console.log('Reee: %s -- %s', token.width, renderedHyphenNode.getBoundingClientRect().width);
+                    // }
+                    // if (token.height != renderedHyphenNode.getBoundingClientRect().height) {
+                    //     console.log('Reee: %s -- %s', token.height, renderedHyphenNode.getBoundingClientRect().height);
+                    // }
+                    token.width = renderedHyphenNode.getBoundingClientRect().width;
+                    token.height = renderedHyphenNode.getBoundingClientRect().height;
+                    break;
                 case 'hyphen':
                     token.hyphenIndexWidths.push(width);
                     break;

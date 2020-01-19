@@ -58,6 +58,8 @@ function TypesetBot(query, settings) {
     this.logger.diff('------ Query DOM');
     this.logger.diff('------ Get Properties');
     this.logger.diff('---- Getting element properties');
+    this.logger.diff('------ Word spacing');
+    this.logger.diff('------ Other');
     this.logger.diff('---- Hyphen calc');
     this.logger.diff('---- Hyphen render');
     this.logger.diff('---- other');
@@ -1342,13 +1344,27 @@ function TypesetBotTypeset(tsb) {
   this.getElementProperties = function (element) {
     this._tsb.logger.start('---- Getting element properties');
 
-    this.backupInnerHtml = element.innerHTML; // Set space width based on settings.
+    this._tsb.logger.start('------ Other');
+
+    this.backupInnerHtml = element.innerHTML;
+
+    this._tsb.logger.end('------ Other');
+
+    this._tsb.logger.start('------ Word spacing'); // Set space width based on settings.
+
 
     this.render.setMinimumWordSpacing(element);
+
+    this._tsb.logger.end('------ Word spacing');
+
+    this._tsb.logger.start('------ Other');
+
     this.elemWidth = this.render.getNodeWidth(element); // Get font size and calc real space properties.
 
     this.elemFontSize = this.render.getDefaultFontSize(element);
     this.spaceWidth = this.elemFontSize * this.settings.spaceWidth, this.spaceShrink = this.elemFontSize * this.settings.spaceShrinkability, this.spaceStretch = this.elemFontSize * this.settings.spaceStretchability;
+
+    this._tsb.logger.end('------ Other');
 
     this._tsb.logger.end('---- Getting element properties');
   };
@@ -1402,9 +1418,8 @@ function TypesetBotTypeset(tsb) {
     this._tsb.logger.end('---- other');
 
     this._tsb.logger.start('---- Get render size of words'); // Get render sizes of nodes.
+    // this.render.getWordProperties(element);
 
-
-    this.render.getWordProperties(element);
 
     this._tsb.logger.end('---- Get render size of words');
 
@@ -1987,7 +2002,12 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
         switch (token.type) {
           case TypesetBotToken.types.WORD:
             var word = token;
-            var lastIndex = 0; // Skip if word has not hyphens
+            var lastIndex = 0;
+            html += '<span class="typeset-hyphen-check">' + word.text + '</span>';
+            renderRequest.push({
+              token: token,
+              type: 'word'
+            }); // Skip if word has not hyphens
 
             if (!word.hasHyphen) {
               continue;
@@ -2092,6 +2112,17 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
         var width = renderedHyphenNode.getBoundingClientRect().width;
 
         switch (request.type) {
+          case 'word':
+            // if (token.width != renderedHyphenNode.getBoundingClientRect().width) {
+            //     console.log('Reee: %s -- %s', token.width, renderedHyphenNode.getBoundingClientRect().width);
+            // }
+            // if (token.height != renderedHyphenNode.getBoundingClientRect().height) {
+            //     console.log('Reee: %s -- %s', token.height, renderedHyphenNode.getBoundingClientRect().height);
+            // }
+            _token.width = renderedHyphenNode.getBoundingClientRect().width;
+            _token.height = renderedHyphenNode.getBoundingClientRect().height;
+            break;
+
           case 'hyphen':
             _token.hyphenIndexWidths.push(width);
 

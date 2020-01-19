@@ -77,11 +77,18 @@ class TypesetBotTypeset {
     getElementProperties = function(element: Element) {
         this._tsb.logger.start('---- Getting element properties');
 
+        this._tsb.logger.start('------ Other');
         this.backupInnerHtml = element.innerHTML;
+        this._tsb.logger.end('------ Other');
 
+
+        this._tsb.logger.start('------ Word spacing');
         // Set space width based on settings.
         this.render.setMinimumWordSpacing(element);
+        this._tsb.logger.end('------ Word spacing');
 
+
+        this._tsb.logger.start('------ Other');
         this.elemWidth = this.render.getNodeWidth(element);
 
         // Get font size and calc real space properties.
@@ -89,6 +96,8 @@ class TypesetBotTypeset {
         this.spaceWidth = this.elemFontSize * this.settings.spaceWidth,
         this.spaceShrink = this.elemFontSize * this.settings.spaceShrinkability,
         this.spaceStretch = this.elemFontSize * this.settings.spaceStretchability;
+        this._tsb.logger.end('------ Other');
+
 
         this._tsb.logger.end('---- Getting element properties');
     }
@@ -137,7 +146,7 @@ class TypesetBotTypeset {
 
         this._tsb.logger.start('---- Get render size of words');
         // Get render sizes of nodes.
-        this.render.getWordProperties(element);
+        // this.render.getWordProperties(element);
         this._tsb.logger.end('---- Get render size of words');
 
         this._tsb.logger.start('---- Hyphen calc');
