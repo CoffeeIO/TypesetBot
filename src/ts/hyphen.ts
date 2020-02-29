@@ -1,11 +1,17 @@
 // Declare vendor library.
-declare var module: any;
+declare var createHyphenator: any;
+
+// Declare languages.
+declare var hyphenationPatternsAf: any;
+declare var hyphenationPatternsEnUs: any;
+
 
 /**
  * Class to handle text hyphenations.
  */
 class TypesetBotHyphen {
     private _tsb: TypesetBot;
+    private _hyphenator: any;
 
     constructor(tsb: TypesetBot) {
         this._tsb = tsb;
@@ -39,32 +45,15 @@ class TypesetBotHyphen {
         if (this._tsb.settings.hyphenLanguage.trim() === '') {
             return [word];
         }
-        if ((window as any).Hypher == null || (window as any).Hypher.languages == null) {
+
+        const language = this.getLanguageFromCode(this._tsb.settings.hyphenLanguage);
+
+        if (language == null) {
             console.warn('Hyphenation library not found');
-            return[word];
-        }
-        if ((window as any).Hypher.languages[this._tsb.settings.hyphenLanguage] == null) { // Language not found
-            const h = new (window as any).Hypher(module.exports);
-
-            if (typeof module.exports.id === 'string') {
-                module.exports.id = [module.exports.id];
-            }
-
-            for (let i = 0; i < module.exports.id.length; i += 1) {
-                (window as any).Hypher.languages[module.exports.id[i]] = h;
-            }
-            if ((window as any).Hypher.languages[this._tsb.settings.hyphenLanguage] != null) {
-                return this.getWordParts(word);
-            }
-
-            console.warn("Hyphenation language '%s' not found", this._tsb.settings.hyphenLanguage);
             return [word];
         }
-
-        (window as any).Hypher.languages[this._tsb.settings.hyphenLanguage].leftMin = this._tsb.settings.hyphenLeftMin + offset.left;
-        (window as any).Hypher.languages[this._tsb.settings.hyphenLanguage].rightMin = this._tsb.settings.hyphenRightMin + offset.right;
-
-        return (window as any).Hypher.languages[this._tsb.settings.hyphenLanguage].hyphenate(word);
+        this._hyphenator = createHyphenator(language);
+        return this._hyphenator(word);
     }
 
     /**
@@ -247,6 +236,24 @@ class TypesetBotHyphen {
             const hyphenIndex = curHyphenLength - prevLength - 1; // 1 for index offset
             curToken.hyphenIndexPositions.push(hyphenIndex);
         }
+    }
+
+    getLanguageFromCode = function(langCode: string): any {
+        if (langCode == null || langCode.trim() == '') {
+            return null;
+        }
+
+        switch (langCode) {
+            case 'af':
+                return (hyphenationPatternsAf) ? hyphenationPatternsAf : null;
+            case 'en-us':
+                    return (hyphenationPatternsEnUs) ? hyphenationPatternsEnUs : null;
+            // case 'af':
+            //     return () ? : null;
+        }
+
+
+        return null;
     }
 }
 
