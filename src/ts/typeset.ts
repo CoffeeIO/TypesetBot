@@ -82,7 +82,8 @@ class TypesetBotTypeset {
         // Set space width based on settings.
         this.render.setMinimumWordSpacing(element);
 
-        this.elemWidth = this.render.getNodeWidth(element);
+        this.elemWidth = this.render.getNodeWidth(element) - 1;
+        
 
         // Get font size and calc real space properties.
         this.elemFontSize = this.render.getDefaultFontSize(element);
@@ -128,6 +129,8 @@ class TypesetBotTypeset {
         // Tokenize element for words, space and tags.
         this._tsb.logger.start('---- Tokenize text');
         this.tokens = this.tokenizer.tokenize(element);
+        console.log(this.tokens);
+
         this._tsb.logger.end('---- Tokenize text');
 
         this._tsb.logger.start('---- other');
@@ -198,6 +201,7 @@ class TypesetBotTypeset {
                 0,
                 false,
                 null,
+                0,
                 0,
                 0,
             ),
@@ -334,6 +338,7 @@ class TypesetBotTypeset {
                 null,
                 originBreakpoint.lineNumber + 1,
                 lineProperties.lineHeight,
+                0,
             ),
         );
     }
@@ -374,6 +379,7 @@ class TypesetBotTypeset {
             fitnessClass,
             origin.lineNumber + 1,
             lineProperties.lineHeight,
+            ratio,
         );
     }
 
@@ -498,6 +504,7 @@ class TypesetBotLinebreak {
         public fitnessClass:  number,
         public lineNumber:    number,
         public maxLineHeight: number,
+        public ratio: number,
     ) { }
 }
 

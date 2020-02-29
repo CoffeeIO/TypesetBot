@@ -274,6 +274,9 @@ class TypesetBotRender {
         for (const line of lines) {
             let lineHtml = '';
 
+            console.log('Line %s', line.lineNumber);
+
+
             lineHtml += this.prependTagTokensOnLine(element, tagStack);
             lineHtml += this.getHtmlFromTokensRange(
                 element,
@@ -289,7 +292,7 @@ class TypesetBotRender {
             lastHyphenIndex = line.hyphenIndex;
 
             html +=
-                '<tsb-line line="' + line.lineNumber + '" style="height:' + line.maxLineHeight + 'px">' +
+                '<tsb-line line="' + line.lineNumber + '" style="height:' + line.maxLineHeight + 'px" data-tsb-ratio="' + line.ratio + '">' +
                     lineHtml +
                 '</tsb-line>';
         }
@@ -397,12 +400,19 @@ class TypesetBotRender {
         // Only the first word token can be hyphenated.
         let isFirstToken = true;
 
+        let total = 0;
+
         // Loop all tokens between start and end token.
         for (let index = startIndex; index < endIndex; index++) {
             const token = tokens[index];
             switch (token.type) {
                 case TypesetBotToken.types.WORD:
                     const word = token as TypesetBotWord;
+
+                    console.log(word.width);
+                    total += word.width;
+
+
                     if (isFirstToken && startHyphenIndex != null) {
                         // Calculate the post-hyphen word string and width.
                         const cutIndex = word.hyphenIndexPositions[startHyphenIndex];
@@ -434,6 +444,9 @@ class TypesetBotRender {
                     break;
             }
         }
+
+        console.log(total);
+
 
         // Calculate the pre-hyphen word string and width.
         if (endHyphenIndex != null) {

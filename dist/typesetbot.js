@@ -1345,7 +1345,7 @@ function TypesetBotTypeset(tsb) {
     this.backupInnerHtml = element.innerHTML; // Set space width based on settings.
 
     this.render.setMinimumWordSpacing(element);
-    this.elemWidth = this.render.getNodeWidth(element); // Get font size and calc real space properties.
+    this.elemWidth = this.render.getNodeWidth(element) - 1; // Get font size and calc real space properties.
 
     this.elemFontSize = this.render.getDefaultFontSize(element);
     this.spaceWidth = this.elemFontSize * this.settings.spaceWidth, this.spaceShrink = this.elemFontSize * this.settings.spaceShrinkability, this.spaceStretch = this.elemFontSize * this.settings.spaceStretchability;
@@ -1391,6 +1391,7 @@ function TypesetBotTypeset(tsb) {
     this._tsb.logger.start('---- Tokenize text');
 
     this.tokens = this.tokenizer.tokenize(element);
+    console.log(this.tokens);
 
     this._tsb.logger.end('---- Tokenize text');
 
@@ -1489,7 +1490,7 @@ function TypesetBotTypeset(tsb) {
     this.activeBreakpoints = new Queue();
     this.shortestPath = {};
     this.finalBreakpoints = [];
-    this.activeBreakpoints.enqueue(new TypesetBotLinebreak(null, 0, null, 0, false, null, 0, 0));
+    this.activeBreakpoints.enqueue(new TypesetBotLinebreak(null, 0, null, 0, false, null, 0, 0, 0));
     var isFinished = false;
 
     while (!isFinished) {
@@ -1605,7 +1606,7 @@ function TypesetBotTypeset(tsb) {
 
 
   this.pushFinalBreakpoint = function (originBreakpoint, lineProperties) {
-    this.finalBreakpoints.push(new TypesetBotLinebreak(originBreakpoint, null, null, originBreakpoint.demerit, false, null, originBreakpoint.lineNumber + 1, lineProperties.lineHeight));
+    this.finalBreakpoints.push(new TypesetBotLinebreak(originBreakpoint, null, null, originBreakpoint.demerit, false, null, originBreakpoint.lineNumber + 1, lineProperties.lineHeight, 0));
   };
   /**
    * Calculate demerit and return new linebreak object.
@@ -1630,7 +1631,7 @@ function TypesetBotTypeset(tsb) {
     var skippingFitnessClass = origin.fitnessClass != null && Math.abs(origin.fitnessClass - fitnessClass) > 1;
     var demerit = this.math.getDemerit(ratio, consecutiveFlag, hasHyphen, skippingFitnessClass);
     return new TypesetBotLinebreak(origin, tokenIndex, hyphenIndex, origin.demerit + demerit, // Append demerit from previous line
-    flag, fitnessClass, origin.lineNumber + 1, lineProperties.lineHeight);
+    flag, fitnessClass, origin.lineNumber + 1, lineProperties.lineHeight, ratio);
   };
   /**
    * Check if a certain breakpoint is the current shortest path to the break.
@@ -1739,7 +1740,7 @@ var TypesetBotLinebreak =
  * @param lineNumber    Line number of current line
  * @param maxLineHeight Max line height of current solution
  */
-function TypesetBotLinebreak(origin, tokenIndex, hyphenIndex, demerit, flag, fitnessClass, lineNumber, maxLineHeight) {
+function TypesetBotLinebreak(origin, tokenIndex, hyphenIndex, demerit, flag, fitnessClass, lineNumber, maxLineHeight, ratio) {
   _classCallCheck(this, TypesetBotLinebreak);
 
   this.origin = origin;
@@ -1750,6 +1751,7 @@ function TypesetBotLinebreak(origin, tokenIndex, hyphenIndex, demerit, flag, fit
   this.fitnessClass = fitnessClass;
   this.lineNumber = lineNumber;
   this.maxLineHeight = maxLineHeight;
+  this.ratio = ratio;
 };
 /**
  * Class representing properties for each line in the dynamic programming algorithm.
@@ -2165,12 +2167,13 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
     for (var _i2 = 0, _lines = lines; _i2 < _lines.length; _i2++) {
       var line = _lines[_i2];
       var lineHtml = '';
+      console.log('Line %s', line.lineNumber);
       lineHtml += this.prependTagTokensOnLine(element, tagStack);
       lineHtml += this.getHtmlFromTokensRange(element, curTokenIndex, lastHyphenIndex, line.tokenIndex, line.hyphenIndex, tagStack);
       lineHtml += this.appendTagTokensOnLine(element, tagStack);
       curTokenIndex = line.tokenIndex;
       lastHyphenIndex = line.hyphenIndex;
-      html += '<tsb-line line="' + line.lineNumber + '" style="height:' + line.maxLineHeight + 'px">' + lineHtml + '</tsb-line>';
+      html += '<tsb-line line="' + line.lineNumber + '" style="height:' + line.maxLineHeight + 'px" data-tsb-ratio="' + line.ratio + '">' + lineHtml + '</tsb-line>';
     }
 
     element.innerHTML = html;
@@ -2295,7 +2298,8 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
     } // Only the first word token can be hyphenated.
 
 
-    var isFirstToken = true; // Loop all tokens between start and end token.
+    var isFirstToken = true;
+    var total = 0; // Loop all tokens between start and end token.
 
     for (var index = startIndex; index < endIndex; index++) {
       var token = tokens[index];
@@ -2303,6 +2307,8 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
       switch (token.type) {
         case TypesetBotToken.types.WORD:
           var word = token;
+          console.log(word.width);
+          total += word.width;
 
           if (isFirstToken && startHyphenIndex != null) {
             // Calculate the post-hyphen word string and width.
@@ -2339,8 +2345,9 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
           break;
       }
-    } // Calculate the pre-hyphen word string and width.
+    }
 
+    console.log(total); // Calculate the pre-hyphen word string and width.
 
     if (endHyphenIndex != null) {
       var _word = tokens[endIndex];
