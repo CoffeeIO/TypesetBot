@@ -16,6 +16,10 @@ class TypesetBot {
     indexToTokens: { [index: number]: TypesetBotToken[] } = {};
     indexToTypesetInstance: { [index: number] : TypesetBotTypeset } = {};
 
+    // Calculated word hyphens store.
+    // hyphenStore['en-us']['hyphenation'] = ["hy", "phen", "ate"]
+    hyphenStore = {};
+
     /**
      * Constructor of new TypesetBot objects.
      *

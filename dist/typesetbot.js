@@ -1,3 +1,6 @@
+//code.stephenmorley.org @see http://code.stephenmorley.org/javascript/queues/
+function Queue(){var a=[],b=0;this.getLength=function(){return a.length-b};this.isEmpty=function(){return 0==a.length};this.enqueue=function(b){a.push(b)};this.dequeue=function(){if(0!=a.length){var c=a[b];2*++b>=a.length&&(a=a.slice(b),b=0);return c}};this.peek=function(){return 0<a.length?a[b]:void 0}};
+
 "use strict";
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
@@ -37,7 +40,10 @@ function TypesetBot(query, settings) {
 
   this.indexToNodes = {};
   this.indexToTokens = {};
-  this.indexToTypesetInstance = {};
+  this.indexToTypesetInstance = {}; // Calculated word hyphens store.
+  // hyphenStore['en-us']['hyphenation'] = ["hy", "phen", "ate"]
+
+  this.hyphenStore = {};
   /**
    * Typeset all elements in query.
    */
@@ -2433,6 +2439,40 @@ var TypesetBotHyphen = function TypesetBotHyphen(tsb) {
     return this.getWordParts(word, offset);
   };
   /**
+   * Try and get cached result of a word hyphenation.
+   *
+   * @param  word The hyphenated word
+   * @returns     The hyphenations
+   */
+
+
+  this.getCachedHyphenation = function (word) {
+    if (!(this._tsb.settings.hyphenLanguage in this._tsb.hyphenStore)) {
+      this._tsb.hyphenStore[this._tsb.settings.hyphenLanguage] = {};
+    }
+
+    if (!(word in this._tsb.hyphenStore[this._tsb.settings.hyphenLanguage])) {
+      return null;
+    }
+
+    return this._tsb.hyphenStore[this._tsb.settings.hyphenLanguage][word];
+  };
+  /**
+   * Add hyphenation result to cache store.
+   *
+   * @param word   The hyphenated word
+   * @param result The hyphenations
+   */
+
+
+  this.addCachedHyphenation = function (word, result) {
+    if (!(this._tsb.settings.hyphenLanguage in this._tsb.hyphenStore)) {
+      this._tsb.hyphenStore[this._tsb.settings.hyphenLanguage] = {};
+    }
+
+    this._tsb.hyphenStore[this._tsb.settings.hyphenLanguage][word] = result;
+  };
+  /**
    * Hyphen word with specific settings.
    * Return array of possible word hyphens.
    * Fx: hyphenation --> ["hyp", "hen", "ation"]
@@ -2450,8 +2490,21 @@ var TypesetBotHyphen = function TypesetBotHyphen(tsb) {
       offset = new TypesetBotWordOffset(0, 0);
     }
 
-    if (this._tsb.settings.hyphenLanguage.trim() === '') {
+    if (this._tsb.settings.hyphenLanguage == null || this._tsb.settings.hyphenLanguage.trim() === '') {
       return [word];
+    }
+
+    var leftTotal = this._tsb.settings.hyphenLeftMin + offset.left;
+    var rightTotal = this._tsb.settings.hyphenRightMin + offset.right; // Check if offset is less than total word length.
+
+    if (word.length < leftTotal + rightTotal) {
+      return [word];
+    }
+
+    var cacheResult = this.getCachedHyphenation(word);
+
+    if (cacheResult != null) {
+      return cacheResult;
     }
 
     if (window.Hypher == null || window.Hypher.languages == null) {
@@ -2479,9 +2532,13 @@ var TypesetBotHyphen = function TypesetBotHyphen(tsb) {
       return [word];
     }
 
-    window.Hypher.languages[this._tsb.settings.hyphenLanguage].leftMin = this._tsb.settings.hyphenLeftMin + offset.left;
-    window.Hypher.languages[this._tsb.settings.hyphenLanguage].rightMin = this._tsb.settings.hyphenRightMin + offset.right;
-    return window.Hypher.languages[this._tsb.settings.hyphenLanguage].hyphenate(word);
+    window.Hypher.languages[this._tsb.settings.hyphenLanguage].leftMin = leftTotal;
+    window.Hypher.languages[this._tsb.settings.hyphenLanguage].rightMin = rightTotal;
+
+    var result = window.Hypher.languages[this._tsb.settings.hyphenLanguage].hyphenate(word);
+
+    this.addCachedHyphenation(word, result);
+    return result;
   };
   /**
    * Get the right and left offset of non-word characters in string.

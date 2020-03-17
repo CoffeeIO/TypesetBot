@@ -13,6 +13,9 @@ var source = [
     'src/ts/html.ts',
     'src/ts/hyphen.ts',
 ];
+var librarySource = [
+    'vendor/Queue.js',
+];
 // ----------------------------------------------------------------------------
 
 // Initialize gulp variables.
@@ -69,14 +72,45 @@ gulp.task('ts-minify', function () {
         .pipe(gulp.dest("dist"));
 });
 
-gulp.task('compile', gulp.series('ts-test', 'ts', 'ts-minify', 'scss'))
-
-gulp.task('watch-src', function() {
-    return watch('src/**/*', gulp.series('ts-test', 'ts', 'ts-minify', 'scss'));
+gulp.task('vendor', function () {
+    return gulp.src(librarySource)
+        .pipe(concat('typesetbot-vendor.js'))
+        .pipe(gulp.dest("dist"));
 });
 
+gulp.task('vendor-minify', function () {
+    return gulp.src('dist/typesetbot-vendor.js')
+        .pipe(minify({
+            ext:{
+                min:'.min.js'
+            }
+        }))
+        .pipe(gulp.dest("dist"));
+});
+
+gulp.task('merge', function () {
+    return gulp.src([
+            'dist/typesetbot-vendor.js',
+            'dist/typesetbot.js',
+        ])
+        .pipe(concat('typesetbot.js'))
+        .pipe(gulp.dest("dist"));
+});
+
+gulp.task('merge-minify', function () {
+    return gulp.src([
+            'dist/typesetbot-vendor.min.js',
+            'dist/typesetbot.min.js',
+        ])
+        .pipe(concat('typesetbot.min.js'))
+        .pipe(gulp.dest("dist"));
+});
+
+var tasks = ['vendor', 'vendor-minify', 'ts-test', 'ts', 'ts-minify', 'merge', 'merge-minify', 'scss'];
+
+gulp.task('compile', gulp.series(tasks))
+gulp.task('watch-src', function() {
+    return watch('src/**/*', gulp.series(tasks));
+});
 gulp.task('watch', gulp.series('compile', 'watch-src'));
-
 gulp.task("default", gulp.series('compile'));
-
-
