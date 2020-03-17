@@ -1,17 +1,11 @@
 // Declare vendor library.
-declare var createHyphenator: any;
-
-// Declare languages.
-declare var hyphenationPatternsAf: any;
-declare var hyphenationPatternsEnUs: any;
-
+declare var module: any;
 
 /**
  * Class to handle text hyphenations.
  */
 class TypesetBotHyphen {
     private _tsb: TypesetBot;
-    private _hyphenator: any;
 
     constructor(tsb: TypesetBot) {
         this._tsb = tsb;
@@ -29,6 +23,38 @@ class TypesetBotHyphen {
     }
 
     /**
+     * Try and get cached result of a word hyphenation.
+     *
+     * @param  word The hyphenated word
+     * @returns     The hyphenations
+     */
+    getCachedHyphenation = function(word: string): string[] {
+        if (!(this._tsb.settings.hyphenLanguage in this._tsb.hyphenStore)) {
+            this._tsb.hyphenStore[this._tsb.settings.hyphenLanguage] = {};
+        }
+
+        if (!(word in this._tsb.hyphenStore[this._tsb.settings.hyphenLanguage])) {
+            return null;
+        }
+
+        return this._tsb.hyphenStore[this._tsb.settings.hyphenLanguage][word];
+    }
+
+    /**
+     * Add hyphenation result to cache store.
+     *
+     * @param word   The hyphenated word
+     * @param result The hyphenations
+     */
+    addCachedHyphenation = function(word: string, result: string[]) {
+        if (!(this._tsb.settings.hyphenLanguage in this._tsb.hyphenStore)) {
+            this._tsb.hyphenStore[this._tsb.settings.hyphenLanguage] = {};
+        }
+
+        this._tsb.hyphenStore[this._tsb.settings.hyphenLanguage][word] = result;
+    }
+
+    /**
      * Hyphen word with specific settings.
      * Return array of possible word hyphens.
      * Fx: hyphenation --> ["hyp", "hen", "ation"]
@@ -42,18 +68,53 @@ class TypesetBotHyphen {
             offset = new TypesetBotWordOffset(0, 0);
         }
 
-        if (this._tsb.settings.hyphenLanguage.trim() === '') {
+        if (this._tsb.settings.hyphenLanguage == null || this._tsb.settings.hyphenLanguage.trim() === '') {
             return [word];
         }
 
-        const language = this.getLanguageFromCode(this._tsb.settings.hyphenLanguage);
+        let leftTotal = this._tsb.settings.hyphenLeftMin + offset.left;
+        let rightTotal = this._tsb.settings.hyphenRightMin + offset.right;
 
-        if (language == null) {
+        // Check if offset is less than total word length.
+        if (word.length < (leftTotal + rightTotal)) {
+            return [word];
+        }
+
+        let cacheResult = this.getCachedHyphenation(word);
+        if (cacheResult != null) {
+            return cacheResult;
+        }
+
+        if ((window as any).Hypher == null || (window as any).Hypher.languages == null) {
             console.warn('Hyphenation library not found');
+            return[word];
+        }
+
+        if ((window as any).Hypher.languages[this._tsb.settings.hyphenLanguage] == null) { // Language not found
+            const h = new (window as any).Hypher(module.exports);
+
+            if (typeof module.exports.id === 'string') {
+                module.exports.id = [module.exports.id];
+            }
+
+            for (let i = 0; i < module.exports.id.length; i += 1) {
+                (window as any).Hypher.languages[module.exports.id[i]] = h;
+            }
+            if ((window as any).Hypher.languages[this._tsb.settings.hyphenLanguage] != null) {
+                return this.getWordParts(word);
+            }
+
+            console.warn("Hyphenation language '%s' not found", this._tsb.settings.hyphenLanguage);
             return [word];
         }
-        this._hyphenator = createHyphenator(language);
-        return this._hyphenator(word);
+
+        (window as any).Hypher.languages[this._tsb.settings.hyphenLanguage].leftMin = leftTotal;
+        (window as any).Hypher.languages[this._tsb.settings.hyphenLanguage].rightMin = rightTotal;
+
+        let result = (window as any).Hypher.languages[this._tsb.settings.hyphenLanguage].hyphenate(word);
+        this.addCachedHyphenation(word, result);
+
+        return result;
     }
 
     /**
@@ -236,24 +297,6 @@ class TypesetBotHyphen {
             const hyphenIndex = curHyphenLength - prevLength - 1; // 1 for index offset
             curToken.hyphenIndexPositions.push(hyphenIndex);
         }
-    }
-
-    getLanguageFromCode = function(langCode: string): any {
-        if (langCode == null || langCode.trim() == '') {
-            return null;
-        }
-
-        switch (langCode) {
-            case 'af':
-                return (hyphenationPatternsAf) ? hyphenationPatternsAf : null;
-            case 'en-us':
-                    return (hyphenationPatternsEnUs) ? hyphenationPatternsEnUs : null;
-            // case 'af':
-            //     return () ? : null;
-        }
-
-
-        return null;
     }
 }
 

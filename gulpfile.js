@@ -15,7 +15,6 @@ var source = [
 ];
 var librarySource = [
     'vendor/Queue.js',
-    'vendor/hyphen.js',
 ];
 // ----------------------------------------------------------------------------
 
