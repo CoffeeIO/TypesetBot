@@ -109,13 +109,8 @@ gulp.task('merge-minify', function () {
 var tasks = ['vendor', 'vendor-minify', 'ts-test', 'ts', 'ts-minify', 'merge', 'merge-minify', 'scss'];
 
 gulp.task('compile', gulp.series(tasks))
-
 gulp.task('watch-src', function() {
     return watch('src/**/*', gulp.series(tasks));
 });
-
 gulp.task('watch', gulp.series('compile', 'watch-src'));
-
 gulp.task("default", gulp.series('compile'));
-
-
