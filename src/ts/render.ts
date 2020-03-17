@@ -12,6 +12,19 @@ class TypesetBotRender {
     }
 
     /**
+     * Reset attributes on elements.
+     *
+     * @param   element The node to check
+     */
+    reset = function(element: HTMLElement) {
+        element.removeAttribute('data-tsb-indexed');
+        element.removeAttribute('data-tsb-uuid');
+        element.removeAttribute('data-typesetbot-word-spacing');
+        element.style.wordSpacing = '';
+        element.classList.remove('typesetbot-justify', 'typesetbot-left', 'typesetbot-right', 'typesetbot-center');
+    }
+
+    /**
      * Get default word space of node.
      *
      * @param   element The node to check
@@ -45,14 +58,14 @@ class TypesetBotRender {
      * @param element
      */
     setMinimumWordSpacing = function(element: HTMLElement) {
-        if (element.dataset.typesetbotWordSpacing) {
+        if (element.getAttribute('typesetbot-word-spacing')) {
             return;
         }
 
         const minSpaceSize = this._tsb.settings.spaceWidth - this._tsb.settings.spaceShrinkability;
         const defaultWidth = this.getSpaceWidth(element);
 
-        element.dataset.typesetbotWordSpacing = "true";
+        element.setAttribute('typesetbot-word-spacing', 'true')
         element.style.wordSpacing = 'calc((1em * ' + minSpaceSize + ') - ' + defaultWidth + 'px)';
     }
 
@@ -331,7 +344,6 @@ class TypesetBotRender {
                 this._tsb.logger.notice('Unknown alignment type: ' + this._tsb.settings.alignment);
                 break;
         }
-
     }
 
     /**

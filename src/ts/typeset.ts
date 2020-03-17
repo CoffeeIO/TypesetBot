@@ -69,6 +69,14 @@ class TypesetBotTypeset {
         this.render.applyLineBreaks(element, solution);
     }
 
+    reset = function(element: Element) {
+        if (this.backupInnerHtml != null) {
+            element.innerHTML = this.backupInnerHtml;
+        }
+
+        this.render.reset(element);
+    }
+
     /**
      * Get a set initial state properties of element.
      *
