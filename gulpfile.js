@@ -107,7 +107,6 @@ gulp.task('merge-minify', function () {
 });
 
 var tasks = ['vendor', 'vendor-minify', 'ts-test', 'ts', 'ts-minify', 'merge', 'merge-minify', 'scss'];
-// var tasks = ['vendor', 'vendor-minify', 'ts-test', 'ts', 'ts-minify', 'scss'];
 
 gulp.task('compile', gulp.series(tasks))
 
