@@ -45,9 +45,14 @@ class TypesetBotRender {
      * @param element
      */
     setMinimumWordSpacing = function(element: HTMLElement) {
+        if (element.dataset.typesetbotWordSpacing) {
+            return;
+        }
+
         const minSpaceSize = this._tsb.settings.spaceWidth - this._tsb.settings.spaceShrinkability;
         const defaultWidth = this.getSpaceWidth(element);
 
+        element.dataset.typesetbotWordSpacing = "true";
         element.style.wordSpacing = 'calc((1em * ' + minSpaceSize + ') - ' + defaultWidth + 'px)';
     }
 

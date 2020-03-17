@@ -1348,7 +1348,10 @@ function TypesetBotTypeset(tsb) {
   this.getElementProperties = function (element) {
     this._tsb.logger.start('---- Getting element properties');
 
-    this.backupInnerHtml = element.innerHTML; // Set space width based on settings.
+    if (this.backupInnerHtml == null) {
+      this.backupInnerHtml = element.innerHTML;
+    } // Set space width based on settings.
+
 
     this.render.setMinimumWordSpacing(element);
     this.elemWidth = this.render.getNodeWidth(element); // Get font size and calc real space properties.
@@ -1823,8 +1826,13 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
 
   this.setMinimumWordSpacing = function (element) {
+    if (element.dataset.typesetbotWordSpacing) {
+      return;
+    }
+
     var minSpaceSize = this._tsb.settings.spaceWidth - this._tsb.settings.spaceShrinkability;
     var defaultWidth = this.getSpaceWidth(element);
+    element.dataset.typesetbotWordSpacing = "true";
     element.style.wordSpacing = 'calc((1em * ' + minSpaceSize + ') - ' + defaultWidth + 'px)';
   };
   /**

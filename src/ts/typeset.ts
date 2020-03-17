@@ -77,7 +77,9 @@ class TypesetBotTypeset {
     getElementProperties = function(element: Element) {
         this._tsb.logger.start('---- Getting element properties');
 
-        this.backupInnerHtml = element.innerHTML;
+        if (this.backupInnerHtml == null) {
+            this.backupInnerHtml = element.innerHTML;
+        }
 
         // Set space width based on settings.
         this.render.setMinimumWordSpacing(element);
