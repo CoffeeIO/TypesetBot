@@ -150,18 +150,16 @@ function TypesetBot(query, settings) {
     this.isTypesetting = false;
     this.unwatch(); // Clear objects.
 
-    this.indexToNodes = null;
-    this.indexToNodes = null;
-    this.indexToTokens = null;
-    this.indexToTypesetInstance = null;
-    this.hyphenStore = null;
-    this.logger = null;
-    this.settings = null;
-    this.query = null;
-    this.typesetter = null;
-    this.util = null;
-    var instance = this;
-    instance = "test";
+    delete this.indexToNodes;
+    delete this.indexToNodes;
+    delete this.indexToTokens;
+    delete this.indexToTypesetInstance;
+    delete this.hyphenStore;
+    delete this.logger;
+    delete this.settings;
+    delete this.query;
+    delete this.typesetter;
+    delete this.util;
   };
   /**
    * Add event listeners to typesetbot instance.
@@ -1474,6 +1472,7 @@ function TypesetBotTypeset(tsb) {
       element.innerHTML = this.backupInnerHtml;
     }
 
+    delete this.backupInnerHtml;
     this.render.reset(element);
   };
   /**
@@ -1940,9 +1939,9 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
   this.reset = function (element) {
     element.removeAttribute('data-tsb-indexed');
     element.removeAttribute('data-tsb-uuid');
-    element.removeAttribute('data-typesetbot-word-spacing');
-    element.style.wordSpacing = '';
+    element.removeAttribute('data-tsb-word-spacing');
     element.classList.remove('typesetbot-justify', 'typesetbot-left', 'typesetbot-right', 'typesetbot-center');
+    element.style.wordSpacing = '';
   };
   /**
    * Get default word space of node.

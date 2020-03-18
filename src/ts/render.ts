@@ -19,9 +19,9 @@ class TypesetBotRender {
     reset = function(element: HTMLElement) {
         element.removeAttribute('data-tsb-indexed');
         element.removeAttribute('data-tsb-uuid');
-        element.removeAttribute('data-typesetbot-word-spacing');
-        element.style.wordSpacing = '';
+        element.removeAttribute('data-tsb-word-spacing');
         element.classList.remove('typesetbot-justify', 'typesetbot-left', 'typesetbot-right', 'typesetbot-center');
+        element.style.wordSpacing = '';
     }
 
     /**

@@ -122,20 +122,17 @@ class TypesetBot {
         this.unwatch();
 
         // Clear objects.
-        this.indexToNodes = null;
-        this.indexToNodes = null;
-        this.indexToTokens = null;
-        this.indexToTypesetInstance = null;
-        this.hyphenStore = null;
+        delete this.indexToNodes;
+        delete this.indexToNodes;
+        delete this.indexToTokens;
+        delete this.indexToTypesetInstance;
+        delete this.hyphenStore;
 
-        this.logger = null;
-        this.settings = null;
-        this.query = null;
-        this.typesetter = null;
-        this.util = null;
-
-        let instance = this;
-        instance = "test";
+        delete this.logger;
+        delete this.settings;
+        delete this.query;
+        delete this.typesetter;
+        delete this.util;
     }
 
     /**

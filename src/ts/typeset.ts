@@ -77,6 +77,7 @@ class TypesetBotTypeset {
         if (this.backupInnerHtml != null) {
             element.innerHTML = this.backupInnerHtml;
         }
+        delete this.backupInnerHtml;
 
         this.render.reset(element);
     }
