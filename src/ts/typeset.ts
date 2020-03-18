@@ -70,6 +70,19 @@ class TypesetBotTypeset {
     }
 
     /**
+     * Reset typesetting by removing attributes and resetting to original html.
+     * @param element The node to check
+     */
+    reset = function(element: Element) {
+        if (this.backupInnerHtml != null) {
+            element.innerHTML = this.backupInnerHtml;
+        }
+        delete this.backupInnerHtml;
+
+        this.render.reset(element);
+    }
+
+    /**
      * Get a set initial state properties of element.
      *
      * @param element
