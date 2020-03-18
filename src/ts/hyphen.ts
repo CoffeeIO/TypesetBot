@@ -72,15 +72,15 @@ class TypesetBotHyphen {
             return [word];
         }
 
-        let leftTotal = this._tsb.settings.hyphenLeftMin + offset.left;
-        let rightTotal = this._tsb.settings.hyphenRightMin + offset.right;
+        const leftTotal = this._tsb.settings.hyphenLeftMin + offset.left;
+        const rightTotal = this._tsb.settings.hyphenRightMin + offset.right;
 
         // Check if offset is less than total word length.
         if (word.length < (leftTotal + rightTotal)) {
             return [word];
         }
 
-        let cacheResult = this.getCachedHyphenation(word);
+        const cacheResult = this.getCachedHyphenation(word);
         if (cacheResult != null) {
             return cacheResult;
         }
@@ -111,7 +111,7 @@ class TypesetBotHyphen {
         (window as any).Hypher.languages[this._tsb.settings.hyphenLanguage].leftMin = leftTotal;
         (window as any).Hypher.languages[this._tsb.settings.hyphenLanguage].rightMin = rightTotal;
 
-        let result = (window as any).Hypher.languages[this._tsb.settings.hyphenLanguage].hyphenate(word);
+        const result = (window as any).Hypher.languages[this._tsb.settings.hyphenLanguage].hyphenate(word);
         this.addCachedHyphenation(word, result);
 
         return result;
