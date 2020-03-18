@@ -1,5 +1,5 @@
 <p style="float:right">
-    <img alt="Rax" src="logo.png" width="300">
+    <img alt="Rax" align="right" src="logo.png" width="300">
 </p>
 
 <div style="float: left; width: calc(100% - 310px)">
@@ -20,7 +20,7 @@ See [coffeeio.com](http://coffeeio.com/) for complete docs and demos.
 
 
 ## Install
----
+
 
 ### Download
 - CSS
@@ -31,7 +31,7 @@ See [coffeeio.com](http://coffeeio.com/) for complete docs and demos.
 
 
 ## License
----
+
 
 ### Commercial license
 
@@ -44,7 +44,7 @@ If you are creating an open source application under a license compatible with t
 
 
 ## Usage
----
+
 
 More examples found at [coffeeio.com](http://coffeeio.com/)
 
@@ -74,7 +74,7 @@ More examples found at [coffeeio.com](http://coffeeio.com/)
 ```
 
 ## Features
----
+
 
 ### Line breaking
 The line breaking algorithm implemented, is inspired by TeX's implementation of the total-fit algorithm.
@@ -93,7 +93,7 @@ With responsive design being a important thing on the web, I think it only made 
 On of the biggest changes that had to be made from the total-fit algorithm, is the support for inline tags in paragraphs. The support allows the user to wrap text in style changing tags like `<span>` or `<b class="someClass">` these can be used as you would expect, even in the middle of a word and with styles that change the font-size.
 
 ## Settings
----
+
 
 Default settings. Any setting can be overwritten.
 Most common settings to adjust is `hyphenLanguage` and `alignment`.
