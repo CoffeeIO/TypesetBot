@@ -80,6 +80,14 @@ class TypesetBot {
     }
 
     /**
+     * Query selector again and run typesetting.
+     */
+    requery = function() {
+        this.query.requery();
+        this.typeset(true);
+    }
+
+    /**
      * Watch nodes for typesetting if not already watching.
      */
     watch = function() {

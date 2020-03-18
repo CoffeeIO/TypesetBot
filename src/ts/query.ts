@@ -4,6 +4,7 @@
 class TypesetBotElementQuery {
 
     nodes: Element[] = [];
+
     private _tsb: TypesetBot;
     private _queryString: string = null;
     private _index: number = 0;
@@ -28,7 +29,7 @@ class TypesetBotElementQuery {
 
         if (typeof query === 'string') {
             this._queryString = query;
-            const elems = document.querySelectorAll(query);
+            const elems = document.querySelectorAll(this._queryString);
             if (elems == null) {
                 return;
             }
@@ -52,15 +53,24 @@ class TypesetBotElementQuery {
     }
 
     /**
-     * Requery the elements to typeset.
+     * Requery elements.
      */
-    updateElements = function() {
+    requery = function() {
         if (this._queryString == null) {
-            this._tsb.logger.warn('Can not update elements without a query string.');
+            this._tsb.logger.warn('Can not requery since query string was not used.');
             return;
         }
 
-        this.elems = document.querySelectorAll(this._queryString);
+        this._nodesTemp = [];
+        const elems = document.querySelectorAll(this._queryString);
+        if (elems == null) {
+            return;
+        }
+        for (const elem of elems) {
+            this._nodesTemp.push(elem);
+        }
+
+        this.indexNodes(this._nodesTemp);
     }
 
     /**

@@ -69,6 +69,10 @@ class TypesetBotTypeset {
         this.render.applyLineBreaks(element, solution);
     }
 
+    /**
+     * Reset typesetting by removing attributes and resetting to original html.
+     * @param element The node to check
+     */
     reset = function(element: Element) {
         if (this.backupInnerHtml != null) {
             element.innerHTML = this.backupInnerHtml;
