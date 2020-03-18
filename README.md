@@ -4,7 +4,7 @@
 
 <div style="float: left; width: calc(100% - 310px)">
 <h1 >TypesetBot</h1>
-Small project to dynamically typeset text on the web.
+    <p>Small project to dynamically typeset text on the web.</p>
 
 <p align="">
 <a href="https://travis-ci.org/CoffeeIO/TypesetBot"><img alt="TypesetBot" src="https://travis-ci.org/CoffeeIO/TypesetBot.svg?branch=master"></a>
