@@ -21,13 +21,36 @@ See [coffeeio.com](http://coffeeio.com/) for complete docs and demos.
 
 ## Install
 
+### CDN
+
+TypesetBot
+```html
+<link href="https://unpkg.com/typesetbot/dist/typesetbot.min.css" rel="stylesheet">
+<script src="https://unpkg.com/typesetbot/dist/typesetbot.min.js" type="text/javascript"></script>
+```
+
+Hyphenation Library
+
+```
+https://unpkg.com/@coffeeio/hypher@1.0.0/dist/hypher.js
+```
+
+Hyphenation pattern, replace `{language-code}` with language code like `en-us`. Full list can be found [here](https://github.com/fluid-project/hyphenation-patterns/tree/master/dist/browser).
+
+```
+https://unpkg.com/@fluid-project/hyphenation-patterns@0.2.2-dev.20181115T211247Z.d313a52/dist/browser/{language-code}.js
+```
 
 ### Download
-- CSS
 
-- JavaScript
+- [typesetbot.css](https://unpkg.com/typesetbot/dist/typesetbot.css)
+- [typesetbot.js](https://unpkg.com/typesetbot/dist/typesetbot.js)
+- [hypher.js](https://unpkg.com/@coffeeio/hypher@1.0.0/dist/hypher.js)
+- Hyphenation pattern example: [en-us.js](https://unpkg.com/@fluid-project/hyphenation-patterns@0.2.2-dev.20181115T211247Z.d313a52/dist/browser/en-us.js)
 
-### CDN
+Minified:
+- [typesetbot.min.css](https://unpkg.com/typesetbot/dist/typesetbot.min.css)
+- [typesetbot.min.js](https://unpkg.com/typesetbot/dist/typesetbot.min.js)
 
 
 ## License
@@ -50,23 +73,24 @@ More examples found at [coffeeio.com](http://coffeeio.com/)
 
 ```html
 <head>
-    <!-- Get hyphenation library -->
-    <script type="text/javascript" src="https://unpkg.com/@coffeeio/hypher@1.0.0/dist/hypher.js"></script>
-    <!-- Get 'en-us' hyphenation patterns -->
-    <script type="text/javascript" src="https://unpkg.com/@fluid-project/hyphenation-patterns@0.2.2-dev.20181115T211247Z.d313a52/dist/browser/en-us.js"></script>
+<!-- Get hyphenation library -->
+<script type="text/javascript" src="https://unpkg.com/@coffeeio/hypher@1.0.0/dist/hypher.js"></script>
+<!-- Get 'en-us' hyphenation patterns -->
+<script type="text/javascript" src="https://unpkg.com/@fluid-project/hyphenation-patterns@0.2.2-dev.20181115T211247Z.d313a52/dist/browser/en-us.js"></script>
 
-    <!-- Get TypesetBot dependencies (latest version) -->
-    <link rel="stylesheet" href="https://unpkg.com/typesetbot/dist/typesetbot.min.css">
-    <script type="text/javascript" src="https://unpkg.com/typesetbot/dist/typesetbot.min.js"></script>
+<!-- Get TypesetBot dependencies (latest version) -->
+<link rel="stylesheet" href="https://unpkg.com/typesetbot/dist/typesetbot.min.css">
+<script type="text/javascript" src="https://unpkg.com/typesetbot/dist/typesetbot.min.js"></script>
 
-    <!-- Initialize TypesetBot -->
-    <script type="text/javascript">
-        let tsb = new TypesetBot(
-            '.container',                 // Query selector
-            { 'hyphenLanguage': 'en-us' } // Settings
-        );
-    </script>
+<!-- Initialize TypesetBot -->
+<script type="text/javascript">
+    let tsb = new TypesetBot(
+        '.container',                 // Query selector
+        { 'hyphenLanguage': 'en-us' } // Settings
+    );
+</script>
 </head>
+
 <body>
     <p class="container">Lorem ipsum...</p>
     <p class="container">Lorem ipsum...</p>
