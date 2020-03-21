@@ -12,7 +12,6 @@ class TypesetBot {
     initParamSettings?: object;
     initParamQuery?: any;
 
-
     // Variables.
     uuid: string;
     isInitialized: boolean;
@@ -44,6 +43,10 @@ class TypesetBot {
         }
     }
 
+    /**
+     * Initialize TypesetBot instance.
+     * This function will be called delayed if the document is not ready.
+     */
     init = function() {
         if (this.isInitialized) {
             return;

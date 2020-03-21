@@ -44,6 +44,10 @@ function TypesetBot(query, settings) {
   // hyphenStore['en-us']['hyphenation'] = ["hy", "phen", "ate"]
 
   this.hyphenStore = {};
+  /**
+   * Initialize TypesetBot instance.
+   * This function will be called delayed if the document is not ready.
+   */
 
   this.init = function () {
     if (this.isInitialized) {
