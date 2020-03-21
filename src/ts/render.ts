@@ -341,7 +341,7 @@ class TypesetBotRender {
                 element.classList.add('typesetbot-center');
                 break;
             default:
-                this._tsb.logger.notice('Unknown alignment type: ' + this._tsb.settings.alignment);
+                this._tsb.logger.warn('Unknown alignment type: ' + this._tsb.settings.alignment);
                 break;
         }
     }

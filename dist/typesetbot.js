@@ -586,8 +586,7 @@ var TypesetBotElementQuery = function TypesetBotElementQuery(tsb, query) {
  */
 
 
-var TypesetBotSettings = // ------------------------------------------------------------------------
-
+var TypesetBotSettings =
 /**
  * @param tsb
  * @param settings Optional settings object.
@@ -600,47 +599,45 @@ function TypesetBotSettings(tsb) {
   // ------------------------------------------------------------------------
   // SETTINGS ---------------------------------------------------------------
   // ------------------------------------------------------------------------
-  // Debug mode: prints performance stats.
-  this.debug = true; // Algorithm. -------------------------------------------------------------
+  // Hyphenation. -----------------------------------------------------------
+  // Language of hyphenation patterns to use
+  this.hyphenLanguage = 'en-us'; // Minimum number of letters to keep on the left side of word
 
-  this.alignment = 'justify'; // Other options are 'left', 'right' and 'center'.
+  this.hyphenLeftMin = 2; // Minimum number of letters to keep on the right side of word
 
-  this.hyphenPenalty = 50; // Penalty for line-breaking on a hyphen
+  this.hyphenRightMin = 2; // Algorithm. -------------------------------------------------------------
+  // Other options are 'left', 'right' and 'center'.
 
-  this.hyphenPenaltyRagged = 500; // Penalty for line-breaking on a hyphen when using ragged text
+  this.alignment = 'justify'; // Penalty for line-breaking on a hyphen
 
-  this.flagPenalty = 3000; // Penalty when current and last line had flag value 1.
+  this.hyphenPenalty = 50; // Penalty for line-breaking on a hyphen when using ragged text
 
-  this.fitnessClassDemerit = 3000; // Penalty when switching between ratio classes.
+  this.hyphenPenaltyRagged = 500; // Penalty when current and last line had flag value 1.
 
-  this.demeritOffset = 1; // Offset to prefer fewer lines by increasing demerit of "~zero badness lines"
+  this.flagPenalty = 3000; // Penalty when switching between ratio classes.
 
-  this.absoluteMaxRatio = 5; // Max adjustment ratio before we give up on finding solutions
+  this.fitnessClassDemerit = 3000; // 4 classes of adjustment ratios.
 
-  this.maxRatio = 2; // Maximum acceptable adjustment ratio.
+  this.fitnessClasses = [-1, -0.5, 0.5, 1, Infinity]; // Offset to prefer fewer lines by increasing demerit of "~zero badness lines"
 
-  this.minRatio = -1; // Minimum acceptable adjustment ratio. Less than -1 will make the text too closely spaced.
-  // Hyphen. ----------------------------------------------------------------
+  this.demeritOffset = 1; // Max adjustment ratio before we give up on finding solutions
 
-  this.hyphenLanguage = 'en-us'; // Language of hyphenation patterns to use
+  this.absoluteMaxRatio = 5; // Maximum acceptable adjustment ratio.
 
-  this.hyphenLeftMin = 2; // Minimum number of letters to keep on the left side of word
+  this.maxRatio = 2; // Minimum acceptable adjustment ratio. Less than -1 will make the text too closely spaced.
 
-  this.hyphenRightMin = 2; // Minimum number of letters to keep on the right side of word
-  // 4 classes of adjustment ratios.
+  this.minRatio = -1; // Tags inside element that might break the typesetting algorithm
 
-  this.fitnessClasses = [-1, -0.5, 0.5, 1, Infinity]; // Font. ------------------------------------------------------------------
+  this.unsupportedTags = ['BR', 'IMG']; // Font. ------------------------------------------------------------------
+  // Ideal space width
 
-  this.spaceUnit = 'em'; // Space width unit, em is relative to font-size
+  this.spaceWidth = 1 / 3; // How much can the space width stretch
 
-  this.spaceWidth = 1 / 3; // Ideal space width
+  this.spaceStretchability = 1 / 6; // How much can the space width shrink
 
-  this.spaceStretchability = 1 / 6; // How much can the space width stretch
+  this.spaceShrinkability = 1 / 9; // Debug mode: prints performance stats. -----------------------------------
 
-  this.spaceShrinkability = 1 / 9; // How much can the space width shrink
-  // Tags inside element that might break the typesetting algorithm
-
-  this.unsupportedTags = ['BR', 'IMG'];
+  this.debug = false;
   /**
    * Merge custom settings with a default set of settings.
    *
@@ -2370,7 +2367,7 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
         break;
 
       default:
-        this._tsb.logger.notice('Unknown alignment type: ' + this._tsb.settings.alignment);
+        this._tsb.logger.warn('Unknown alignment type: ' + this._tsb.settings.alignment);
 
         break;
     }
