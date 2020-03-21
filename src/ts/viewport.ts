@@ -6,12 +6,20 @@
 typesetbotWindowSet('ready', false);
 typesetbotWindowSet('onload', false);
 
-(function() {
+document.addEventListener("DOMContentLoaded", function(event) {
     typesetbotWindowSet('ready', true);
-})();
+    var event = new Event('typesetbot--interactive');
+
+    // Dispatch the event to all TSB instances.
+    document.dispatchEvent(event);
+});
 
 (window as any).onload = function() {
     typesetbotWindowSet('onload', true);
+    var event = new Event('typesetbot--complete');
+
+    // Dispatch the event to all TSB instances.
+    document.dispatchEvent(event);
 };
 
 // Set global typesetbot variables in window
@@ -57,7 +65,7 @@ function typesetbotEndResize() {
     const event = new Event('typesetbot-viewport--reize');
 
     // Dispatch the event to all TSB instances.
-    document.body.dispatchEvent(event);
+    document.dispatchEvent(event);
 }
 
 /**

@@ -44,12 +44,33 @@ function TypesetBot(query, settings) {
   // hyphenStore['en-us']['hyphenation'] = ["hy", "phen", "ate"]
 
   this.hyphenStore = {};
+
+  this.init = function () {
+    if (this.isInitialized) {
+      return;
+    }
+
+    this.isInitialized = true;
+    this.util = new TypesetBotUtils(this);
+    this.settings = new TypesetBotSettings(this, this.initParamSettings);
+    this.logger = new TypesetBotLog(this);
+    this.uuid = TypesetBotUtils.createUUID();
+    this.query = new TypesetBotElementQuery(this, this.initParamQuery);
+    this.typesetter = new TypesetBotTypeset(this);
+    this.isWatching = true;
+    this.typeset();
+  };
   /**
    * Typeset all elements in query.
    */
 
+
   this.typeset = function () {
     var force = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+    if (!this.isInitialized) {
+      return;
+    }
 
     if (force || this.isWatching) {
       this.logger.resetTime();
@@ -168,7 +189,13 @@ function TypesetBot(query, settings) {
 
   this.addEventListeners = function () {
     var instance = this;
-    document.body.addEventListener('typesetbot-viewport--reize', function () {
+    document.addEventListener('typesetbot--complete', function () {
+      instance.init();
+    }, false);
+    document.addEventListener('typesetbot--interactive', function () {
+      instance.init();
+    }, false);
+    document.addEventListener('typesetbot-viewport--reize', function () {
       instance.typeset();
     }, false);
   };
@@ -214,15 +241,14 @@ function TypesetBot(query, settings) {
     this.isTypesetting = false;
   };
 
-  this.util = new TypesetBotUtils(this);
-  this.settings = new TypesetBotSettings(this, settings);
-  this.logger = new TypesetBotLog(this);
-  this.uuid = TypesetBotUtils.createUUID();
-  this.query = new TypesetBotElementQuery(this, query);
-  this.typesetter = new TypesetBotTypeset(this);
+  this.initParamQuery = query;
+  this.initParamSettings = settings;
+  this.isInitialized = false;
   this.addEventListeners();
-  this.isWatching = true;
-  this.typeset();
+
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    this.init();
+  }
 };
 /**
  * Class for handling debug messages and performance logging.
@@ -830,13 +856,18 @@ TypesetBotUtils.getArrayIndexes = function (arr) {
 
 typesetbotWindowSet('ready', false);
 typesetbotWindowSet('onload', false);
-
-(function () {
+document.addEventListener("DOMContentLoaded", function (event) {
   typesetbotWindowSet('ready', true);
-})();
+  var event = new Event('typesetbot--interactive'); // Dispatch the event to all TSB instances.
+
+  document.dispatchEvent(event);
+});
 
 window.onload = function () {
   typesetbotWindowSet('onload', true);
+  var event = new Event('typesetbot--complete'); // Dispatch the event to all TSB instances.
+
+  document.dispatchEvent(event);
 }; // Set global typesetbot variables in window
 
 
@@ -879,7 +910,7 @@ function typesetbotEndResize() {
   document.body.classList.remove('typeset-viewport');
   var event = new Event('typesetbot-viewport--reize'); // Dispatch the event to all TSB instances.
 
-  document.body.dispatchEvent(event);
+  document.dispatchEvent(event);
 }
 /**
  * Get variable from window.
@@ -2453,7 +2484,7 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
     var html = '';
 
     if (endIndex == null) {
-      endIndex = tokens.length - 1;
+      endIndex = tokens.length;
     } // Only the first word token can be hyphenated.
 
 
