@@ -31,8 +31,8 @@ TypesetBot
 
 Hyphenation Library
 
-```
-https://unpkg.com/@coffeeio/hypher@1.0.0/dist/hypher.js
+```html
+<script src="https://unpkg.com/@coffeeio/hypher@1.0.0/dist/hypher.js" type="text/javascript"></script>
 ```
 
 Hyphenation pattern, replace `{language-code}` with language code like `en-us`. Full list can be found [here](https://github.com/fluid-project/hyphenation-patterns/tree/master/dist/browser).
