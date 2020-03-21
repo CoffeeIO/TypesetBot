@@ -73,14 +73,15 @@ More examples found at [coffeeio.com](http://coffeeio.com/)
 
 ```html
 <head>
-<!-- Get hyphenation library -->
+<link rel="stylesheet" href="https://unpkg.com/typesetbot/dist/typesetbot.min.css">
+<script type="text/javascript" src="https://unpkg.com/typesetbot/dist/typesetbot.min.js"></script>    
+    
+<!-- (optional) -->
+<!-- hyphenation library -->
 <script type="text/javascript" src="https://unpkg.com/@coffeeio/hypher@1.0.0/dist/hypher.js"></script>
-<!-- Get 'en-us' hyphenation patterns -->
+<!-- hyphenation pattern for US english -->
 <script type="text/javascript" src="https://unpkg.com/@fluid-project/hyphenation-patterns@0.2.2-dev.20181115T211247Z.d313a52/dist/browser/en-us.js"></script>
 
-<!-- Get TypesetBot dependencies (latest version) -->
-<link rel="stylesheet" href="https://unpkg.com/typesetbot/dist/typesetbot.min.css">
-<script type="text/javascript" src="https://unpkg.com/typesetbot/dist/typesetbot.min.js"></script>
 
 <!-- Initialize TypesetBot -->
 <script type="text/javascript">
