@@ -135,9 +135,6 @@ Most common settings to adjust is `hyphenLanguage` and `alignment`.
     // Minimum number of letters to keep on the right side of word
     hyphenRightMin: number = 2;
 
-    // 4 classes of adjustment ratios.
-    fitnessClasses: number[] = [-1, -0.5, 0.5, 1, Infinity];
-
     // Algorithm. -------------------------------------------------------------
 
     // Other options are 'left', 'right' and 'center'.
@@ -155,6 +152,9 @@ Most common settings to adjust is `hyphenLanguage` and `alignment`.
     // Penalty when switching between ratio classes.
     fitnessClassDemerit: number = 3000;
 
+    // 4 classes of adjustment ratios.
+    fitnessClasses: number[] = [-1, -0.5, 0.5, 1, Infinity];
+
     // Offset to prefer fewer lines by increasing demerit of "~zero badness lines"
     demeritOffset      : number = 1;
 
@@ -170,9 +170,6 @@ Most common settings to adjust is `hyphenLanguage` and `alignment`.
     unsupportedTags: string[] = ['BR', 'IMG'];
 
     // Font. ------------------------------------------------------------------
-
-    // Space width unit, em is relative to font-size
-    spaceUnit          : string = 'em';
 
     // Ideal space width
     spaceWidth         : number = 1 / 3;
