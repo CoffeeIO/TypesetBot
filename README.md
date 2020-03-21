@@ -182,7 +182,7 @@ Most common settings to adjust is `hyphenLanguage` and `alignment`.
 
     // Debug mode: prints performance stats. -----------------------------------
 
-    debug: boolean = true;
+    debug: boolean = false;
 
 }
 ```
