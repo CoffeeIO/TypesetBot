@@ -31,6 +31,15 @@ gulp.task('scss', function () {
     return gulp.src(
         './src/scss/main.scss'
     )
+    .pipe(sass().on('error', sass.logError))
+    .pipe(concat('typesetbot.css'))
+    .pipe(gulp.dest('dist'));
+});
+
+gulp.task('scss-minify', function () {
+    return gulp.src(
+        './src/scss/main.scss'
+    )
     .pipe(sass({ outputStyle: 'compressed' }).on('error', sass.logError))
     .pipe(concat('typesetbot.min.css'))
     .pipe(gulp.dest('dist'));
@@ -106,7 +115,13 @@ gulp.task('merge-minify', function () {
         .pipe(gulp.dest("dist"));
 });
 
-var tasks = ['vendor', 'vendor-minify', 'ts-test', 'ts', 'ts-minify', 'merge', 'merge-minify', 'scss'];
+var tasks = [
+    'vendor', 'vendor-minify', // Bundle vendor files
+    'ts-test',                 // Check if the Typescript can compile
+    'ts', 'ts-minify',         // Compile Typescript files
+    'merge', 'merge-minify',   // Merge vendor files with typescript files
+    'scss', 'scss-minify'      // Compile sass files
+];
 
 gulp.task('compile', gulp.series(tasks))
 gulp.task('watch-src', function() {
