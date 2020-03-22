@@ -2145,9 +2145,7 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
 
   this.getDefaultFontSize = function (element) {
-    var fontSize = this.getNodeStyle(element, 'font-size'); // Remove pixels from output and convert to number.
-
-    return Number(fontSize.replace('px', ''));
+    return this.getNodeStyleNumber(element, 'font-size');
   };
   /**
    * Get width of node.

@@ -140,10 +140,7 @@ class TypesetBotRender {
      * @returns         The font size in pixels as number
      */
     getDefaultFontSize = function(element: HTMLElement) : number {
-        const fontSize = this.getNodeStyle(element, 'font-size');
-
-        // Remove pixels from output and convert to number.
-        return Number(fontSize.replace('px', ''));
+        return this.getNodeStyleNumber(element, 'font-size');
     }
 
     /**
