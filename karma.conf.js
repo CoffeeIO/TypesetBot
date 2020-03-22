@@ -17,24 +17,31 @@ module.exports = function(config) {
         files: [
             // Source files.
             {pattern: 'dist/typesetbot.js', watched: true, included: true, served: true},
-
-            {pattern: 'test/fixtures/**/*.html'},
+            {pattern: 'dist/typesetbot.css', watched: true, included: true, served: true},
 
             // Test files.
             {pattern: 'test/init.test.js', watched: true, included: true, served: true},
         ],
 
+        // plugins: [
+        //     // "karma-browserify",
+        //     // "karma-chrome-launcher",
+        //     // "karma-firefox-launcher",
+        //     // "karma-ie-launcher",
+        //     // "karma-opera-launcher",
+        //     // "karma-phantomjs-launcher"
+        // ],
+        browsers: [
+            "Chrome",
+            // "Firefox",
+            // "IE",
+            //"Opera",
+            // "PhantomJS"
+        ],
+
         // list of files to exclude
         exclude: [
         ],
-
-
-        // preprocess matching files before serving them to the browser
-        // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-        preprocessors: {
-            '**/*.html': ['html2js']
-        },
-
 
         // test results reporter to use
         // possible values: 'dots', 'progress'
@@ -58,11 +65,6 @@ module.exports = function(config) {
         // enable / disable watching file and executing tests whenever any file changes
         autoWatch: true,
 
-
-        // start these browsers
-        // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-        browsers: ['Chrome'],
-
         customLaunchers: {
             Chrome_travis_ci: {
                 base: 'Chrome',
@@ -72,31 +74,28 @@ module.exports = function(config) {
 
         // Continuous Integration mode
         // if true, Karma captures browsers, runs the tests and exits
-        singleRun: false,
+        singleRun: true,
 
         // Concurrency level
         // how many browser should be started simultaneous
-        concurrency: Infinity,
-
-        html2JsPreprocessor: {
-            // strip this from the file path
-            stripPrefix: 'public/',
-
-            // prepend this to the file path
-            prependPrefix: 'served/',
-
-            // or define a custom transform function
-            processPath: function(filePath) {
-                // Drop the file extension
-                return filePath.replace(/\.html$/, '');
-            }
-        }
+        concurrency: Infinity
     };
 
-    // Change some config (Chrome to Chrome Canary) if Running on TravisCI.
-    // See: http://stackoverflow.com/questions/19255976/how-to-make-travis-execute-angular-tests-on-chrome-please-set-env-variable-chr
-    if(process.env.TRAVIS){
-        configuration.browsers = ['Chrome_travis_ci'];
+    // Travis configuration.
+    if (process.env.TRAVIS) {
+        configuration.customLaunchers = {
+            Chrome_travis_ci: {
+                base: 'Chrome',
+                flags: ['--no-sandbox']
+            }
+        };
+        configuration.browsers = [
+            "Chrome_travis_ci",
+            "Firefox",
+            //"IE",
+            //"Opera",
+            "PhantomJS"
+        ];
         configuration.singleRun = true;
     }
 
