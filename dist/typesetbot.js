@@ -1491,7 +1491,7 @@ function TypesetBotTypeset(tsb) {
     } // Render solution to DOM.
 
 
-    this.render.applyLineBreaks(element, solution, this.lineHeight);
+    this.render.applyLineBreaks(element, solution);
   };
   /**
    * Reset typesetting by removing attributes and resetting to original html.
@@ -1522,9 +1522,9 @@ function TypesetBotTypeset(tsb) {
     } // Set space width based on settings.
 
 
-    this.render.setMinimumWordSpacing(element);
-    this.elemWidth = this.render.getNodeWidth(element) - 1;
-    this.lineHeight = this.render.getNodeStyle(element, 'line-height'); // Get font size and calc real space properties.
+    this.render.setMinimumWordSpacing(element); // Get element width.
+
+    this.elemWidth = this.render.getNodeWidth(element); // Get font size and calc real space properties.
 
     this.elemFontSize = this.render.getDefaultFontSize(element);
     this.spaceWidth = this.elemFontSize * this.settings.spaceWidth, this.spaceShrink = this.elemFontSize * this.settings.spaceShrinkability, this.spaceStretch = this.elemFontSize * this.settings.spaceStretchability;
@@ -2342,11 +2342,10 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
    *
    * @param element
    * @param finalBreakpoint The breakpoint of the final line in solution
-   * @param lineHeight
    */
 
 
-  this.applyLineBreaks = function (element, finalBreakpoint, lineHeight) {
+  this.applyLineBreaks = function (element, finalBreakpoint) {
     this._tsb.logger.start('-- Apply breakpoints');
 
     var lines = [];

@@ -268,9 +268,8 @@ class TypesetBotRender {
      *
      * @param element
      * @param finalBreakpoint The breakpoint of the final line in solution
-     * @param lineHeight
      */
-    applyLineBreaks = function(element: Element, finalBreakpoint: TypesetBotLinebreak, lineHeight: number) {
+    applyLineBreaks = function(element: Element, finalBreakpoint: TypesetBotLinebreak) {
         this._tsb.logger.start('-- Apply breakpoints');
 
         const lines = [];
