@@ -20,7 +20,7 @@ class TypesetBotRender {
         element.removeAttribute('data-tsb-indexed');
         element.removeAttribute('data-tsb-uuid');
         element.removeAttribute('data-tsb-word-spacing');
-        element.classList.remove('typesetbot-justify', 'typesetbot-left', 'typesetbot-right', 'typesetbot-center');
+        this.removeJustificationClass(element);
         element.style.wordSpacing = '';
     }
 
@@ -120,7 +120,9 @@ class TypesetBotRender {
         for (const renderedWordNode of renderedWordNodes) {
             const wordToken = renderIndexToToken[renderIndex] as TypesetBotWord;
             wordToken.width = renderedWordNode.getBoundingClientRect().width;
-            wordToken.height = renderedWordNode.getBoundingClientRect().height;
+
+            // wordToken.height = renderedWordNode.getBoundingClientRect().height;
+            wordToken.height = this.getNodeStyle(renderedWordNode, 'line-height');
 
             renderIndex += 1;
         }
@@ -140,7 +142,7 @@ class TypesetBotRender {
      * @returns         The font size in pixels as number
      */
     getDefaultFontSize = function(element: HTMLElement) : number {
-        const fontSize = window.getComputedStyle(element).fontSize;
+        const fontSize = this.getNodeStyle(element, 'font-size');
 
         // Remove pixels from output and convert to number.
         return Number(fontSize.replace('px', ''));
@@ -154,6 +156,17 @@ class TypesetBotRender {
      */
     getNodeWidth = function(element: HTMLElement): number {
         return element.getBoundingClientRect().width;
+    }
+
+    /**
+     * Get style property of element.
+     *
+     * @param   element  The element
+     * @param   property The property name
+     * @returns          The rendered style property
+     */
+    getNodeStyle = function(element: HTMLElement, property: string): string {
+        return window.getComputedStyle(element).getPropertyValue(property);
     }
 
     /**
@@ -257,8 +270,9 @@ class TypesetBotRender {
      *
      * @param element
      * @param finalBreakpoint The breakpoint of the final line in solution
+     * @param lineHeight
      */
-    applyLineBreaks = function(element: Element, finalBreakpoint: TypesetBotLinebreak) {
+    applyLineBreaks = function(element: Element, finalBreakpoint: TypesetBotLinebreak, lineHeight: number) {
         this._tsb.logger.start('-- Apply breakpoints');
 
         const lines = [];
@@ -307,7 +321,8 @@ class TypesetBotRender {
             lastHyphenIndex = line.hyphenIndex;
 
             html +=
-                '<tsb-line line="' + line.lineNumber + '" style="height:' + line.maxLineHeight + 'px">' +
+                '<tsb-line line="' + line.lineNumber + '" style="height:' + lineHeight + '">' +
+                // '<tsb-line line="' + line.lineNumber + '" style="height:' + line.maxLineHeight + 'px">' +
                     lineHtml +
                 '</tsb-line>';
         }
@@ -325,7 +340,7 @@ class TypesetBotRender {
      * @param element
      */
     setJustificationClass = function(element: Element) {
-        // @todo : remove any existing typesetbot classes.
+        this.removeJustificationClass(element);
 
         switch (this._tsb.settings.alignment) {
             case 'justify':
@@ -344,6 +359,15 @@ class TypesetBotRender {
                 this._tsb.logger.warn('Unknown alignment type: ' + this._tsb.settings.alignment);
                 break;
         }
+    }
+
+    /**
+     * Remove all justification classes from element.
+     *
+     * @param element The element
+     */
+    removeJustificationClass = function(element: Element) {
+        element.classList.remove('typesetbot-justify', 'typesetbot-left', 'typesetbot-right', 'typesetbot-center');
     }
 
     /**

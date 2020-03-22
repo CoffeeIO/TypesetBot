@@ -23,6 +23,7 @@ class TypesetBotTypeset {
     spaceWidth: number;
     spaceShrink: number;
     spaceStretch: number;
+    lineHeight: number;
 
     // Breakpoint structures.
     activeBreakpoints: TypesetBotLinebreak[];
@@ -66,7 +67,7 @@ class TypesetBotTypeset {
         }
 
         // Render solution to DOM.
-        this.render.applyLineBreaks(element, solution);
+        this.render.applyLineBreaks(element, solution, this.lineHeight);
     }
 
     /**
@@ -97,7 +98,9 @@ class TypesetBotTypeset {
         // Set space width based on settings.
         this.render.setMinimumWordSpacing(element);
 
-        this.elemWidth = this.render.getNodeWidth(element);
+        this.elemWidth = this.render.getNodeWidth(element) - 1;
+
+        this.lineHeight = this.render.getNodeStyle(element, 'line-height');
 
         // Get font size and calc real space properties.
         this.elemFontSize = this.render.getDefaultFontSize(element);

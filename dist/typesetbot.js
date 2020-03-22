@@ -1491,7 +1491,7 @@ function TypesetBotTypeset(tsb) {
     } // Render solution to DOM.
 
 
-    this.render.applyLineBreaks(element, solution);
+    this.render.applyLineBreaks(element, solution, this.lineHeight);
   };
   /**
    * Reset typesetting by removing attributes and resetting to original html.
@@ -1523,7 +1523,8 @@ function TypesetBotTypeset(tsb) {
 
 
     this.render.setMinimumWordSpacing(element);
-    this.elemWidth = this.render.getNodeWidth(element); // Get font size and calc real space properties.
+    this.elemWidth = this.render.getNodeWidth(element) - 1;
+    this.lineHeight = this.render.getNodeStyle(element, 'line-height'); // Get font size and calc real space properties.
 
     this.elemFontSize = this.render.getDefaultFontSize(element);
     this.spaceWidth = this.elemFontSize * this.settings.spaceWidth, this.spaceShrink = this.elemFontSize * this.settings.spaceShrinkability, this.spaceStretch = this.elemFontSize * this.settings.spaceStretchability;
@@ -1972,7 +1973,7 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
     element.removeAttribute('data-tsb-indexed');
     element.removeAttribute('data-tsb-uuid');
     element.removeAttribute('data-tsb-word-spacing');
-    element.classList.remove('typesetbot-justify', 'typesetbot-left', 'typesetbot-right', 'typesetbot-center');
+    this.removeJustificationClass(element);
     element.style.wordSpacing = '';
   };
   /**
@@ -2107,8 +2108,9 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
       for (var _iterator13 = renderedWordNodes[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
         var renderedWordNode = _step13.value;
         var wordToken = renderIndexToToken[renderIndex];
-        wordToken.width = renderedWordNode.getBoundingClientRect().width;
-        wordToken.height = renderedWordNode.getBoundingClientRect().height;
+        wordToken.width = renderedWordNode.getBoundingClientRect().width; // wordToken.height = renderedWordNode.getBoundingClientRect().height;
+
+        wordToken.height = this.getNodeStyle(renderedWordNode, 'line-height');
         renderIndex += 1;
       }
     } catch (err) {
@@ -2143,7 +2145,7 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
 
   this.getDefaultFontSize = function (element) {
-    var fontSize = window.getComputedStyle(element).fontSize; // Remove pixels from output and convert to number.
+    var fontSize = this.getNodeStyle(element, 'font-size'); // Remove pixels from output and convert to number.
 
     return Number(fontSize.replace('px', ''));
   };
@@ -2157,6 +2159,18 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
   this.getNodeWidth = function (element) {
     return element.getBoundingClientRect().width;
+  };
+  /**
+   * Get style property of element.
+   *
+   * @param   element  The element
+   * @param   property The property name
+   * @returns          The rendered style property
+   */
+
+
+  this.getNodeStyle = function (element, property) {
+    return window.getComputedStyle(element).getPropertyValue(property);
   };
   /**
    * Get rendering dimensions of words and word parts for hyphenation.
@@ -2329,10 +2343,11 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
    *
    * @param element
    * @param finalBreakpoint The breakpoint of the final line in solution
+   * @param lineHeight
    */
 
 
-  this.applyLineBreaks = function (element, finalBreakpoint) {
+  this.applyLineBreaks = function (element, finalBreakpoint, lineHeight) {
     this._tsb.logger.start('-- Apply breakpoints');
 
     var lines = [];
@@ -2367,7 +2382,8 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
       lineHtml += this.appendTagTokensOnLine(element, tagStack);
       curTokenIndex = line.tokenIndex;
       lastHyphenIndex = line.hyphenIndex;
-      html += '<tsb-line line="' + line.lineNumber + '" style="height:' + line.maxLineHeight + 'px">' + lineHtml + '</tsb-line>';
+      html += '<tsb-line line="' + line.lineNumber + '" style="height:' + lineHeight + '">' + // '<tsb-line line="' + line.lineNumber + '" style="height:' + line.maxLineHeight + 'px">' +
+      lineHtml + '</tsb-line>';
     }
 
     element.innerHTML = html;
@@ -2383,7 +2399,8 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
 
   this.setJustificationClass = function (element) {
-    // @todo : remove any existing typesetbot classes.
+    this.removeJustificationClass(element);
+
     switch (this._tsb.settings.alignment) {
       case 'justify':
         element.classList.add('typesetbot-justify');
@@ -2406,6 +2423,16 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
         break;
     }
+  };
+  /**
+   * Remove all justification classes from element.
+   *
+   * @param element The element
+   */
+
+
+  this.removeJustificationClass = function (element) {
+    element.classList.remove('typesetbot-justify', 'typesetbot-left', 'typesetbot-right', 'typesetbot-center');
   };
   /**
    * Get HTMl string of prepended tags on line.
