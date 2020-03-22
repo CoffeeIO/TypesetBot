@@ -9,8 +9,12 @@ class TypesetBot {
     typesetter: TypesetBotTypeset;
     util:       TypesetBotUtils;
 
+    initParamSettings?: object;
+    initParamQuery?: any;
+
     // Variables.
     uuid: string;
+    isInitialized: boolean;
     isTypesetting: boolean;
     isWatching: boolean;
     indexToNodes: { [index: number] : Element[]; } = {};
@@ -28,15 +32,36 @@ class TypesetBot {
      * @param settings? Custom settings object
      */
     constructor(query?: any, settings?: object) {
+        this.initParamQuery = query;
+        this.initParamSettings = settings;
+
+        this.isInitialized = false;
+        this.addEventListeners();
+
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            this.init();
+        }
+    }
+
+    /**
+     * Initialize TypesetBot instance.
+     * This function will be called delayed if the document is not ready.
+     */
+    init = function() {
+        if (this.isInitialized) {
+            return;
+        }
+
+        this.isInitialized = true;
+
         this.util = new TypesetBotUtils(this);
-        this.settings = new TypesetBotSettings(this, settings);
+        this.settings = new TypesetBotSettings(this, this.initParamSettings);
         this.logger = new TypesetBotLog(this);
         this.uuid = TypesetBotUtils.createUUID();
 
-        this.query = new TypesetBotElementQuery(this, query);
+        this.query = new TypesetBotElementQuery(this, this.initParamQuery);
         this.typesetter = new TypesetBotTypeset(this);
 
-        this.addEventListeners();
         this.isWatching = true;
         this.typeset();
     }
@@ -45,6 +70,10 @@ class TypesetBot {
      * Typeset all elements in query.
      */
     typeset = function(force: boolean = false)  {
+        if (!this.isInitialized) {
+            return;
+        }
+
         if (force || this.isWatching) {
             this.logger.resetTime();
 
@@ -140,7 +169,16 @@ class TypesetBot {
      */
     addEventListeners = function() {
         const instance = this;
-        document.body.addEventListener('typesetbot-viewport--reize', function() {
+
+        document.addEventListener('typesetbot--complete', function() {
+            instance.init();
+        }, false);
+
+        document.addEventListener('typesetbot--interactive', function() {
+            instance.init();
+        }, false);
+
+        document.addEventListener('typesetbot-viewport--reize', function() {
             instance.typeset();
         }, false);
     }

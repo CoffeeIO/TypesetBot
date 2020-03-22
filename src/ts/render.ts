@@ -408,7 +408,7 @@ class TypesetBotRender {
         let html = '';
 
         if (endIndex == null) {
-            endIndex = tokens.length - 1;
+            endIndex = tokens.length;
         }
 
         // Only the first word token can be hyphenated.

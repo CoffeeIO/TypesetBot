@@ -1,87 +1,42 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
+    <link rel="stylesheet" href="dist/typesetbot.min.css">
+    <script type="text/javascript" src="dist/typesetbot.js"></script>
 
-
+    <!-- (optional) -->
+    <!-- hyphenation library -->
     <script type="text/javascript" src="https://unpkg.com/@coffeeio/hypher@1.0.0/dist/hypher.js"></script>
+    <!-- hyphenation pattern for US english -->
     <script type="text/javascript" src="https://unpkg.com/@fluid-project/hyphenation-patterns@0.2.2-dev.20181115T211247Z.d313a52/dist/browser/en-us.js"></script>
-<!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@fluid-project/hyphenation-patterns@0.2.2-dev.20181115T211247Z.d313a52/dist/browser/da.js"></script> -->
-<!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@coffeeio/hypher@1.0.0/dist/hypher.js"></script> -->
-<link rel="stylesheet" href="dist/typesetbot.min.css">
-<script type="text/javascript" src="dist/typesetbot.js"></script>
+
+
+    <!-- Initialize TypesetBot -->
+    <script type="text/javascript">
+        let tsb = new TypesetBot(
+            '.container', // Query selector.
+            {
+                'hyphenLanguage': 'en-us',
+                'alignment': 'justify',
+            }
+        );
+    </script>
 </head>
 <body>
-
-    <p>The more the world advances, the more stimulation it will provide as an incentive for us to get outside of our own mind to engage with it.
-        While Pascal’s generalization that a lack of comfort with solitude is the root of all our problems may be an exaggeration, it isn’t an entirely unmerited one.
-        Everything that has done so much to connect us has simultaneously isolated us. We are so busy being distracted that we are forgetting to tend to ourselves, which is consequently making us feel more and more alone.
-        Interestingly, the main culprit isn’t our obsession with any particular worldly stimulation. It’s the fear of nothingness — our addiction to a state of not-being-bored. We have an instinctive aversion to simply being.
-        Without realizing the value of solitude, we are overlooking the fact that, once the fear of boredom is faced, it can actually provide its own stimulation. And the only way to face it is to make time, whether every day or every week, to just sit — with our thoughts, our feelings, with a moment of stillness.
-        The oldest philosophical wisdom in the world has one piece of advice for us: know yourself. And there is a good reason why that is.
-        Without knowing ourselves, it’s almost impossible to find a healthy way to interact with the world around us. Without taking time to figure it out, we don’t have a foundation to built the rest of our lives on.
-        Being alone and connecting inwardly is a skill nobody ever teaches us. That’s ironic because it’s more important than most of the ones they do.
-        Solitude may not be the solution to everything, but it certainly is a start.
+    <p class="container">
+            Lorem ipsum dolor sit amet, consectetur adipiscing
+            elit. Aliquam ut lectus nec tellus venenatis feugiat
+            sed a sem. Nullam rutrum lacus sed enim vehicula,
+            vel suscipit ex gravida. Duis interdum est non augue
+            bibendum ornare. Nunc accumsan egestas quam.
+            Sed mollis quis urna ac laoreet. Mauris consequat
+            congue nibh ut varius. Quisque ultrices felis et diam
+            mollis convallis. Vivamus convallis felis vitae augue
+            faucibus, vel porttitor diam viverra. Vivamus dictum
+            vulputate aliquet. Ut neque arcu, venenatis eget ul-
+            lamcorper id, pulvinar sit amet nunc. Morbi cursus
+            euismod lorem rutrum lacinia.
     </p>
-    <!-- <p>The more the world advances, the more stimulation it will provide as an incentive for us to get outside of our own mind to engage with it.
-        While Pascal’s generalization that a lack of comfort with solitude is the root of all our problems may be an exaggeration, it isn’t an entirely unmerited one.
-        Everything that has done so much to connect us has simultaneously isolated us. We are so busy being distracted that we are forgetting to tend to ourselves, which is consequently making us feel more and more alone.
-        Interestingly, the main culprit isn’t our obsession with any particular worldly stimulation. It’s the fear of nothingness — our addiction to a state of not-being-bored. We have an instinctive aversion to simply being.
-        Without realizing the value of solitude, we are overlooking the fact that, once the fear of boredom is faced, it can actually provide its own stimulation. And the only way to face it is to make time, whether every day or every week, to just sit — with our thoughts, our feelings, with a moment of stillness.
-        The oldest philosophical wisdom in the world has one piece of advice for us: know yourself. And there is a good reason why that is.
-        Without knowing ourselves, it’s almost impossible to find a healthy way to interact with the world around us. Without taking time to figure it out, we don’t have a foundation to built the rest of our lives on.
-        Being alone and connecting inwardly is a skill nobody ever teaches us. That’s ironic because it’s more important than most of the ones they do.
-        Solitude may not be the solution to everything, but it certainly is a start.
-    </p>
-
-    <p>The more the world advances, the more stimulation it will provide as an incentive for us to get outside of our own mind to engage with it.
-        While Pascal’s generalization that a lack of comfort with solitude is the root of all our problems may be an exaggeration, it isn’t an entirely unmerited one.
-        Everything that has done so much to connect us has simultaneously isolated us. We are so busy being distracted that we are forgetting to tend to ourselves, which is consequently making us feel more and more alone.
-        Interestingly, the main culprit isn’t our obsession with any particular worldly stimulation. It’s the fear of nothingness — our addiction to a state of not-being-bored. We have an instinctive aversion to simply being.
-        Without realizing the value of solitude, we are overlooking the fact that, once the fear of boredom is faced, it can actually provide its own stimulation. And the only way to face it is to make time, whether every day or every week, to just sit — with our thoughts, our feelings, with a moment of stillness.
-        The oldest philosophical wisdom in the world has one piece of advice for us: know yourself. And there is a good reason why that is.
-        Without knowing ourselves, it’s almost impossible to find a healthy way to interact with the world around us. Without taking time to figure it out, we don’t have a foundation to built the rest of our lives on.
-        Being alone and connecting inwardly is a skill nobody ever teaches us. That’s ironic because it’s more important than most of the ones they do.
-        Solitude may not be the solution to everything, but it certainly is a start.
-    </p>
-
-    <p>The more the world advances, the more stimulation it will provide as an incentive for us to get outside of our own mind to engage with it.
-        While Pascal’s generalization that a lack of comfort with solitude is the root of all our problems may be an exaggeration, it isn’t an entirely unmerited one.
-        Everything that has done so much to connect us has simultaneously isolated us. We are so busy being distracted that we are forgetting to tend to ourselves, which is consequently making us feel more and more alone.
-        Interestingly, the main culprit isn’t our obsession with any particular worldly stimulation. It’s the fear of nothingness — our addiction to a state of not-being-bored. We have an instinctive aversion to simply being.
-        Without realizing the value of solitude, we are overlooking the fact that, once the fear of boredom is faced, it can actually provide its own stimulation. And the only way to face it is to make time, whether every day or every week, to just sit — with our thoughts, our feelings, with a moment of stillness.
-        The oldest philosophical wisdom in the world has one piece of advice for us: know yourself. And there is a good reason why that is.
-        Without knowing ourselves, it’s almost impossible to find a healthy way to interact with the world around us. Without taking time to figure it out, we don’t have a foundation to built the rest of our lives on.
-        Being alone and connecting inwardly is a skill nobody ever teaches us. That’s ironic because it’s more important than most of the ones they do.
-        Solitude may not be the solution to everything, but it certainly is a start.
-    </p>
-
-    <p>The more the world advances, the more stimulation it will provide as an incentive for us to get outside of our own mind to engage with it.
-        While Pascal’s generalization that a lack of comfort with solitude is the root of all our problems may be an exaggeration, it isn’t an entirely unmerited one.
-        Everything that has done so much to connect us has simultaneously isolated us. We are so busy being distracted that we are forgetting to tend to ourselves, which is consequently making us feel more and more alone.
-        Interestingly, the main culprit isn’t our obsession with any particular worldly stimulation. It’s the fear of nothingness — our addiction to a state of not-being-bored. We have an instinctive aversion to simply being.
-        Without realizing the value of solitude, we are overlooking the fact that, once the fear of boredom is faced, it can actually provide its own stimulation. And the only way to face it is to make time, whether every day or every week, to just sit — with our thoughts, our feelings, with a moment of stillness.
-        The oldest philosophical wisdom in the world has one piece of advice for us: know yourself. And there is a good reason why that is.
-        Without knowing ourselves, it’s almost impossible to find a healthy way to interact with the world around us. Without taking time to figure it out, we don’t have a foundation to built the rest of our lives on.
-        Being alone and connecting inwardly is a skill nobody ever teaches us. That’s ironic because it’s more important than most of the ones they do.
-        Solitude may not be the solution to everything, but it certainly is a start.
-    </p>
-
-    <p>The more the world advances, the more stimulation it will provide as an incentive for us to get outside of our own mind to engage with it.
-        While Pascal’s generalization that a lack of comfort with solitude is the root of all our problems may be an exaggeration, it isn’t an entirely unmerited one.
-        Everything that has done so much to connect us has simultaneously isolated us. We are so busy being distracted that we are forgetting to tend to ourselves, which is consequently making us feel more and more alone.
-        Interestingly, the main culprit isn’t our obsession with any particular worldly stimulation. It’s the fear of nothingness — our addiction to a state of not-being-bored. We have an instinctive aversion to simply being.
-        Without realizing the value of solitude, we are overlooking the fact that, once the fear of boredom is faced, it can actually provide its own stimulation. And the only way to face it is to make time, whether every day or every week, to just sit — with our thoughts, our feelings, with a moment of stillness.
-        The oldest philosophical wisdom in the world has one piece of advice for us: know yourself. And there is a good reason why that is.
-        Without knowing ourselves, it’s almost impossible to find a healthy way to interact with the world around us. Without taking time to figure it out, we don’t have a foundation to built the rest of our lives on.
-        Being alone and connecting inwardly is a skill nobody ever teaches us. That’s ironic because it’s more important than most of the ones they do.
-        Solitude may not be the solution to everything, but it certainly is a start.
-    </p> -->
-
-
-    <script charset="utf-8">
-        let tsb = new TypesetBot('body p', {});
-    </script>
 </body>
 
 </html>
