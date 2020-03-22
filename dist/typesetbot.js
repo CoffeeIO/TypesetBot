@@ -1491,7 +1491,7 @@ function TypesetBotTypeset(tsb) {
     } // Render solution to DOM.
 
 
-    this.render.applyLineBreaks(element, solution);
+    this.render.applyLineBreaks(element, solution, this.lineHeight);
   };
   /**
    * Reset typesetting by removing attributes and resetting to original html.
@@ -1522,8 +1522,10 @@ function TypesetBotTypeset(tsb) {
     } // Set space width based on settings.
 
 
-    this.render.setMinimumWordSpacing(element);
-    this.elemWidth = this.render.getNodeWidth(element); // Get font size and calc real space properties.
+    this.render.setMinimumWordSpacing(element); // Get element width.
+
+    this.elemWidth = this.render.getNodeWidth(element);
+    this.lineHeight = this.render.getLineHeight(element); // Get font size and calc real space properties.
 
     this.elemFontSize = this.render.getDefaultFontSize(element);
     this.spaceWidth = this.elemFontSize * this.settings.spaceWidth, this.spaceShrink = this.elemFontSize * this.settings.spaceShrinkability, this.spaceStretch = this.elemFontSize * this.settings.spaceStretchability;
@@ -1972,7 +1974,7 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
     element.removeAttribute('data-tsb-indexed');
     element.removeAttribute('data-tsb-uuid');
     element.removeAttribute('data-tsb-word-spacing');
-    element.classList.remove('typesetbot-justify', 'typesetbot-left', 'typesetbot-right', 'typesetbot-center');
+    this.removeJustificationClass(element);
     element.style.wordSpacing = '';
   };
   /**
@@ -1984,16 +1986,16 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
 
   this.getSpaceWidth = function (element) {
-    var spanNode = document.createElement('SPAN');
+    var spanNode = document.createElement('TSB-NONE');
     var preTextNode = document.createTextNode('1');
     var postTextNode = document.createTextNode('1');
     var textNode = document.createTextNode(' ');
-    var spaceContainer = document.createElement('SPAN');
+    var spaceContainer = document.createElement('TSB-NONE');
     spaceContainer.appendChild(textNode);
     spanNode.appendChild(preTextNode);
     spanNode.appendChild(spaceContainer);
     spanNode.appendChild(postTextNode);
-    element.appendChild(spanNode);
+    element.prepend(spanNode);
     var rect = spaceContainer.getBoundingClientRect();
     var width = rect.right - rect.left;
     spanNode.remove();
@@ -2048,7 +2050,7 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
             var word = token;
             renderIndexToToken[currentIndex] = token;
             currentIndex += 1;
-            html += '<span class="typeset-word-node">' + word.text + '</span>';
+            html += '<tsb-none class="typeset-word-node">' + word.text + '</tsb-none>';
             break;
 
           case TypesetBotToken.types.TAG:
@@ -2108,7 +2110,7 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
         var renderedWordNode = _step13.value;
         var wordToken = renderIndexToToken[renderIndex];
         wordToken.width = renderedWordNode.getBoundingClientRect().width;
-        wordToken.height = renderedWordNode.getBoundingClientRect().height;
+        wordToken.height = this.getLineHeight(renderedWordNode);
         renderIndex += 1;
       }
     } catch (err) {
@@ -2143,9 +2145,7 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
 
   this.getDefaultFontSize = function (element) {
-    var fontSize = window.getComputedStyle(element).fontSize; // Remove pixels from output and convert to number.
-
-    return Number(fontSize.replace('px', ''));
+    return this.getNodeStyleNumber(element, 'font-size');
   };
   /**
    * Get width of node.
@@ -2157,6 +2157,51 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
   this.getNodeWidth = function (element) {
     return element.getBoundingClientRect().width;
+  };
+  /**
+   * Get style property of element.
+   *
+   * @param   element  The element
+   * @param   property The property name
+   * @returns          The rendered style property
+   */
+
+
+  this.getNodeStyle = function (element, property) {
+    return window.getComputedStyle(element).getPropertyValue(property);
+  };
+  /**
+   * Get style property of element as Number without px postfix.
+   *
+   * @param   element  The element
+   * @param   property The property name
+   * @returns          The rendered style property
+   */
+
+
+  this.getNodeStyleNumber = function (element, property) {
+    return Number(this.getNodeStyle(element, property).replace('px', ''));
+  };
+  /**
+   * Get line height of element.
+   *
+   * @param element
+   */
+
+
+  this.getLineHeight = function (element) {
+    var lineHeight = this.getNodeStyle(element, 'line-height');
+
+    if (lineHeight == 'normal') {
+      // Make line height relative to font size.
+      var fontSize = this.getNodeStyleNumber(element, 'font-size');
+      lineHeight = 1.2 * fontSize; // 1.2 em
+    } else {
+      // Format number.
+      lineHeight = Number(lineHeight.replace('px', ''));
+    }
+
+    return lineHeight;
   };
   /**
    * Get rendering dimensions of words and word parts for hyphenation.
@@ -2202,7 +2247,7 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
                 var _cut = word.text.substring(lastIndex, hyphenIndex + 1);
 
                 lastIndex = hyphenIndex + 1;
-                html += '<span class="typeset-hyphen-check">' + _cut + '</span>';
+                html += '<tsb-none class="typeset-hyphen-check">' + _cut + '</tsb-none>';
                 renderRequest.push({
                   token: token,
                   type: 'hyphen'
@@ -2226,7 +2271,7 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
             if (word.text.length !== lastIndex) {
               var cut = word.text.substr(lastIndex);
-              html += '<span class="typeset-hyphen-check">' + cut + '</span>';
+              html += '<tsb-none class="typeset-hyphen-check">' + cut + '</tsb-none>';
               renderRequest.push({
                 token: token,
                 type: 'remain'
@@ -2234,7 +2279,7 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
             } // Queue dash, '-'.
 
 
-            html += '<span class="typeset-hyphen-check">-</span>';
+            html += '<tsb-none class="typeset-hyphen-check">-</tsb-none>';
             renderRequest.push({
               token: token,
               type: 'dash'
@@ -2328,11 +2373,12 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
    * Apply linebreaks of solution to element.
    *
    * @param element
-   * @param finalBreakpoint The breakpoint of the final line in solution
+   * @param finalBreakpoint   The breakpoint of the final line in solution
+   * @param defaultLineHeight
    */
 
 
-  this.applyLineBreaks = function (element, finalBreakpoint) {
+  this.applyLineBreaks = function (element, finalBreakpoint, defaultLineHeight) {
     this._tsb.logger.start('-- Apply breakpoints');
 
     var lines = [];
@@ -2367,7 +2413,13 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
       lineHtml += this.appendTagTokensOnLine(element, tagStack);
       curTokenIndex = line.tokenIndex;
       lastHyphenIndex = line.hyphenIndex;
-      html += '<tsb-line line="' + line.lineNumber + '" style="height:' + line.maxLineHeight + 'px">' + lineHtml + '</tsb-line>';
+      var lineHeight = line.maxLineHeight;
+
+      if (lineHeight == null || lineHeight == 0) {
+        lineHeight = defaultLineHeight;
+      }
+
+      html += '<tsb-line line="' + line.lineNumber + '" style="height:' + lineHeight + 'px">' + lineHtml + '</tsb-line>';
     }
 
     element.innerHTML = html;
@@ -2383,7 +2435,8 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
 
   this.setJustificationClass = function (element) {
-    // @todo : remove any existing typesetbot classes.
+    this.removeJustificationClass(element);
+
     switch (this._tsb.settings.alignment) {
       case 'justify':
         element.classList.add('typesetbot-justify');
@@ -2406,6 +2459,16 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
         break;
     }
+  };
+  /**
+   * Remove all justification classes from element.
+   *
+   * @param element The element
+   */
+
+
+  this.removeJustificationClass = function (element) {
+    element.classList.remove('typesetbot-justify', 'typesetbot-left', 'typesetbot-right', 'typesetbot-center');
   };
   /**
    * Get HTMl string of prepended tags on line.

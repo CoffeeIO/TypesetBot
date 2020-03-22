@@ -19,6 +19,7 @@ class TypesetBotTypeset {
 
     // Font properties
     elemWidth: number; // In pixels
+    lineHeight: number;
     elemFontSize: number;
     spaceWidth: number;
     spaceShrink: number;
@@ -66,7 +67,7 @@ class TypesetBotTypeset {
         }
 
         // Render solution to DOM.
-        this.render.applyLineBreaks(element, solution);
+        this.render.applyLineBreaks(element, solution, this.lineHeight);
     }
 
     /**
@@ -97,7 +98,9 @@ class TypesetBotTypeset {
         // Set space width based on settings.
         this.render.setMinimumWordSpacing(element);
 
+        // Get element width.
         this.elemWidth = this.render.getNodeWidth(element);
+        this.lineHeight = this.render.getLineHeight(element);
 
         // Get font size and calc real space properties.
         this.elemFontSize = this.render.getDefaultFontSize(element);
