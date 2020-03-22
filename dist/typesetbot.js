@@ -1491,7 +1491,7 @@ function TypesetBotTypeset(tsb) {
     } // Render solution to DOM.
 
 
-    this.render.applyLineBreaks(element, solution);
+    this.render.applyLineBreaks(element, solution, this.lineHeight);
   };
   /**
    * Reset typesetting by removing attributes and resetting to original html.
@@ -1524,7 +1524,8 @@ function TypesetBotTypeset(tsb) {
 
     this.render.setMinimumWordSpacing(element); // Get element width.
 
-    this.elemWidth = this.render.getNodeWidth(element); // Get font size and calc real space properties.
+    this.elemWidth = this.render.getNodeWidth(element);
+    this.lineHeight = this.render.getLineHeight(element); // Get font size and calc real space properties.
 
     this.elemFontSize = this.render.getDefaultFontSize(element);
     this.spaceWidth = this.elemFontSize * this.settings.spaceWidth, this.spaceShrink = this.elemFontSize * this.settings.spaceShrinkability, this.spaceStretch = this.elemFontSize * this.settings.spaceStretchability;
@@ -2109,7 +2110,7 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
         var renderedWordNode = _step13.value;
         var wordToken = renderIndexToToken[renderIndex];
         wordToken.width = renderedWordNode.getBoundingClientRect().width;
-        wordToken.height = Number(this.getNodeStyle(renderedWordNode, 'line-height').replace('px', ''));
+        wordToken.height = this.getLineHeight(renderedWordNode);
         renderIndex += 1;
       }
     } catch (err) {
@@ -2170,6 +2171,39 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
   this.getNodeStyle = function (element, property) {
     return window.getComputedStyle(element).getPropertyValue(property);
+  };
+  /**
+   * Get style property of element as Number without px postfix.
+   *
+   * @param   element  The element
+   * @param   property The property name
+   * @returns          The rendered style property
+   */
+
+
+  this.getNodeStyleNumber = function (element, property) {
+    return Number(this.getNodeStyle(element, property).replace('px', ''));
+  };
+  /**
+   * Get line height of element.
+   *
+   * @param element
+   */
+
+
+  this.getLineHeight = function (element) {
+    var lineHeight = this.getNodeStyle(element, 'line-height');
+
+    if (lineHeight == 'normal') {
+      // Make line height relative to font size.
+      var fontSize = this.getNodeStyleNumber(element, 'font-size');
+      lineHeight = 1.2 * fontSize; // 1.2 em
+    } else {
+      // Format number.
+      lineHeight = Number(lineHeight.replace('px', ''));
+    }
+
+    return lineHeight;
   };
   /**
    * Get rendering dimensions of words and word parts for hyphenation.
@@ -2341,11 +2375,12 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
    * Apply linebreaks of solution to element.
    *
    * @param element
-   * @param finalBreakpoint The breakpoint of the final line in solution
+   * @param finalBreakpoint   The breakpoint of the final line in solution
+   * @param defaultLineHeight
    */
 
 
-  this.applyLineBreaks = function (element, finalBreakpoint) {
+  this.applyLineBreaks = function (element, finalBreakpoint, defaultLineHeight) {
     this._tsb.logger.start('-- Apply breakpoints');
 
     var lines = [];
@@ -2380,7 +2415,13 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
       lineHtml += this.appendTagTokensOnLine(element, tagStack);
       curTokenIndex = line.tokenIndex;
       lastHyphenIndex = line.hyphenIndex;
-      html += '<tsb-line line="' + line.lineNumber + '" style="height:' + line.maxLineHeight + 'px">' + lineHtml + '</tsb-line>';
+      var lineHeight = line.maxLineHeight;
+
+      if (lineHeight == null || lineHeight == 0) {
+        lineHeight = defaultLineHeight;
+      }
+
+      html += '<tsb-line line="' + line.lineNumber + '" style="height:' + lineHeight + 'px">' + lineHtml + '</tsb-line>';
     }
 
     element.innerHTML = html;

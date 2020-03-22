@@ -121,7 +121,7 @@ class TypesetBotRender {
         for (const renderedWordNode of renderedWordNodes) {
             const wordToken = renderIndexToToken[renderIndex] as TypesetBotWord;
             wordToken.width = renderedWordNode.getBoundingClientRect().width;
-            wordToken.height = Number(this.getNodeStyle(renderedWordNode, 'line-height').replace('px', ''));
+            wordToken.height = this.getLineHeight(renderedWordNode);
 
             renderIndex += 1;
         }
@@ -165,6 +165,36 @@ class TypesetBotRender {
      */
     getNodeStyle = function(element: HTMLElement, property: string): string {
         return window.getComputedStyle(element).getPropertyValue(property);
+    }
+
+    /**
+     * Get style property of element as Number without px postfix.
+     *
+     * @param   element  The element
+     * @param   property The property name
+     * @returns          The rendered style property
+     */
+    getNodeStyleNumber = function(element: HTMLElement, property: string): number {
+        return Number(this.getNodeStyle(element, property).replace('px', ''));
+    }
+
+    /**
+     * Get line height of element.
+     *
+     * @param element
+     */
+    getLineHeight = function(element: HTMLElement) {
+        let lineHeight = this.getNodeStyle(element, 'line-height');
+        if (lineHeight == 'normal') {
+            // Make line height relative to font size.
+            let fontSize = this.getNodeStyleNumber(element, 'font-size');
+            lineHeight = 1.2 * fontSize; // 1.2 em
+        } else {
+            // Format number.
+            lineHeight = Number(lineHeight.replace('px', ''));
+        }
+
+        return lineHeight;
     }
 
     /**
@@ -267,9 +297,10 @@ class TypesetBotRender {
      * Apply linebreaks of solution to element.
      *
      * @param element
-     * @param finalBreakpoint The breakpoint of the final line in solution
+     * @param finalBreakpoint   The breakpoint of the final line in solution
+     * @param defaultLineHeight
      */
-    applyLineBreaks = function(element: Element, finalBreakpoint: TypesetBotLinebreak) {
+    applyLineBreaks = function(element: Element, finalBreakpoint: TypesetBotLinebreak, defaultLineHeight: number) {
         this._tsb.logger.start('-- Apply breakpoints');
 
         const lines = [];
@@ -317,8 +348,13 @@ class TypesetBotRender {
             curTokenIndex = line.tokenIndex;
             lastHyphenIndex = line.hyphenIndex;
 
+            let lineHeight = line.maxLineHeight;
+            if (lineHeight == null || lineHeight == 0) {
+                lineHeight = defaultLineHeight;
+            }
+
             html +=
-                '<tsb-line line="' + line.lineNumber + '" style="height:' + line.maxLineHeight + 'px">' +
+                '<tsb-line line="' + line.lineNumber + '" style="height:' + lineHeight + 'px">' +
                     lineHtml +
                 '</tsb-line>';
         }
