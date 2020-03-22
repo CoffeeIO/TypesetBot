@@ -31,17 +31,18 @@ class TypesetBotRender {
      * @returns         The default word spacing in pixels
      */
     getSpaceWidth = function(element: Element): number {
-        const spanNode = document.createElement('SPAN');
+        const spanNode = document.createElement('TSB-NONE');
         const preTextNode = document.createTextNode('1');
         const postTextNode = document.createTextNode('1');
         const textNode = document.createTextNode(' ');
-        const spaceContainer = document.createElement('SPAN');
+        const spaceContainer = document.createElement('TSB-NONE');
 
         spaceContainer.appendChild(textNode);
         spanNode.appendChild(preTextNode);
         spanNode.appendChild(spaceContainer);
         spanNode.appendChild(postTextNode);
-        element.appendChild(spanNode);
+
+        element.prepend(spanNode);
 
         const rect = spaceContainer.getBoundingClientRect();
         const width = rect.right - rect.left;
@@ -67,6 +68,7 @@ class TypesetBotRender {
 
         element.setAttribute('data-tsb-word-spacing', 'true')
         element.style.wordSpacing = 'calc((1em * ' + minSpaceSize + ') - ' + defaultWidth + 'px)';
+
     }
 
     /**
@@ -89,7 +91,7 @@ class TypesetBotRender {
 
                     renderIndexToToken[currentIndex] = token;
                     currentIndex += 1;
-                    html += '<span class="typeset-word-node">' + word.text + '</span>';
+                    html += '<tsb-none class="typeset-word-node">' + word.text + '</tsb-none>';
                     break;
                 case TypesetBotToken.types.TAG:
                     const tag = token as TypesetBotTag;
@@ -120,9 +122,7 @@ class TypesetBotRender {
         for (const renderedWordNode of renderedWordNodes) {
             const wordToken = renderIndexToToken[renderIndex] as TypesetBotWord;
             wordToken.width = renderedWordNode.getBoundingClientRect().width;
-
-            // wordToken.height = renderedWordNode.getBoundingClientRect().height;
-            wordToken.height = this.getNodeStyle(renderedWordNode, 'line-height');
+            wordToken.height = Number(this.getNodeStyle(renderedWordNode, 'line-height').replace('px', ''));
 
             renderIndex += 1;
         }
@@ -197,7 +197,7 @@ class TypesetBotRender {
                         const cut = word.text.substring(lastIndex, hyphenIndex + 1);
                         lastIndex = hyphenIndex + 1;
 
-                        html += '<span class="typeset-hyphen-check">' + cut + '</span>';
+                        html += '<tsb-none class="typeset-hyphen-check">' + cut + '</tsb-none>';
                         renderRequest.push({
                             token,
                             type: 'hyphen',
@@ -206,7 +206,7 @@ class TypesetBotRender {
                     // Queue remain (if any), fx 'phen'.
                     if (word.text.length !== lastIndex) {
                         const cut = word.text.substr(lastIndex);
-                        html += '<span class="typeset-hyphen-check">' + cut + '</span>';
+                        html += '<tsb-none class="typeset-hyphen-check">' + cut + '</tsb-none>';
                         renderRequest.push({
                             token,
                             type: 'remain',
@@ -214,7 +214,7 @@ class TypesetBotRender {
                     }
 
                     // Queue dash, '-'.
-                    html += '<span class="typeset-hyphen-check">-</span>';
+                    html += '<tsb-none class="typeset-hyphen-check">-</tsb-none>';
                     renderRequest.push({
                         token,
                         type: 'dash',
@@ -321,8 +321,7 @@ class TypesetBotRender {
             lastHyphenIndex = line.hyphenIndex;
 
             html +=
-                '<tsb-line line="' + line.lineNumber + '" style="height:' + lineHeight + '">' +
-                // '<tsb-line line="' + line.lineNumber + '" style="height:' + line.maxLineHeight + 'px">' +
+                '<tsb-line line="' + line.lineNumber + '" style="height:' + line.maxLineHeight + 'px">' +
                     lineHtml +
                 '</tsb-line>';
         }

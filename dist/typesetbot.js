@@ -1985,16 +1985,16 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
 
   this.getSpaceWidth = function (element) {
-    var spanNode = document.createElement('SPAN');
+    var spanNode = document.createElement('TSB-NONE');
     var preTextNode = document.createTextNode('1');
     var postTextNode = document.createTextNode('1');
     var textNode = document.createTextNode(' ');
-    var spaceContainer = document.createElement('SPAN');
+    var spaceContainer = document.createElement('TSB-NONE');
     spaceContainer.appendChild(textNode);
     spanNode.appendChild(preTextNode);
     spanNode.appendChild(spaceContainer);
     spanNode.appendChild(postTextNode);
-    element.appendChild(spanNode);
+    element.prepend(spanNode);
     var rect = spaceContainer.getBoundingClientRect();
     var width = rect.right - rect.left;
     spanNode.remove();
@@ -2049,7 +2049,7 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
             var word = token;
             renderIndexToToken[currentIndex] = token;
             currentIndex += 1;
-            html += '<span class="typeset-word-node">' + word.text + '</span>';
+            html += '<tsb-none class="typeset-word-node">' + word.text + '</tsb-none>';
             break;
 
           case TypesetBotToken.types.TAG:
@@ -2108,9 +2108,8 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
       for (var _iterator13 = renderedWordNodes[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
         var renderedWordNode = _step13.value;
         var wordToken = renderIndexToToken[renderIndex];
-        wordToken.width = renderedWordNode.getBoundingClientRect().width; // wordToken.height = renderedWordNode.getBoundingClientRect().height;
-
-        wordToken.height = this.getNodeStyle(renderedWordNode, 'line-height');
+        wordToken.width = renderedWordNode.getBoundingClientRect().width;
+        wordToken.height = Number(this.getNodeStyle(renderedWordNode, 'line-height').replace('px', ''));
         renderIndex += 1;
       }
     } catch (err) {
@@ -2216,7 +2215,7 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
                 var _cut = word.text.substring(lastIndex, hyphenIndex + 1);
 
                 lastIndex = hyphenIndex + 1;
-                html += '<span class="typeset-hyphen-check">' + _cut + '</span>';
+                html += '<tsb-none class="typeset-hyphen-check">' + _cut + '</tsb-none>';
                 renderRequest.push({
                   token: token,
                   type: 'hyphen'
@@ -2240,7 +2239,7 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
             if (word.text.length !== lastIndex) {
               var cut = word.text.substr(lastIndex);
-              html += '<span class="typeset-hyphen-check">' + cut + '</span>';
+              html += '<tsb-none class="typeset-hyphen-check">' + cut + '</tsb-none>';
               renderRequest.push({
                 token: token,
                 type: 'remain'
@@ -2248,7 +2247,7 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
             } // Queue dash, '-'.
 
 
-            html += '<span class="typeset-hyphen-check">-</span>';
+            html += '<tsb-none class="typeset-hyphen-check">-</tsb-none>';
             renderRequest.push({
               token: token,
               type: 'dash'
@@ -2382,8 +2381,7 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
       lineHtml += this.appendTagTokensOnLine(element, tagStack);
       curTokenIndex = line.tokenIndex;
       lastHyphenIndex = line.hyphenIndex;
-      html += '<tsb-line line="' + line.lineNumber + '" style="height:' + lineHeight + '">' + // '<tsb-line line="' + line.lineNumber + '" style="height:' + line.maxLineHeight + 'px">' +
-      lineHtml + '</tsb-line>';
+      html += '<tsb-line line="' + line.lineNumber + '" style="height:' + line.maxLineHeight + 'px">' + lineHtml + '</tsb-line>';
     }
 
     element.innerHTML = html;
