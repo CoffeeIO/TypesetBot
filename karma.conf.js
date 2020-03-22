@@ -91,10 +91,10 @@ module.exports = function(config) {
         };
         configuration.browsers = [
             "Chrome_travis_ci",
-            "Firefox",
+            // "Firefox",
             //"IE",
             //"Opera",
-            "PhantomJS"
+            // "PhantomJS"
         ];
         configuration.singleRun = true;
     }

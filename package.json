@@ -16,8 +16,6 @@
     "gulp-sass": "^4.0.2",
     "gulp-typescript": "^5.0.1",
     "gulp-watch": "^5.0.1",
-    "hyphenation.en-us": "~0.2.1",
-    "hypher": "~0.2.5",
     "jasmine-core": "^3.5.0",
     "karma": "^4.4.1",
     "karma-browserify": "^7.0.0",
