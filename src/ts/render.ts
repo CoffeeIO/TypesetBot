@@ -68,7 +68,6 @@ class TypesetBotRender {
 
         element.setAttribute('data-tsb-word-spacing', 'true')
         element.style.wordSpacing = 'calc((1em * ' + minSpaceSize + ') - ' + defaultWidth + 'px)';
-
     }
 
     /**
@@ -132,7 +131,6 @@ class TypesetBotRender {
         this._tsb.logger.start('------ Update DOM');
         element.innerHTML = backupHtml;
         this._tsb.logger.end('------ Update DOM');
-
     }
 
     /**
