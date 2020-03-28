@@ -91,19 +91,6 @@ class TypesetBotHyphen {
         }
 
         if ((window as any).Hypher.languages[this._tsb.settings.hyphenLanguage] == null) { // Language not found
-            const h = new (window as any).Hypher(module.exports);
-
-            if (typeof module.exports.id === 'string') {
-                module.exports.id = [module.exports.id];
-            }
-
-            for (let i = 0; i < module.exports.id.length; i += 1) {
-                (window as any).Hypher.languages[module.exports.id[i]] = h;
-            }
-            if ((window as any).Hypher.languages[this._tsb.settings.hyphenLanguage] != null) {
-                return this.getWordParts(word);
-            }
-
             this._tsb.logger.warn("Hyphenation language '%s' not found", this._tsb.settings.hyphenLanguage);
             return [word];
         }

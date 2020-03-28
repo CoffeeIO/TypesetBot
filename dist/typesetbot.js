@@ -2818,20 +2818,6 @@ var TypesetBotHyphen = function TypesetBotHyphen(tsb) {
 
     if (window.Hypher.languages[this._tsb.settings.hyphenLanguage] == null) {
       // Language not found
-      var h = new window.Hypher(module.exports);
-
-      if (typeof module.exports.id === 'string') {
-        module.exports.id = [module.exports.id];
-      }
-
-      for (var i = 0; i < module.exports.id.length; i += 1) {
-        window.Hypher.languages[module.exports.id[i]] = h;
-      }
-
-      if (window.Hypher.languages[this._tsb.settings.hyphenLanguage] != null) {
-        return this.getWordParts(word);
-      }
-
       this._tsb.logger.warn("Hyphenation language '%s' not found", this._tsb.settings.hyphenLanguage);
 
       return [word];

@@ -1,6 +1,6 @@
 'use strict';
 
-describe('Testing query.ts:', function() {
+describe('query.ts:', function() {
 
     let defaultSettings = {
         'noRun': true,
