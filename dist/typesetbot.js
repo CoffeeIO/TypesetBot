@@ -62,7 +62,10 @@ function TypesetBot(query, settings) {
     this.query = new TypesetBotElementQuery(this, this.initParamQuery);
     this.typesetter = new TypesetBotTypeset(this);
     this.isWatching = true;
-    this.typeset();
+
+    if (!this.settings.noRun) {
+      this.typeset();
+    }
   };
   /**
    * Typeset all elements in query.
@@ -616,7 +619,9 @@ var TypesetBotElementQuery = function TypesetBotElementQuery(tsb, query) {
  */
 
 
-var TypesetBotSettings =
+var TypesetBotSettings = // Silence all warnings.
+// silence: boolean = false;
+
 /**
  * @param tsb
  * @param settings Optional settings object.
@@ -665,9 +670,12 @@ function TypesetBotSettings(tsb) {
 
   this.spaceStretchability = 1 / 6; // How much can the space width shrink
 
-  this.spaceShrinkability = 1 / 9; // Debug mode: prints performance stats. -----------------------------------
+  this.spaceShrinkability = 1 / 9; // Debug mode. -----------------------------------
+  // Prints performance stats.
 
-  this.debug = false;
+  this.debug = false; // Don't run Typesetting as soon as program is initialized.
+
+  this.noRun = false;
   /**
    * Merge custom settings with a default set of settings.
    *
@@ -2762,7 +2770,8 @@ var TypesetBotHyphen = function TypesetBotHyphen(tsb) {
     }
 
     if (window.Hypher == null || window.Hypher.languages == null) {
-      console.warn('Hyphenation library not found');
+      this._tsb.logger.warn('Hyphenation library not found');
+
       return [word];
     }
 
@@ -2782,7 +2791,8 @@ var TypesetBotHyphen = function TypesetBotHyphen(tsb) {
         return this.getWordParts(word);
       }
 
-      console.warn("Hyphenation language '%s' not found", this._tsb.settings.hyphenLanguage);
+      this._tsb.logger.warn("Hyphenation language '%s' not found", this._tsb.settings.hyphenLanguage);
+
       return [word];
     }
 

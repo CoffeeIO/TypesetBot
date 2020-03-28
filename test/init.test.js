@@ -4,8 +4,8 @@ function timeout(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-beforeEach(function () {
-    // setTimeout(function () {
+beforeEach(function() {
+    // setTimeout(function() {
     //     done();
     // }, 50);
 });
@@ -17,9 +17,9 @@ afterEach(function() {
     }
 });
 
-describe('Setup', function () {
+describe('Testing Jasmine and browser emulation', function() {
 
-    describe('Basic logic', function () {
+    describe('Basic logic', function() {
         function logMessage() {
             console.log('Hello world');
         }
@@ -27,19 +27,19 @@ describe('Setup', function () {
             console.error('Hello world');
         }
 
-        it('Basic math', function () {
+        it('Basic math', function() {
             let x = 1;
             let y = 4;
 
             expect(x + y).toEqual(5);
         });
-        it('Class exists', function () {
+        it('Class exists', function() {
             let tsb = new TypesetBot();
 
             expect(TypesetBot).not.toEqual(null);
             expect(TypesetBot).not.toEqual(undefined);
         });
-        it('Console log spy', function () {
+        it('Console log spy', function() {
             console.log = jasmine.createSpy("log");
             console.error = jasmine.createSpy("error");
 
@@ -47,7 +47,7 @@ describe('Setup', function () {
             expect(console.log).not.toHaveBeenCalledWith('Hello worl');
             expect(console.log).toHaveBeenCalledWith('Hello world');
         });
-        it('Console error spy', function () {
+        it('Console error spy', function() {
             console.error = jasmine.createSpy("error");
             console.log = jasmine.createSpy("log");
 
@@ -59,31 +59,31 @@ describe('Setup', function () {
             expect(console.error).toHaveBeenCalledWith('Hello world');
         });
     });
-    describe('Inserting HTML', function () {
+    describe('Inserting HTML', function() {
         let fixture =
             '<div class="test">' +
                 'Hello world' +
             '</div>';
 
-        it('Adding fixture', function () {
+        it('Adding fixture', function() {
             document.body.insertAdjacentHTML('beforeend', fixture);
 
             let t = document.querySelector('.test');
             expect(t.innerHTML).toEqual('Hello world');
         });
 
-        it('Body is cleared after each test', function () {
+        it('Body is cleared after each test', function() {
             let t = document.querySelector('.test');
             expect(t).toEqual(null);
         });
     });
 
-    describe('Render dimensions', function () {
+    describe('Render dimensions', function() {
         let fixture =
             '<div class="test">' +
                 'Hello world' +
             '</div>';
-        it('Default style properties', function () {
+        it('Default style properties', function() {
             document.body.insertAdjacentHTML('beforeend', fixture);
 
             let t = document.querySelector('.test');
@@ -92,9 +92,9 @@ describe('Setup', function () {
             expect(fontSize).not.toEqual(null);
             expect(fontSize.indexOf('px')).not.toEqual(-1);
         });
-        it('Overwrite style properties', function () {
+        it('Overwrite style properties', function() {
             let style =
-                '<style class="test">' +
+                '<style class="style">' +
                     '.test { font-size: 29px; }' +
                 '<style>';
 
@@ -106,7 +106,7 @@ describe('Setup', function () {
             let fontSize = window.getComputedStyle(t).getPropertyValue('font-size');
             expect(fontSize).toEqual('29px');
         });
-        it('Removing style properties after test', function () {
+        it('Removing style properties after test', function() {
             document.body.insertAdjacentHTML('beforeend', fixture);
 
             let t = document.querySelector('.test');
@@ -128,11 +128,12 @@ describe('Setup', function () {
             expect(widthProp).toEqual('500px');
 
             // Wait a bit for DOM to update.
-            setTimeout(function () {
+            setTimeout(function() {
             // return timeout(3000).then(function(r) {
                 const rect = t.getBoundingClientRect();
                 const width = rect.right - rect.left;
                 expect(width).toEqual(500);
+
                 done();
             }, 50);
         });

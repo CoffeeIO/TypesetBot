@@ -86,7 +86,7 @@ class TypesetBotHyphen {
         }
 
         if ((window as any).Hypher == null || (window as any).Hypher.languages == null) {
-            console.warn('Hyphenation library not found');
+            this._tsb.logger.warn('Hyphenation library not found');
             return[word];
         }
 
@@ -104,7 +104,7 @@ class TypesetBotHyphen {
                 return this.getWordParts(word);
             }
 
-            console.warn("Hyphenation language '%s' not found", this._tsb.settings.hyphenLanguage);
+            this._tsb.logger.warn("Hyphenation language '%s' not found", this._tsb.settings.hyphenLanguage);
             return [word];
         }
 

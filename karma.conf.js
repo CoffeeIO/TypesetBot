@@ -1,6 +1,4 @@
 // Karma configuration
-// Generated on Mon Jul 18 2016 14:06:44 GMT-0500 (Central Daylight Time (Mexico))
-
 module.exports = function(config) {
 
     var configuration = {
@@ -20,7 +18,7 @@ module.exports = function(config) {
             {pattern: 'dist/typesetbot.css', watched: true, included: true, served: true},
 
             // Test files.
-            {pattern: 'test/init.test.js', watched: true, included: true, served: true},
+            {pattern: 'test/*.test.js', watched: true, included: true, served: true},
         ],
 
         // plugins: [
@@ -38,6 +36,10 @@ module.exports = function(config) {
             //"Opera",
             // "PhantomJS"
         ],
+
+        client: {
+            captureConsole: true,
+        },
 
         // list of files to exclude
         exclude: [
