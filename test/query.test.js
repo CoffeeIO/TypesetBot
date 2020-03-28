@@ -219,7 +219,7 @@ describe('Testing query.ts', function() {
                 done();
             }, 100);
         });
-        it('Mulitple TSB instances, overlapping selectors', function(done) {
+        it('Mulitple TSB instances, can not reselect', function(done) {
             let fixture2 =
                 '<div class="test test2">' +
                     'Hello world' +
