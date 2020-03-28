@@ -31,7 +31,7 @@ module.exports = function(config) {
         // ],
         browsers: [
             "Chrome",
-            // "Firefox",
+            "Firefox",
             // "IE",
             //"Opera",
             // "PhantomJS"
