@@ -4,12 +4,10 @@ function timeout(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-beforeEach(function() {
-    // setTimeout(function() {
-    //     done();
-    // }, 50);
-});
-
+/**
+ * Remove all testing elements and styles after each test.
+ * This runs cross all test classes.
+ */
 afterEach(function() {
     let x = document.body.querySelectorAll('.test, .style');
     for (let y of x) {

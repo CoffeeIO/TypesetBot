@@ -21,6 +21,7 @@ describe('Testing query.ts', function() {
             setTimeout(function() {
                 expect(tsb.query.nodes).not.toEqual(null);
                 expect(tsb.query.nodes.length).toEqual(1);
+
                 done();
             }, 100);
         });
@@ -51,6 +52,7 @@ describe('Testing query.ts', function() {
             setTimeout(function() {
                 expect(tsb.query.nodes).not.toEqual(null);
                 expect(tsb.query.nodes.length).toEqual(1);
+
                 done();
             }, 100);
         });
@@ -64,6 +66,7 @@ describe('Testing query.ts', function() {
             setTimeout(function() {
                 expect(tsb.query.nodes).not.toEqual(null);
                 expect(tsb.query.nodes.length).toEqual(2);
+
                 done();
             }, 100);
         });
@@ -79,6 +82,7 @@ describe('Testing query.ts', function() {
             setTimeout(function() {
                 expect(tsb.query.nodes).not.toEqual(null);
                 expect(tsb.query.nodes.length).toEqual(2);
+
                 done();
             }, 100);
         });
@@ -97,6 +101,7 @@ describe('Testing query.ts', function() {
             setTimeout(function() {
                 expect(tsb.query.nodes).not.toEqual(null);
                 expect(tsb.query.nodes.length).toEqual(3);
+
                 done();
             }, 100);
         });
@@ -162,7 +167,6 @@ describe('Testing query.ts', function() {
             }, 100);
         });
 
-
         // it('Nested selectors, only detect inner element', function(done) {
         //     let fixture =
         //         '<div class="test">' +
@@ -182,7 +186,7 @@ describe('Testing query.ts', function() {
         // });
     });
 
-    describe('Direct class', function() {
+    describe('Direct class call', function() {
         it('Null selector with direct call to query', function(done) {
             document.body.insertAdjacentHTML('beforeend', fixture);
             document.body.insertAdjacentHTML('beforeend', fixture);
