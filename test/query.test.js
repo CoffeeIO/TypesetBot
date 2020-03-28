@@ -1,6 +1,6 @@
 'use strict';
 
-describe('Testing query.ts', function() {
+describe('Testing query.ts:', function() {
 
     let defaultSettings = {
         'noRun': true,
@@ -11,7 +11,7 @@ describe('Testing query.ts', function() {
             'Hello world' +
         '</div>';
 
-    describe('Query Node', function() {
+    describe('Query Node --', function() {
         it('Query single Node', function(done) {
             document.body.insertAdjacentHTML('beforeend', fixture);
 
@@ -32,7 +32,6 @@ describe('Testing query.ts', function() {
             let t = document.querySelector('.test');
             let tsb = new TypesetBot(t, defaultSettings);
 
-
             setTimeout(function() {
                 expect(tsb.query.nodes).not.toEqual(null);
                 expect(tsb.query.nodes.length).toEqual(1);
@@ -42,7 +41,7 @@ describe('Testing query.ts', function() {
         });
     });
 
-    describe('Query NodeList', function() {
+    describe('Query NodeList --', function() {
         it('Query selector all', function(done) {
             document.body.insertAdjacentHTML('beforeend', fixture);
 
@@ -72,7 +71,7 @@ describe('Testing query.ts', function() {
         });
     });
 
-    describe('Query String', function() {
+    describe('Query String --', function() {
         it('Class selector, multiple', function(done) {
             document.body.insertAdjacentHTML('beforeend', fixture);
             document.body.insertAdjacentHTML('beforeend', fixture);
@@ -186,7 +185,7 @@ describe('Testing query.ts', function() {
         // });
     });
 
-    describe('Direct class call', function() {
+    describe('Direct class call --', function() {
         it('Null selector with direct call to query', function(done) {
             document.body.insertAdjacentHTML('beforeend', fixture);
             document.body.insertAdjacentHTML('beforeend', fixture);
@@ -202,7 +201,7 @@ describe('Testing query.ts', function() {
         });
     });
 
-    describe('Multiple instances', function() {
+    describe('Multiple instances --', function() {
         it('Mulitple TSB instances, overlapping selectors', function(done) {
             let fixture2 =
                 '<div class="test test2">' +
@@ -239,6 +238,56 @@ describe('Testing query.ts', function() {
             setTimeout(function() {
                 expect(tsb1.query.nodes.length).toEqual(3);
                 expect(tsb2.query.nodes.length).toEqual(0);
+
+                done();
+            }, 100);
+        });
+    });
+
+    describe('Requery function --', function() {
+        it('Requery - no difference', function(done) {
+            document.body.insertAdjacentHTML('beforeend', fixture);
+            document.body.insertAdjacentHTML('beforeend', fixture);
+
+            let tsb1 = new TypesetBot('.test', defaultSettings);
+            setTimeout(function() {
+                expect(tsb1.query.nodes.length).toEqual(2);
+
+                tsb1.query.requery();
+                expect(tsb1.query.nodes.length).toEqual(2);
+
+                done();
+            }, 100);
+        });
+        it('Requery - more nodes', function(done) {
+            document.body.insertAdjacentHTML('beforeend', fixture);
+            document.body.insertAdjacentHTML('beforeend', fixture);
+
+            let tsb1 = new TypesetBot('.test', defaultSettings);
+            setTimeout(function() {
+                expect(tsb1.query.nodes.length).toEqual(2);
+
+                document.body.insertAdjacentHTML('beforeend', fixture);
+
+                tsb1.query.requery();
+                expect(tsb1.query.nodes.length).toEqual(3);
+
+                done();
+            }, 100);
+        });
+        it('Requery - less nodes', function(done) {
+            document.body.insertAdjacentHTML('beforeend', fixture);
+            document.body.insertAdjacentHTML('beforeend', fixture);
+
+            let tsb1 = new TypesetBot('.test', defaultSettings);
+            setTimeout(function() {
+                expect(tsb1.query.nodes.length).toEqual(2);
+
+                // Remove single node.
+                document.querySelector('.test').remove();
+
+                tsb1.query.requery();
+                expect(tsb1.query.nodes.length).toEqual(1);
 
                 done();
             }, 100);

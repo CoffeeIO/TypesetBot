@@ -79,9 +79,24 @@ class TypesetBotElementQuery {
      * @param elem
      */
     indexNodes = function(nodes: Element[]) {
+        this.removeNodesNotInDom();
+
         for (const node of nodes) {
             this.indexNode(node);
         }
+    }
+
+    /**
+     * Remove any queried Node no longer in DOM.
+     */
+    removeNodesNotInDom = function() {
+        const newNodes: NodeList[] = [];
+        for (const node of this.nodes) {
+            if (document.body.contains(node)) {
+                newNodes.push(node);
+            }
+        }
+        this.nodes = newNodes;
     }
 
     /**
