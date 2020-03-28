@@ -67,7 +67,7 @@ class TypesetBotSettings {
     // How much can the space width shrink
     spaceShrinkability : number = 1 / 9;
 
-    // Debug mode. -----------------------------------
+    // Debug mode. ------------------------------------------------------------
 
     // Prints performance stats.
     debug: boolean = false;
@@ -75,8 +75,8 @@ class TypesetBotSettings {
     // Don't run Typesetting as soon as program is initialized.
     noRun: boolean = false;
 
-    // Silence all warnings.
-    // silence: boolean = false;
+    // Define levels to log. Options: 'error', 'warn', 'log'
+    logs: string[] = ['error', 'warn'];
 
     /**
      * @param tsb

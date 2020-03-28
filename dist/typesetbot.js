@@ -272,6 +272,7 @@ function TypesetBotLog(tsb) {
   _classCallCheck(this, TypesetBotLog);
 
   this.debug = false;
+  this.logs = [];
   /**
    * Log messages if debug mode is on.
    *
@@ -279,7 +280,7 @@ function TypesetBotLog(tsb) {
    */
 
   this.log = function (message) {
-    if (this.debug) {
+    if ('log' in this.logs) {
       console.log('TypesetBot: %s', message);
 
       if (_typeof(message) === 'object') {
@@ -295,7 +296,7 @@ function TypesetBotLog(tsb) {
 
 
   this.warn = function (message) {
-    if (this.debug) {
+    if ('warn' in this.logs) {
       console.warn('TypesetBot: %s', message);
 
       if (_typeof(message) === 'object') {
@@ -311,10 +312,12 @@ function TypesetBotLog(tsb) {
 
 
   this.error = function (message) {
-    console.error('TypesetBot: %s', message);
+    if ('error' in this.logs) {
+      console.error('TypesetBot: %s', message);
 
-    if (_typeof(message) === 'object') {
-      console.error(message);
+      if (_typeof(message) === 'object') {
+        console.error(message);
+      }
     }
   };
   /**
@@ -399,6 +402,7 @@ function TypesetBotLog(tsb) {
   this._tsb = tsb;
   this._performanceMap = {};
   this.debug = this._tsb.settings.debug;
+  this.logs = this._tsb.settings.logs;
 };
 /**
  * Class to hold start and end timestamps for a specific key.
@@ -619,9 +623,7 @@ var TypesetBotElementQuery = function TypesetBotElementQuery(tsb, query) {
  */
 
 
-var TypesetBotSettings = // Silence all warnings.
-// silence: boolean = false;
-
+var TypesetBotSettings =
 /**
  * @param tsb
  * @param settings Optional settings object.
@@ -670,12 +672,14 @@ function TypesetBotSettings(tsb) {
 
   this.spaceStretchability = 1 / 6; // How much can the space width shrink
 
-  this.spaceShrinkability = 1 / 9; // Debug mode. -----------------------------------
+  this.spaceShrinkability = 1 / 9; // Debug mode. ------------------------------------------------------------
   // Prints performance stats.
 
   this.debug = false; // Don't run Typesetting as soon as program is initialized.
 
-  this.noRun = false;
+  this.noRun = false; // Define levels to log. Options: 'error', 'warn', 'log'
+
+  this.logs = ['error', 'warn'];
   /**
    * Merge custom settings with a default set of settings.
    *

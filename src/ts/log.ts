@@ -4,6 +4,8 @@
 class TypesetBotLog {
 
     debug: boolean = false;
+    logs: string[] = [];
+
     private _tsb: TypesetBot;
     private _performanceMap: { [key: string] : TypesetBotPerformanceEntry; };
 
@@ -16,6 +18,7 @@ class TypesetBotLog {
         this._tsb = tsb;
         this._performanceMap = {};
         this.debug = this._tsb.settings.debug;
+        this.logs = this._tsb.settings.logs;
     }
 
     /**
@@ -24,7 +27,7 @@ class TypesetBotLog {
      * @param message The log message
      */
     log = function(message: any) {
-        if (this.debug) {
+        if ('log' in this.logs) {
             console.log('TypesetBot: %s', message);
             if (typeof message === 'object') {
                 console.log(message);
@@ -38,7 +41,7 @@ class TypesetBotLog {
      * @param message The log message
      */
     warn = function(message: any) {
-        if (this.debug) {
+        if ('warn' in this.logs) {
             console.warn('TypesetBot: %s', message);
             if (typeof message === 'object') {
                 console.warn(message);
@@ -52,9 +55,11 @@ class TypesetBotLog {
      * @param message The log message
      */
     error = function(message: any) {
-        console.error('TypesetBot: %s', message)
-        if (typeof message === 'object') {
-            console.error(message);
+        if ('error' in this.logs) {
+            console.error('TypesetBot: %s', message)
+            if (typeof message === 'object') {
+                console.error(message);
+            }
         }
     }
 
