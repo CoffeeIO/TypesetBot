@@ -295,7 +295,7 @@ function TypesetBotLog(tsb) {
    */
 
   this.log = function (message) {
-    if ('log' in this.logs) {
+    if (this.logs.includes('log')) {
       console.log('TypesetBot: %s', message);
 
       if (_typeof(message) === 'object') {
@@ -311,7 +311,7 @@ function TypesetBotLog(tsb) {
 
 
   this.warn = function (message) {
-    if ('warn' in this.logs) {
+    if (this.logs.includes('warn')) {
       console.warn('TypesetBot: %s', message);
 
       if (_typeof(message) === 'object') {
@@ -327,7 +327,7 @@ function TypesetBotLog(tsb) {
 
 
   this.error = function (message) {
-    if ('error' in this.logs) {
+    if (this.logs.includes('error')) {
       console.error('TypesetBot: %s', message);
 
       if (_typeof(message) === 'object') {
@@ -1289,10 +1289,12 @@ function TypesetBotTokenizer(tsb, typesetter) {
       return [];
     }
 
-    if (node.nodeName in this._tsb.settings.unsupportedTags) {
+    if (this._tsb.settings.unsupportedTags.includes(node.nodeName)) {
       this._tsb.logger.warn('Tokenizer found unsupported node type, typesetting might not work as intended.');
 
       this._tsb.logger.warn(node);
+
+      return [];
     }
 
     var nodeIndex = this.appendToNodeMap(root, node); // Add start tag.

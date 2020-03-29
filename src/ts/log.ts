@@ -27,7 +27,7 @@ class TypesetBotLog {
      * @param message The log message
      */
     log = function(message: any) {
-        if ('log' in this.logs) {
+        if (this.logs.includes('log')) {
             console.log('TypesetBot: %s', message);
             if (typeof message === 'object') {
                 console.log(message);
@@ -41,7 +41,7 @@ class TypesetBotLog {
      * @param message The log message
      */
     warn = function(message: any) {
-        if ('warn' in this.logs) {
+        if (this.logs.includes('warn')) {
             console.warn('TypesetBot: %s', message);
             if (typeof message === 'object') {
                 console.warn(message);
@@ -55,7 +55,7 @@ class TypesetBotLog {
      * @param message The log message
      */
     error = function(message: any) {
-        if ('error' in this.logs) {
+        if (this.logs.includes('error')) {
             console.error('TypesetBot: %s', message)
             if (typeof message === 'object') {
                 console.error(message);

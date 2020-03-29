@@ -76,9 +76,10 @@ class TypesetBotTokenizer {
             return [];
         }
 
-        if (node.nodeName in this._tsb.settings.unsupportedTags) {
+        if (this._tsb.settings.unsupportedTags.includes(node.nodeName)) {
             this._tsb.logger.warn('Tokenizer found unsupported node type, typesetting might not work as intended.');
             this._tsb.logger.warn(node);
+            return [];
         }
 
         const nodeIndex = this.appendToNodeMap(root, node);
