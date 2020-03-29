@@ -99,8 +99,9 @@ class TypesetBotSettings {
         }
 
         for (const [key, value] of Object.entries(settings)) {
-            if (this[key] === undefined) {
-                this._tsb.logger.warn('Unknown settings key "' + key +'"');
+            if (typeof this[key] === 'undefined') {
+                console.warn('Unknown settings key "' + key +'"');
+                continue;
             }
 
             this[key] = value;
