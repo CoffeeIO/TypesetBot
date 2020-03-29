@@ -160,7 +160,7 @@ describe('math.ts:', function () {
                 done();
             }, 100);
         });
-        it('Flags', function (done) {
+        it('Flags increase demerit', function (done) {
             let tsb1 = new TypesetBot(null, defaultSettings);
             setTimeout(function() {
                 let math = new TypesetBotMath(tsb1);
