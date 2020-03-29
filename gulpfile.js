@@ -1,5 +1,6 @@
 // Ordered set of TypeScript files to load. -----------------------------------
 var source = [
+    'src/ts/polyfill.ts',
     'src/ts/main.ts',
     'src/ts/log.ts',
     'src/ts/query.ts',

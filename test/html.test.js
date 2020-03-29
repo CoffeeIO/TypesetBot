@@ -26,6 +26,7 @@ describe('html.ts:', function () {
                 expect(tokens[0].type).toEqual(3);
                 expect(tokens[2].type).toEqual(3);
 
+                // flag, flag="" is the same.
                 expect(html.createTagHtml(node, tokens[0])).toEqual('<span id="some-id" class="inner" data-hello="world" flag="" >');
                 expect(html.createTagHtml(node, tokens[0], true)).toEqual('</span>');
                 expect(html.createTagHtml(node, tokens[2])).toEqual('</span>');

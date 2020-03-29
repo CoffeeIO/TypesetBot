@@ -7,11 +7,6 @@ describe('math.ts:', function () {
         'logs': ['error', 'warn', 'log'],
     };
 
-    let fixture =
-        '<div class="test">' +
-            'Hello world' +
-        '</div>';
-
     describe('getRatio --', function() {
         it('Perfect fit', function(done) {
             let tsb1 = new TypesetBot(null, defaultSettings);

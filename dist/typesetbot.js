@@ -25,9 +25,24 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+if (!Object.entries) {
+  Object.entries = function (obj) {
+    var ownProps = Object.keys(obj),
+        i = ownProps.length,
+        resArray = new Array(i); // preallocate the Array
+
+    while (i--) {
+      resArray[i] = [ownProps[i], obj[ownProps[i]]];
+    }
+
+    return resArray;
+  };
+}
 /**
  * The main TypesetBot class handing initializing new instances of TypesetBot.
  */
+
+
 var TypesetBot =
 /**
  * Constructor of new TypesetBot objects.
@@ -735,8 +750,9 @@ function TypesetBotSettings(tsb) {
           key = _Object$entries$_i[0],
           value = _Object$entries$_i[1];
 
-      if (this[key] === undefined) {
-        this._tsb.logger.warn('Unknown settings key "' + key + '"');
+      if (typeof this[key] === 'undefined') {
+        console.warn('Unknown settings key "' + key + '"');
+        continue;
       }
 
       this[key] = value;
