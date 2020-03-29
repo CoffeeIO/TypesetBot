@@ -57,7 +57,6 @@ describe('hyphen.ts:', function() {
                 let hyphen = new TypesetBotHyphen(tsb1);
                 let wordparts = hyphen.hyphenate('hyphenation');
 
-                console.log(wordparts);
                 expect(wordparts.length).toEqual(3);
                 expect(wordparts).toEqual(['hyphen', 'a', 'tion']);
 
@@ -75,7 +74,6 @@ describe('hyphen.ts:', function() {
                 let hyphen = new TypesetBotHyphen(tsb1);
                 let wordparts = hyphen.hyphenate('hyphenation');
 
-                console.log(wordparts);
                 expect(wordparts.length).toEqual(3);
                 expect(wordparts).toEqual(['hy', 'phen', 'ation']);
 
@@ -192,5 +190,8 @@ describe('hyphen.ts:', function() {
                 done();
             }, 100);
         })
+    });
+    describe('nextWord --', function() {
+        // Should be implemented.
     });
 });
