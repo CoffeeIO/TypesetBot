@@ -89,9 +89,6 @@ describe('math.ts:', function () {
 
     });
     describe('getDemeritFromBadness --', function() {
-
-    });
-    describe('getDemerit --', function() {
         it('Zero penalty', function (done) {
             let tsb1 = new TypesetBot(null, defaultSettings);
             setTimeout(function() {
@@ -146,6 +143,81 @@ describe('math.ts:', function () {
                 expect(zeroPenalty).toBeLessThan(penalty);
                 expect(zeroPenaltyFlag).toBeLessThan(penaltyFlag);
                 expect(penalty).toBeLessThan(penaltyFlag);
+
+                done();
+            }, 100);
+        });
+    });
+    describe('getDemerit --', function() {
+        it('Ideal ratio', function (done) {
+            let tsb1 = new TypesetBot(null, defaultSettings);
+            setTimeout(function() {
+                let math = new TypesetBotMath(tsb1);
+
+                expect(math.getDemerit(0, false, false, false)).toBeLessThan(math.getDemerit(0.5, false, false, false));
+                expect(math.getDemerit(0, false, false, false)).toBeLessThan(math.getDemerit(-0.5, false, false, false));
+
+                done();
+            }, 100);
+        });
+        it('Flags', function (done) {
+            let tsb1 = new TypesetBot(null, defaultSettings);
+            setTimeout(function() {
+                let math = new TypesetBotMath(tsb1);
+
+                expect(math.getDemerit(0, false, false, false)).toBeLessThan(math.getDemerit(0, true, false, false));
+                expect(math.getDemerit(0, false, false, false)).toBeLessThan(math.getDemerit(0, false, true, false));
+                expect(math.getDemerit(0, false, false, false)).toBeLessThan(math.getDemerit(0, false, false, true));
+
+                expect(math.getDemerit(0, false, false, false)).toBeLessThan(math.getDemerit(1, true, false, false));
+                expect(math.getDemerit(0, false, false, false)).toBeLessThan(math.getDemerit(1, false, true, false));
+                expect(math.getDemerit(0, false, false, false)).toBeLessThan(math.getDemerit(1, false, false, true));
+
+                done();
+            }, 100);
+        });
+        it('Penalty settings', function (done) {
+            const settings = Object.assign({}, defaultSettings);
+            settings.hyphenPenalty = 50;
+            settings.hyphenPenaltyRagged = 500;
+            settings.fitnessClassDemerit = 3000;
+            settings.flagPenalty = 3000;
+            settings.alignment = 'justify';
+
+            const settings2 = Object.assign({}, defaultSettings);
+            settings2.flagPenalty = 4000;
+
+            const settings3 = Object.assign({}, defaultSettings);
+            settings3.hyphenPenalty = 100;
+
+            const settings4 = Object.assign({}, defaultSettings);
+            settings4.fitnessClassDemerit = 4000;
+
+            const settings5 = Object.assign({}, defaultSettings);
+            settings5.alignment = 'left';
+
+            setTimeout(function() {
+                let math1 = new TypesetBotMath(new TypesetBot(null, settings));
+                let math2 = new TypesetBotMath(new TypesetBot(null, settings2));
+                let math3 = new TypesetBotMath(new TypesetBot(null, settings3));
+                let math4 = new TypesetBotMath(new TypesetBot(null, settings4));
+                let math5 = new TypesetBotMath(new TypesetBot(null, settings5));
+
+                // Increase flag penalty.
+                expect(math1.getDemerit(0, false, false, false)).toEqual(math2.getDemerit(0, false, false, false));
+                expect(math1.getDemerit(0, true, false, false)).toBeLessThan(math2.getDemerit(0, true, false, false));
+
+                // Increase hyphen penalty.
+                expect(math1.getDemerit(0, false, false, false)).toEqual(math3.getDemerit(0, false, false, false));
+                expect(math1.getDemerit(0, false, true, false)).toBeLessThan(math3.getDemerit(0, false, true, false));
+
+                // Increase class demerit.
+                expect(math1.getDemerit(0, false, false, false)).toEqual(math4.getDemerit(0, false, false, false));
+                expect(math1.getDemerit(0, false, false, true)).toBeLessThan(math4.getDemerit(0, false, false, true));
+
+                // Change alignment to ragged.
+                expect(math1.getDemerit(0, false, false, false)).toEqual(math5.getDemerit(0, false, false, false));
+                expect(math1.getDemerit(0, false, true, false)).toBeLessThan(math5.getDemerit(0, false, true, false));
 
                 done();
             }, 100);
