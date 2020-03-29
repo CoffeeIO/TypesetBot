@@ -43,6 +43,6 @@ describe('utils.ts:', function () {
         it('General', function() {
             expect(TypesetBotUtils.getArrayIndexes(["hyp", "hen", "ation"])).toEqual([3, 3]);
             expect(TypesetBotUtils.getArrayIndexes(["hyptation"])).toEqual([]);
-        })
-    })
+        });
+    });
 });
