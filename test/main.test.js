@@ -1,5 +1,5 @@
 'use strict';
 
-describe('Testing main.ts', function () {
+describe('main.ts:', function () {
 
 });

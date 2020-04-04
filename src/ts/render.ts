@@ -71,6 +71,103 @@ class TypesetBotRender {
     }
 
     /**
+     * Get default font size of element.
+     *
+     * @param   element
+     * @returns         The font size in pixels as number
+     */
+    getDefaultFontSize = function(element: HTMLElement) : number {
+        return this.getNodeStyleNumber(element, 'font-size');
+    }
+
+    /**
+     * Get width of node.
+     *
+     * @param   element
+     * @returns         The width of node in pixels as number
+     */
+    getNodeWidth = function(element: HTMLElement): number {
+        return element.getBoundingClientRect().width;
+    }
+
+    /**
+     * Get style property of element.
+     *
+     * @param   element  The element
+     * @param   property The property name
+     * @returns          The rendered style property
+     */
+    getNodeStyle = function(element: HTMLElement, property: string): string {
+        return window.getComputedStyle(element).getPropertyValue(property);
+    }
+
+    /**
+     * Get style property of element as Number without px postfix.
+     *
+     * @param   element  The element
+     * @param   property The property name
+     * @returns          The rendered style property
+     */
+    getNodeStyleNumber = function(element: HTMLElement, property: string): number {
+        return Number(this.getNodeStyle(element, property).replace('px', ''));
+    }
+
+    /**
+     * Get line height of element.
+     *
+     * @param element
+     */
+    getLineHeight = function(element: HTMLElement) {
+        let lineHeight = this.getNodeStyle(element, 'line-height');
+        if (lineHeight == 'normal') {
+            // Make line height relative to font size.
+            let fontSize = this.getNodeStyleNumber(element, 'font-size');
+            lineHeight = 1.2 * fontSize; // 1.2 em
+        } else {
+            // Format number.
+            lineHeight = Number(lineHeight.replace('px', ''));
+        }
+
+        return lineHeight;
+    }
+
+    /**
+     * Add text justification class to element.
+     *
+     * @param element
+     */
+    setJustificationClass = function(element: Element) {
+        this.removeJustificationClass(element);
+
+        switch (this._tsb.settings.alignment) {
+            case 'justify':
+                element.classList.add('typesetbot-justify');
+                break;
+            case 'left':
+                element.classList.add('typesetbot-left');
+                break;
+            case 'right':
+                element.classList.add('typesetbot-right');
+                break;
+            case 'center':
+                element.classList.add('typesetbot-center');
+                break;
+            default:
+                this._tsb.logger.warn('Unknown alignment type: ' + this._tsb.settings.alignment);
+                break;
+        }
+    }
+
+    /**
+     * Remove all justification classes from element.
+     *
+     * @param element The element
+     */
+    removeJustificationClass = function(element: Element) {
+        element.classList.remove('typesetbot-justify', 'typesetbot-left', 'typesetbot-right', 'typesetbot-center');
+    }
+
+    /**
      * Get rendering dimensions of words in element.
      *
      * @param element
@@ -131,67 +228,6 @@ class TypesetBotRender {
         this._tsb.logger.start('------ Update DOM');
         element.innerHTML = backupHtml;
         this._tsb.logger.end('------ Update DOM');
-    }
-
-    /**
-     * Get default font size of element.
-     *
-     * @param   element
-     * @returns         The font size in pixels as number
-     */
-    getDefaultFontSize = function(element: HTMLElement) : number {
-        return this.getNodeStyleNumber(element, 'font-size');
-    }
-
-    /**
-     * Get width of node.
-     *
-     * @param   element
-     * @returns         The width of node in pixels as number
-     */
-    getNodeWidth = function(element: HTMLElement): number {
-        return element.getBoundingClientRect().width;
-    }
-
-    /**
-     * Get style property of element.
-     *
-     * @param   element  The element
-     * @param   property The property name
-     * @returns          The rendered style property
-     */
-    getNodeStyle = function(element: HTMLElement, property: string): string {
-        return window.getComputedStyle(element).getPropertyValue(property);
-    }
-
-    /**
-     * Get style property of element as Number without px postfix.
-     *
-     * @param   element  The element
-     * @param   property The property name
-     * @returns          The rendered style property
-     */
-    getNodeStyleNumber = function(element: HTMLElement, property: string): number {
-        return Number(this.getNodeStyle(element, property).replace('px', ''));
-    }
-
-    /**
-     * Get line height of element.
-     *
-     * @param element
-     */
-    getLineHeight = function(element: HTMLElement) {
-        let lineHeight = this.getNodeStyle(element, 'line-height');
-        if (lineHeight == 'normal') {
-            // Make line height relative to font size.
-            let fontSize = this.getNodeStyleNumber(element, 'font-size');
-            lineHeight = 1.2 * fontSize; // 1.2 em
-        } else {
-            // Format number.
-            lineHeight = Number(lineHeight.replace('px', ''));
-        }
-
-        return lineHeight;
     }
 
     /**
@@ -331,8 +367,8 @@ class TypesetBotRender {
         for (const line of lines) {
             let lineHtml = '';
 
-            lineHtml += this.prependTagTokensOnLine(element, tagStack);
-            lineHtml += this.getHtmlFromTokensRange(
+            lineHtml += this.htmlGenerator.prependTagTokensOnLine(element, tagStack);
+            lineHtml += this.htmlGenerator.getHtmlFromTokensRange(
                 element,
                 curTokenIndex,
                 lastHyphenIndex,
@@ -340,7 +376,7 @@ class TypesetBotRender {
                 line.hyphenIndex,
                 tagStack,
             );
-            lineHtml += this.appendTagTokensOnLine(element, tagStack);
+            lineHtml += this.htmlGenerator.appendTagTokensOnLine(element, tagStack);
 
             curTokenIndex = line.tokenIndex;
             lastHyphenIndex = line.hyphenIndex;
@@ -361,159 +397,5 @@ class TypesetBotRender {
 
 
         this._tsb.logger.end('-- Apply breakpoints');
-    }
-
-    /**
-     * Add text justification class to element.
-     *
-     * @param element
-     */
-    setJustificationClass = function(element: Element) {
-        this.removeJustificationClass(element);
-
-        switch (this._tsb.settings.alignment) {
-            case 'justify':
-                element.classList.add('typesetbot-justify');
-                break;
-            case 'left':
-                element.classList.add('typesetbot-left');
-                break;
-            case 'right':
-                element.classList.add('typesetbot-right');
-                break;
-            case 'center':
-                element.classList.add('typesetbot-center');
-                break;
-            default:
-                this._tsb.logger.warn('Unknown alignment type: ' + this._tsb.settings.alignment);
-                break;
-        }
-    }
-
-    /**
-     * Remove all justification classes from element.
-     *
-     * @param element The element
-     */
-    removeJustificationClass = function(element: Element) {
-        element.classList.remove('typesetbot-justify', 'typesetbot-left', 'typesetbot-right', 'typesetbot-center');
-    }
-
-    /**
-     * Get HTMl string of prepended tags on line.
-     *
-     * @param   element
-     * @param   tagStack Array of open tags to repeat
-     * @returns          The HTML of tag code
-     */
-    prependTagTokensOnLine = function(element: Element, tagStack: TypesetBotToken[]): string {
-        return this.getTagTokensOnLine(element, tagStack, false);
-    }
-
-    /**
-     * Get HTML string of appended closing tags on line.
-     *
-     * @param   element
-     * @param   tagStack Array of open tags to close
-     * @returns          The HTML of closing tags
-     */
-    appendTagTokensOnLine = function(element: Element, tagStack: TypesetBotToken[]): string {
-        return this.getTagTokensOnLine(element, tagStack, true);
-    }
-
-    /**
-     * Get HTML string of tags on line.
-     *
-     * @param   element
-     * @param   tagStack     Array of open tags
-     * @param   isClosingTag Get the HTML of the closing or opening tags
-     * @returns              The HTML of tags
-     */
-    getTagTokensOnLine = function(element: Element, tagStack: TypesetBotToken[], isClosingTag: boolean): string {
-        let html = '';
-        for (const tag of tagStack) {
-            html += this.htmlGenerator.createTagHtml(element, tag, isClosingTag);
-        }
-
-        return html;
-    }
-
-    /**
-     * Get HTML of token range.
-     *
-     * @param   element
-     * @param   startIndex       Index of first token
-     * @param   startHyphenIndex Hyphenation index for the first word token
-     * @param   endIndex         Index of last token
-     * @param   endHyphenIndex   Hyphenation index for the last word token
-     * @param   tagStack         Stack of open tags
-     * @returns                  The HTML string
-     */
-    getHtmlFromTokensRange = function(
-        element: Element,
-        startIndex: number,
-        startHyphenIndex: number,
-        endIndex: number,
-        endHyphenIndex: number,
-        tagStack: TypesetBotToken[],
-    ): string {
-        const tokens = this._tsb.util.getElementTokens(element);
-        let html = '';
-
-        if (endIndex == null) {
-            endIndex = tokens.length;
-        }
-
-        // Only the first word token can be hyphenated.
-        let isFirstToken = true;
-
-        // Loop all tokens between start and end token.
-        for (let index = startIndex; index < endIndex; index++) {
-            const token = tokens[index];
-            switch (token.type) {
-                case TypesetBotToken.types.WORD:
-                    const word = token as TypesetBotWord;
-                    if (isFirstToken && startHyphenIndex != null) {
-                        // Calculate the post-hyphen word string and width.
-                        const cutIndex = word.hyphenIndexPositions[startHyphenIndex];
-                        const cut = word.text.substr(cutIndex + 1); // Offset by 1, fx: hy[p]-hen
-                        html += cut;
-
-                        isFirstToken = false;
-                        continue;
-                    }
-
-                    html += word.text;
-                    break;
-                case TypesetBotToken.types.TAG:
-                    const tag = token as TypesetBotTag;
-                    if (!tag.isEndTag) {
-                        tagStack.push(tag);
-                    } else {
-                        tagStack.pop();
-                    }
-
-                    html += this.htmlGenerator.createTagHtml(element, tag);
-                    break;
-                case TypesetBotToken.types.SPACE:
-                    html += ' ';
-                    break;
-                default:
-                    // Ignore the other node types.
-                    this._tsb.logger.error('Unknown token type found: ' + token.type);
-                    break;
-            }
-        }
-
-        // Calculate the pre-hyphen word string and width.
-        if (endHyphenIndex != null) {
-            const word = tokens[endIndex];
-            const cutIndex = word.hyphenIndexPositions[endHyphenIndex];
-            const cut = word.text.substr(0, cutIndex + 1);
-
-            html += cut + '-'; // Add dash to html
-        }
-
-        return html;
     }
 }

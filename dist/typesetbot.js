@@ -2088,6 +2088,116 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
     element.style.wordSpacing = 'calc((1em * ' + minSpaceSize + ') - ' + defaultWidth + 'px)';
   };
   /**
+   * Get default font size of element.
+   *
+   * @param   element
+   * @returns         The font size in pixels as number
+   */
+
+
+  this.getDefaultFontSize = function (element) {
+    return this.getNodeStyleNumber(element, 'font-size');
+  };
+  /**
+   * Get width of node.
+   *
+   * @param   element
+   * @returns         The width of node in pixels as number
+   */
+
+
+  this.getNodeWidth = function (element) {
+    return element.getBoundingClientRect().width;
+  };
+  /**
+   * Get style property of element.
+   *
+   * @param   element  The element
+   * @param   property The property name
+   * @returns          The rendered style property
+   */
+
+
+  this.getNodeStyle = function (element, property) {
+    return window.getComputedStyle(element).getPropertyValue(property);
+  };
+  /**
+   * Get style property of element as Number without px postfix.
+   *
+   * @param   element  The element
+   * @param   property The property name
+   * @returns          The rendered style property
+   */
+
+
+  this.getNodeStyleNumber = function (element, property) {
+    return Number(this.getNodeStyle(element, property).replace('px', ''));
+  };
+  /**
+   * Get line height of element.
+   *
+   * @param element
+   */
+
+
+  this.getLineHeight = function (element) {
+    var lineHeight = this.getNodeStyle(element, 'line-height');
+
+    if (lineHeight == 'normal') {
+      // Make line height relative to font size.
+      var fontSize = this.getNodeStyleNumber(element, 'font-size');
+      lineHeight = 1.2 * fontSize; // 1.2 em
+    } else {
+      // Format number.
+      lineHeight = Number(lineHeight.replace('px', ''));
+    }
+
+    return lineHeight;
+  };
+  /**
+   * Add text justification class to element.
+   *
+   * @param element
+   */
+
+
+  this.setJustificationClass = function (element) {
+    this.removeJustificationClass(element);
+
+    switch (this._tsb.settings.alignment) {
+      case 'justify':
+        element.classList.add('typesetbot-justify');
+        break;
+
+      case 'left':
+        element.classList.add('typesetbot-left');
+        break;
+
+      case 'right':
+        element.classList.add('typesetbot-right');
+        break;
+
+      case 'center':
+        element.classList.add('typesetbot-center');
+        break;
+
+      default:
+        this._tsb.logger.warn('Unknown alignment type: ' + this._tsb.settings.alignment);
+
+        break;
+    }
+  };
+  /**
+   * Remove all justification classes from element.
+   *
+   * @param element The element
+   */
+
+
+  this.removeJustificationClass = function (element) {
+    element.classList.remove('typesetbot-justify', 'typesetbot-left', 'typesetbot-right', 'typesetbot-center');
+  };
+  /**
    * Get rendering dimensions of words in element.
    *
    * @param element
@@ -2202,73 +2312,6 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
     element.innerHTML = backupHtml;
 
     this._tsb.logger.end('------ Update DOM');
-  };
-  /**
-   * Get default font size of element.
-   *
-   * @param   element
-   * @returns         The font size in pixels as number
-   */
-
-
-  this.getDefaultFontSize = function (element) {
-    return this.getNodeStyleNumber(element, 'font-size');
-  };
-  /**
-   * Get width of node.
-   *
-   * @param   element
-   * @returns         The width of node in pixels as number
-   */
-
-
-  this.getNodeWidth = function (element) {
-    return element.getBoundingClientRect().width;
-  };
-  /**
-   * Get style property of element.
-   *
-   * @param   element  The element
-   * @param   property The property name
-   * @returns          The rendered style property
-   */
-
-
-  this.getNodeStyle = function (element, property) {
-    return window.getComputedStyle(element).getPropertyValue(property);
-  };
-  /**
-   * Get style property of element as Number without px postfix.
-   *
-   * @param   element  The element
-   * @param   property The property name
-   * @returns          The rendered style property
-   */
-
-
-  this.getNodeStyleNumber = function (element, property) {
-    return Number(this.getNodeStyle(element, property).replace('px', ''));
-  };
-  /**
-   * Get line height of element.
-   *
-   * @param element
-   */
-
-
-  this.getLineHeight = function (element) {
-    var lineHeight = this.getNodeStyle(element, 'line-height');
-
-    if (lineHeight == 'normal') {
-      // Make line height relative to font size.
-      var fontSize = this.getNodeStyleNumber(element, 'font-size');
-      lineHeight = 1.2 * fontSize; // 1.2 em
-    } else {
-      // Format number.
-      lineHeight = Number(lineHeight.replace('px', ''));
-    }
-
-    return lineHeight;
   };
   /**
    * Get rendering dimensions of words and word parts for hyphenation.
@@ -2475,9 +2518,9 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
     for (var _i2 = 0, _lines = lines; _i2 < _lines.length; _i2++) {
       var line = _lines[_i2];
       var lineHtml = '';
-      lineHtml += this.prependTagTokensOnLine(element, tagStack);
-      lineHtml += this.getHtmlFromTokensRange(element, curTokenIndex, lastHyphenIndex, line.tokenIndex, line.hyphenIndex, tagStack);
-      lineHtml += this.appendTagTokensOnLine(element, tagStack);
+      lineHtml += this.htmlGenerator.prependTagTokensOnLine(element, tagStack);
+      lineHtml += this.htmlGenerator.getHtmlFromTokensRange(element, curTokenIndex, lastHyphenIndex, line.tokenIndex, line.hyphenIndex, tagStack);
+      lineHtml += this.htmlGenerator.appendTagTokensOnLine(element, tagStack);
       curTokenIndex = line.tokenIndex;
       lastHyphenIndex = line.hyphenIndex;
       var lineHeight = line.maxLineHeight;
@@ -2494,48 +2537,63 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
     this._tsb.logger.end('-- Apply breakpoints');
   };
+
+  this._tsb = tsb;
+  this.htmlGenerator = new TypesetBotHtml(tsb);
+};
+/**
+ * Class for constructing HTML code.
+ */
+
+
+var TypesetBotHtml = function TypesetBotHtml(tsb) {
+  _classCallCheck(this, TypesetBotHtml);
+
   /**
-   * Add text justification class to element.
+   * Create HTML code from HTML tag object.
    *
-   * @param element
+   * @param   node        The element to typeset
+   * @param   token       The token representing HTML tag
+   * @param   forceEndTag Get HTML of end tag, disregarding any tag properties
+   * @returns             The HTML string
    */
+  this.createTagHtml = function (node, token) {
+    var forceEndTag = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
+    var elementNodes = this._tsb.util.getElementNodes(node);
 
-  this.setJustificationClass = function (element) {
-    this.removeJustificationClass(element);
+    var tagNode = elementNodes[token.nodeIndex];
 
-    switch (this._tsb.settings.alignment) {
-      case 'justify':
-        element.classList.add('typesetbot-justify');
-        break;
-
-      case 'left':
-        element.classList.add('typesetbot-left');
-        break;
-
-      case 'right':
-        element.classList.add('typesetbot-right');
-        break;
-
-      case 'center':
-        element.classList.add('typesetbot-center');
-        break;
-
-      default:
-        this._tsb.logger.warn('Unknown alignment type: ' + this._tsb.settings.alignment);
-
-        break;
+    if (token.isEndTag || forceEndTag) {
+      return '</' + tagNode.tagName.toLowerCase() + '>';
     }
-  };
-  /**
-   * Remove all justification classes from element.
-   *
-   * @param element The element
-   */
 
+    var attrText = '';
+    var _iteratorNormalCompletion18 = true;
+    var _didIteratorError18 = false;
+    var _iteratorError18 = undefined;
 
-  this.removeJustificationClass = function (element) {
-    element.classList.remove('typesetbot-justify', 'typesetbot-left', 'typesetbot-right', 'typesetbot-center');
+    try {
+      for (var _iterator18 = tagNode.attributes[Symbol.iterator](), _step18; !(_iteratorNormalCompletion18 = (_step18 = _iterator18.next()).done); _iteratorNormalCompletion18 = true) {
+        var attr = _step18.value;
+        attrText += attr.name + '="' + attr.value + '" ';
+      }
+    } catch (err) {
+      _didIteratorError18 = true;
+      _iteratorError18 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion18 && _iterator18["return"] != null) {
+          _iterator18["return"]();
+        }
+      } finally {
+        if (_didIteratorError18) {
+          throw _iteratorError18;
+        }
+      }
+    }
+
+    return '<' + tagNode.tagName.toLowerCase() + ' ' + attrText + '>';
   };
   /**
    * Get HTMl string of prepended tags on line.
@@ -2573,26 +2631,26 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
 
   this.getTagTokensOnLine = function (element, tagStack, isClosingTag) {
     var html = '';
-    var _iteratorNormalCompletion18 = true;
-    var _didIteratorError18 = false;
-    var _iteratorError18 = undefined;
+    var _iteratorNormalCompletion19 = true;
+    var _didIteratorError19 = false;
+    var _iteratorError19 = undefined;
 
     try {
-      for (var _iterator18 = tagStack[Symbol.iterator](), _step18; !(_iteratorNormalCompletion18 = (_step18 = _iterator18.next()).done); _iteratorNormalCompletion18 = true) {
-        var tag = _step18.value;
-        html += this.htmlGenerator.createTagHtml(element, tag, isClosingTag);
+      for (var _iterator19 = tagStack[Symbol.iterator](), _step19; !(_iteratorNormalCompletion19 = (_step19 = _iterator19.next()).done); _iteratorNormalCompletion19 = true) {
+        var tag = _step19.value;
+        html += this.createTagHtml(element, tag, isClosingTag);
       }
     } catch (err) {
-      _didIteratorError18 = true;
-      _iteratorError18 = err;
+      _didIteratorError19 = true;
+      _iteratorError19 = err;
     } finally {
       try {
-        if (!_iteratorNormalCompletion18 && _iterator18["return"] != null) {
-          _iterator18["return"]();
+        if (!_iteratorNormalCompletion19 && _iterator19["return"] != null) {
+          _iterator19["return"]();
         }
       } finally {
-        if (_didIteratorError18) {
-          throw _iteratorError18;
+        if (_didIteratorError19) {
+          throw _iteratorError19;
         }
       }
     }
@@ -2653,7 +2711,7 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
             tagStack.pop();
           }
 
-          html += this.htmlGenerator.createTagHtml(element, tag);
+          html += this.createTagHtml(element, tag);
           break;
 
         case TypesetBotToken.types.SPACE:
@@ -2679,64 +2737,6 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
     }
 
     return html;
-  };
-
-  this._tsb = tsb;
-  this.htmlGenerator = new TypesetBotHtml(tsb);
-};
-/**
- * Class for constructing HTML code.
- */
-
-
-var TypesetBotHtml = function TypesetBotHtml(tsb) {
-  _classCallCheck(this, TypesetBotHtml);
-
-  /**
-   * Create HTML code from HTML tag object.
-   *
-   * @param   node        The element to typeset
-   * @param   token       The token representing HTML tag
-   * @param   forceEndTag Get HTML of end tag, disregarding any tag properties
-   * @returns             The HTML string
-   */
-  this.createTagHtml = function (node, token) {
-    var forceEndTag = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-
-    var elementNodes = this._tsb.util.getElementNodes(node);
-
-    var tagNode = elementNodes[token.nodeIndex];
-
-    if (token.isEndTag || forceEndTag) {
-      return '</' + tagNode.tagName.toLowerCase() + '>';
-    } else {
-      var attrText = '';
-      var _iteratorNormalCompletion19 = true;
-      var _didIteratorError19 = false;
-      var _iteratorError19 = undefined;
-
-      try {
-        for (var _iterator19 = tagNode.attributes[Symbol.iterator](), _step19; !(_iteratorNormalCompletion19 = (_step19 = _iterator19.next()).done); _iteratorNormalCompletion19 = true) {
-          var attr = _step19.value;
-          attrText += attr.name + '="' + attr.value + '" ';
-        }
-      } catch (err) {
-        _didIteratorError19 = true;
-        _iteratorError19 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion19 && _iterator19["return"] != null) {
-            _iterator19["return"]();
-          }
-        } finally {
-          if (_didIteratorError19) {
-            throw _iteratorError19;
-          }
-        }
-      }
-
-      return '<' + tagNode.tagName.toLowerCase() + ' ' + attrText + '>';
-    }
   };
 
   this._tsb = tsb;

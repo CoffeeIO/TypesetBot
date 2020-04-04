@@ -1,5 +1,5 @@
 'use strict';
 
-describe('Testing typeset.ts', function () {
+describe('typeset.ts:', function () {
 
 });

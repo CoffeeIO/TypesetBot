@@ -15,8 +15,7 @@ describe('html.ts:', function () {
         it('General', function(done) {
             document.body.insertAdjacentHTML('beforeend', fixture);
 
-            let t = document.querySelector('.test');
-            let tsb = new TypesetBot(t, defaultSettings);
+            let tsb = new TypesetBot('.test', defaultSettings);
 
             setTimeout(function() {
                 let html = new TypesetBotHtml(tsb);

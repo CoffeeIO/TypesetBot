@@ -1,5 +1,5 @@
 'use strict';
 
-describe('Testing viewport.ts', function () {
+describe('viewport.ts:', function () {
 
 });
