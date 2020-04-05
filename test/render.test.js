@@ -368,7 +368,24 @@ describe('render.ts:', function () {
                 expect([].slice.call(target.classList)).toEqual(['test', 'typesetbot-justify']);
 
                 done();
-            }, 1000);
+            }, 500);
+        });
+        it('Get settings class, different setting', function(done) {
+            let settings = {
+                alignment: 'left',
+            };
+
+            document.body.insertAdjacentHTML('beforeend', fixture);
+
+            let tsb = new TypesetBot('.test', settings);
+
+            setTimeout(function() {
+                let target = document.querySelector('.test');
+
+                expect([].slice.call(target.classList)).toEqual(['test', 'typesetbot-left']);
+
+                done();
+            }, 500);
         });
     });
     describe('removeJustificationClass --', function() {
