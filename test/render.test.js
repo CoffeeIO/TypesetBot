@@ -353,10 +353,45 @@ describe('render.ts:', function () {
         });
     });
     describe('setJustificationClass --', function() {
+        it('Get settings class', function(done) {
+            let settings = {
+                alignment: 'justify',
+            };
 
+            document.body.insertAdjacentHTML('beforeend', fixture);
+
+            let tsb = new TypesetBot('.test', settings);
+
+            setTimeout(function() {
+                let target = document.querySelector('.test');
+
+                expect([].slice.call(target.classList)).toEqual(['test', 'typesetbot-justify']);
+
+                done();
+            }, 1000);
+        });
     });
     describe('removeJustificationClass --', function() {
+        it('Removing class', function(done) {
+            let settings = {
+                alignment: 'justify',
+            };
 
+            document.body.insertAdjacentHTML('beforeend', fixture);
+
+            let tsb = new TypesetBot('.test', settings);
+
+            setTimeout(function() {
+                let render = new TypesetBotRender(tsb);
+
+                let target = document.querySelector('.test');
+                render.removeJustificationClass(target);
+
+                expect([].slice.call(target.classList)).toEqual(['test']);
+
+                done();
+            }, 1000);
+        });
     });
 
     // ---
