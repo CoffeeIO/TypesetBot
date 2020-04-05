@@ -190,19 +190,167 @@ describe('render.ts:', function () {
         });
     });
     describe('getSpaceWidth --', function() {
+        it('Default width', function(done) {
+            let style =
+                '<style class="style">' +
+                    '.test { font-family: "Arial"; }' +
+                '<style>';
+            document.body.insertAdjacentHTML('beforeend', fixture);
 
+            let tsb = new TypesetBot(null, noRunSettings);
+
+            setTimeout(function() {
+                let render = new TypesetBotRender(tsb);
+                let target = document.querySelector('.test');
+
+                expect(render.getSpaceWidth(target)).toBeLessThan(10);
+                expect(render.getSpaceWidth(target)).not.toBeLessThan(0);
+
+                done();
+            }, 100);
+        });
+        it('Condensed form', function(done) {
+            // Verdana is quite a wide font.
+            let style1 =
+                '<style class="style">' +
+                    '.test { font-family: Verdana, Geneva, sans-serif; }' +
+                '<style>';
+            let style2 =
+                '<style class="style">' +
+                    '.test { font-family: "Open Sans Condensed", sans-serif; }' +
+                '<style>';
+            document.body.insertAdjacentHTML('beforeend', fixture);
+            document.body.insertAdjacentHTML('beforeend', style1);
+
+            let tsb = new TypesetBot(null, noRunSettings);
+
+            setTimeout(function() {
+                let render = new TypesetBotRender(tsb);
+                let target = document.querySelector('.test');
+
+                let regular = render.getSpaceWidth(target);
+
+                // Change font.
+                document.body.insertAdjacentHTML('beforeend', style2);
+
+                expect(render.getSpaceWidth(target)).toBeLessThan(regular);
+
+                done();
+            }, 100);
+        });
+
+        // @todo: check affect of preset word-spacing.
     });
     describe('setMinimumWordSpacing --', function() {
 
     });
     describe('getNodeStyle --', function() {
+        it('Various properties', function(done) {
+            let style =
+                '<style class="style">' +
+                    '.test {' +
+                        'width: 225px;' +
+                        'font-weight: bold;' +
+                        'float: right;' +
+                    '}' +
+                '<style>';
 
+            document.body.insertAdjacentHTML('beforeend', fixture);
+            document.body.insertAdjacentHTML('beforeend', style);
+
+            let tsb = new TypesetBot(null, noRunSettings);
+
+            setTimeout(function() {
+                let render = new TypesetBotRender(tsb);
+                let target = document.querySelector('.test');
+
+
+                expect(render.getNodeStyle(target, 'width')).toEqual('225px');
+                expect(render.getNodeStyle(target, 'font-weight')).toEqual('700'); // bold == 700
+                expect(render.getNodeStyle(target, 'float')).toEqual('right');
+
+                done();
+            }, 100);
+        });
     });
     describe('getNodeStyleNumber --', function() {
+        it('Various properties', function(done) {
+            let style =
+                '<style class="style">' +
+                    '.test {' +
+                        'width: 225.6px;' +
+                        'font-size: 22.5px;' +
+                    '}' +
+                '<style>';
 
+            document.body.insertAdjacentHTML('beforeend', fixture);
+            document.body.insertAdjacentHTML('beforeend', style);
+
+            let tsb = new TypesetBot(null, noRunSettings);
+
+            setTimeout(function() {
+                let render = new TypesetBotRender(tsb);
+                let target = document.querySelector('.test');
+
+                expect(render.getNodeStyleNumber(target, 'width')).not.toBeLessThan(225.3);
+                expect(render.getNodeStyleNumber(target, 'width')).toBeLessThan(225.9);
+                expect(render.getNodeStyleNumber(target, 'font-size')).toEqual(22.5);
+
+                done();
+            }, 100);
+        });
     });
     describe('getLineHeight --', function() {
+        it('Lineheight depending on font size', function(done) {
+            // Verdana is quite a wide font.
+            let style1 =
+                '<style class="style">' +
+                    '.test { line-height: 20px; font-size: 16px; }' +
+                '<style>';
+            let style2 =
+                '<style class="style">' +
+                    '.test { line-height: normal; }' +
+                '<style>';
+            let style3 =
+                '<style class="style">' +
+                    '.test { line-height: 1.5; }' +
+                '<style>';
+            let style4 =
+                '<style class="style">' +
+                    '.test { line-height: 200%; }' +
+                '<style>';
+            let style5 =
+                '<style class="style">' +
+                    '.test { line-height: 3em; }' +
+                '<style>';
 
+            document.body.insertAdjacentHTML('beforeend', fixture);
+
+            let tsb = new TypesetBot(null, noRunSettings);
+
+            setTimeout(function() {
+                let render = new TypesetBotRender(tsb);
+                let target = document.querySelector('.test');
+
+
+                document.body.insertAdjacentHTML('beforeend', style1);
+                expect(render.getLineHeight(target)).toEqual(20);
+                // Change style.
+                document.body.insertAdjacentHTML('beforeend', style2);
+                expect(render.getLineHeight(target)).toEqual(19.2); // 16*1.2=19.2
+
+                document.body.insertAdjacentHTML('beforeend', style3);
+                expect(render.getLineHeight(target)).toEqual(24);
+
+                document.body.insertAdjacentHTML('beforeend', style4);
+                expect(render.getLineHeight(target)).toEqual(32);
+
+                document.body.insertAdjacentHTML('beforeend', style5);
+                expect(render.getLineHeight(target)).toEqual(48);
+
+                done();
+            }, 100);
+        });
     });
     describe('setJustificationClass --', function() {
 

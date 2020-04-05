@@ -20,6 +20,8 @@ module.exports = function(config) {
             {pattern: 'https://unpkg.com/@coffeeio/hypher@1.0.0/dist/hypher.js', watched: false, included: true, served: true},
             {pattern: 'https://unpkg.com/@fluid-project/hyphenation-patterns@0.2.2-dev.20181115T211247Z.d313a52/dist/browser/en-us.js', watched: false, included: true, served: true},
             {pattern: 'https://unpkg.com/@fluid-project/hyphenation-patterns@0.2.2-dev.20181115T211247Z.d313a52/dist/browser/en-gb.js', watched: false, included: true, served: true},
+            {pattern: 'https://fonts.googleapis.com/css2?family=Open+Sans+Condensed&display=swap', watched: false, included: true, served: true},
+            {pattern: 'https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap', watched: false, included: true, served: true},
 
             // Test files.
             {pattern: 'test/*.test.js', watched: true, included: true, served: true},
