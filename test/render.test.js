@@ -209,11 +209,11 @@ describe('render.ts:', function () {
                 done();
             }, 100);
         });
-        it('Condensed form', function(done) {
+        it('Condensed font', function(done) {
             // Verdana is quite a wide font.
             let style1 =
                 '<style class="style">' +
-                    '.test { font-family: Verdana, Geneva, sans-serif; }' +
+                    '.test { font-family: Times New Roman, Verdana, Geneva, sans-serif; }' +
                 '<style>';
             let style2 =
                 '<style class="style">' +
@@ -233,7 +233,7 @@ describe('render.ts:', function () {
                 // Change font.
                 document.body.insertAdjacentHTML('beforeend', style2);
 
-                expect(render.getSpaceWidth(target)).toBeLessThan(regular);
+                expect(render.getSpaceWidth(target)).not.toBeLessThan(regular);
 
                 done();
             }, 100);
