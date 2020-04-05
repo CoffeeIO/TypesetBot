@@ -166,6 +166,7 @@ describe('query.ts:', function() {
             }, 100);
         });
 
+        // @todo
         // it('Nested selectors, only detect inner element', function(done) {
         //     let fixture =
         //         '<div class="test">' +

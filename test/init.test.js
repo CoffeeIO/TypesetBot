@@ -127,7 +127,6 @@ describe('Testing Jasmine and browser emulation', function() {
 
             // Wait a bit for DOM to update.
             setTimeout(function() {
-            // return timeout(3000).then(function(r) {
                 const rect = t.getBoundingClientRect();
                 const width = rect.right - rect.left;
                 expect(width).toEqual(500);

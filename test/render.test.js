@@ -191,10 +191,6 @@ describe('render.ts:', function () {
     });
     describe('getSpaceWidth --', function() {
         it('Default width', function(done) {
-            let style =
-                '<style class="style">' +
-                    '.test { font-family: "Arial"; }' +
-                '<style>';
             document.body.insertAdjacentHTML('beforeend', fixture);
 
             let tsb = new TypesetBot(null, noRunSettings);
@@ -414,12 +410,12 @@ describe('render.ts:', function () {
     // ---
 
     describe('getWordProperties --', function() {
-
+        // @todo
     });
     describe('getHyphenProperties --', function() {
-
+        // @todo
     });
     describe('applyLineBreaks --', function() {
-
+        // @todo
     });
 });

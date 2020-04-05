@@ -29,6 +29,7 @@ describe('utils.ts:', function () {
             document.body.insertAdjacentHTML('beforeend', style);
             expect(TypesetBotUtils.isVisible(document.querySelector('.test'))).toEqual(false);
         });
+        // @todo
         // it('Check empty element', function() {
         //     let fixture =
         //         '<div class="test">' +

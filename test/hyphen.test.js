@@ -192,6 +192,6 @@ describe('hyphen.ts:', function() {
         })
     });
     describe('nextWord --', function() {
-        // Should be implemented.
+        // @todo
     });
 });
