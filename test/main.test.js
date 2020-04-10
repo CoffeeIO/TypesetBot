@@ -24,24 +24,21 @@ describe('main.ts:', function () {
             document.body.insertAdjacentHTML('beforeend', loremIpsum);
 
             let target = document.querySelector('.test');
+            let width = 500;
 
-            expect(target.getBoundingClientRect().width).toEqual(500);
+            expect(target.getBoundingClientRect().width).toEqual(width);
             expect(document.querySelector('tsb-line')).toEqual(null);
 
             let beforeHeight = target.getBoundingClientRect().height;
-
             // Magic values.
             expect(beforeHeight).toBeGreaterThan(100);
             expect(beforeHeight).toBeLessThan(300);
 
-
             let tsb = new TypesetBot('.test');
 
             setTimeout(function() {
-
                 expect(document.querySelectorAll('tsb-line')).not.toEqual(null); // Typesetting worked.
-
-                expect(target.getBoundingClientRect().width).toEqual(500);
+                expect(target.getBoundingClientRect().width).toEqual(width);
 
                 // Magic values.
                 expect(document.querySelectorAll('tsb-line').length).toBeGreaterThan(10);
@@ -53,36 +50,32 @@ describe('main.ts:', function () {
                 done();
             }, 100);
         });
-
         it('Mobile viewport', function (done) {
             let style =
                 '<style class="style">' +
                     '.test { width: 200px; line-height: 16px; }' +
                 '<style>';
             let fontSize = 16;
+            let width = 200;
 
             document.body.insertAdjacentHTML('beforeend', style);
             document.body.insertAdjacentHTML('beforeend', loremIpsum);
 
             let target = document.querySelector('.test');
 
-            expect(target.getBoundingClientRect().width).toEqual(200);
+            expect(target.getBoundingClientRect().width).toEqual(width);
             expect(document.querySelector('tsb-line')).toEqual(null);
 
             let beforeHeight = target.getBoundingClientRect().height;
-
             // Magic values.
-            expect(beforeHeight).toBeGreaterThan(100);
+            expect(beforeHeight).toBeGreaterThan(300);
             expect(beforeHeight).toBeLessThan(600);
-
 
             let tsb = new TypesetBot('.test');
 
             setTimeout(function() {
-
                 expect(document.querySelectorAll('tsb-line')).not.toEqual(null); // Typesetting worked.
-
-                expect(target.getBoundingClientRect().width).toEqual(200);
+                expect(target.getBoundingClientRect().width).toEqual(width);
 
                 // Magic values.
                 let lines = document.querySelectorAll('tsb-line').length;
@@ -95,24 +88,23 @@ describe('main.ts:', function () {
                 done();
             }, 100);
         });
-
         it('Wide viewport', function (done) {
             let style =
                 '<style class="style">' +
                     '.test { width: 1000px; line-height: 16px; }' +
                 '<style>';
             let fontSize = 16;
+            let width = 1000;
 
             document.body.insertAdjacentHTML('beforeend', style);
             document.body.insertAdjacentHTML('beforeend', loremIpsum);
 
             let target = document.querySelector('.test');
 
-            expect(target.getBoundingClientRect().width).toEqual(1000);
+            expect(target.getBoundingClientRect().width).toEqual(width);
             expect(document.querySelector('tsb-line')).toEqual(null);
 
             let beforeHeight = target.getBoundingClientRect().height;
-
             // Magic values.
             expect(beforeHeight).toBeGreaterThan(50);
             expect(beforeHeight).toBeLessThan(200);
@@ -121,10 +113,8 @@ describe('main.ts:', function () {
             let tsb = new TypesetBot('.test');
 
             setTimeout(function() {
-
                 expect(document.querySelectorAll('tsb-line')).not.toEqual(null); // Typesetting worked.
-
-                expect(target.getBoundingClientRect().width).toEqual(1000);
+                expect(target.getBoundingClientRect().width).toEqual(width);
 
                 // Magic values.
                 let lines = document.querySelectorAll('tsb-line').length;
