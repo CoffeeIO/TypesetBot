@@ -1720,6 +1720,16 @@ function TypesetBotTypeset(tsb) {
     return solution;
   };
   /**
+   * Reset linebreak variables.
+   */
+
+
+  this.resetLineBreak = function () {
+    this.activeBreakpoints = new Queue();
+    this.shortestPath = {};
+    this.finalBreakpoints = [];
+  };
+  /**
    * Get all possible solutions to break the text.
    *
    * @param   element
@@ -1733,9 +1743,7 @@ function TypesetBotTypeset(tsb) {
 
     this._tsb.logger.start('-- Dynamic programming');
 
-    this.activeBreakpoints = new Queue();
-    this.shortestPath = {};
-    this.finalBreakpoints = [];
+    this.resetLineBreak();
     this.activeBreakpoints.enqueue(new TypesetBotLinebreak(null, 0, null, 0, false, null, 0, 0));
     var isFinished = false;
 
@@ -1891,7 +1899,12 @@ function TypesetBotTypeset(tsb) {
 
 
   this.isShortestPath = function (breakpoint) {
-    var hyphenIndex = breakpoint.hyphenIndex == null ? -1 : breakpoint.hyphenIndex; // Safety check.
+    var hyphenIndex = breakpoint.hyphenIndex == null ? -1 : breakpoint.hyphenIndex;
+
+    if (this.shortestPath == null) {
+      this.shortestPath = {};
+    } // Safety check.
+
 
     if (this.shortestPath[breakpoint.lineNumber] != null && this.shortestPath[breakpoint.lineNumber][breakpoint.tokenIndex] != null && this.shortestPath[breakpoint.lineNumber][breakpoint.tokenIndex][hyphenIndex] != null && this.shortestPath[breakpoint.lineNumber][breakpoint.tokenIndex][hyphenIndex] > breakpoint.demerit) {
       this._tsb.logger.error('Dynamic: Found shortest path with higher demerit than current breakpoint');
@@ -1913,6 +1926,10 @@ function TypesetBotTypeset(tsb) {
 
   this.updateShortestPath = function (breakpoint) {
     var hyphenIndex = breakpoint.hyphenIndex == null ? -1 : breakpoint.hyphenIndex;
+
+    if (this.shortestPath == null) {
+      this.shortestPath = {};
+    }
 
     if (this.shortestPath[breakpoint.lineNumber] == null) {
       this.shortestPath[breakpoint.lineNumber] = {};

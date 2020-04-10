@@ -195,6 +195,15 @@ class TypesetBotTypeset {
     }
 
     /**
+     * Reset linebreak variables.
+     */
+    resetLineBreak = function() {
+        this.activeBreakpoints = new Queue();
+        this.shortestPath = {};
+        this.finalBreakpoints = [];
+    }
+
+    /**
      * Get all possible solutions to break the text.
      *
      * @param   element
@@ -204,9 +213,7 @@ class TypesetBotTypeset {
     getFinalLineBreaks = function(element: Element, looseness: number = 0): TypesetBotLinebreak[] {
         this._tsb.logger.start('-- Dynamic programming');
 
-        this.activeBreakpoints = new Queue();
-        this.shortestPath = {};
-        this.finalBreakpoints = [];
+        this.resetLineBreak();
 
         this.activeBreakpoints.enqueue(
             new TypesetBotLinebreak(
@@ -407,6 +414,9 @@ class TypesetBotTypeset {
     isShortestPath = function(breakpoint: TypesetBotLinebreak) : boolean {
         const hyphenIndex = breakpoint.hyphenIndex == null ? -1 : breakpoint.hyphenIndex;
 
+        if (this.shortestPath == null) {
+            this.shortestPath = {};
+        }
         // Safety check.
         if (
             this.shortestPath[breakpoint.lineNumber] != null &&
@@ -438,6 +448,9 @@ class TypesetBotTypeset {
     updateShortestPath = function(breakpoint: TypesetBotLinebreak): boolean {
         const hyphenIndex = breakpoint.hyphenIndex == null ? -1 : breakpoint.hyphenIndex;
 
+        if (this.shortestPath == null) {
+            this.shortestPath = {};
+        }
         if (this.shortestPath[breakpoint.lineNumber] == null) {
             this.shortestPath[breakpoint.lineNumber] = {};
         }

@@ -47,6 +47,10 @@ describe('main.ts:', function () {
                 // Height should be less than or equal.
                 expect(target.getBoundingClientRect().height).toBeLessThanOrEqual(beforeHeight);
 
+                // Check use of hyphen character.
+                var count = (target.textContent.match(/-/g) || []).length;
+                expect(count).toBeGreaterThanOrEqual(0);
+
                 done();
             }, 100);
         });
@@ -84,6 +88,10 @@ describe('main.ts:', function () {
                 expect(target.getBoundingClientRect().height).toEqual(fontSize * lines);
                 // On small viewport this should produce smaller height.
                 expect(target.getBoundingClientRect().height).toBeLessThan(beforeHeight);
+
+                // Check use of hyphen character.
+                var count = (target.textContent.match(/-/g) || []).length;
+                expect(count).toBeGreaterThan(0);
 
                 done();
             }, 100);
@@ -123,6 +131,10 @@ describe('main.ts:', function () {
                 expect(target.getBoundingClientRect().height).toEqual(fontSize * lines);
                 // Wide viewports should have the same height.
                 expect(target.getBoundingClientRect().height).toEqual(beforeHeight);
+
+                // Check use of hyphen character.
+                var count = (target.textContent.match(/-/g) || []).length;
+                expect(count).toEqual(0);
 
                 done();
             }, 100);
