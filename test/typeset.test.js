@@ -31,7 +31,6 @@ describe('typeset.ts:', function () {
     });
     describe('updateShortestPath & isShortestPath --', function() { // Interesting
         it('Replacing solution based on demerit', function() {
-
             let typeset = new TypesetBotTypeset(new TypesetBot(null, { 'noRun': false }));
 
             let bp1 = new TypesetBotLinebreak(null, 1, 0, 300, false, 0, 1, 16);
@@ -47,19 +46,18 @@ describe('typeset.ts:', function () {
             expect(typeset.updateShortestPath(bp2)).toEqual(false); // Worse
             expect(typeset.updateShortestPath(bp3)).toEqual(true);  // Better
 
+            expect(typeset.isShortestPath(bp1)).toEqual(false);
             expect(typeset.isShortestPath(bp2)).toEqual(false);
             expect(typeset.isShortestPath(bp3)).toEqual(true);
         });
 
         it('Different lines', function() {
-
             let typeset = new TypesetBotTypeset(new TypesetBot(null, { 'noRun': false }));
 
             let bp1 = new TypesetBotLinebreak(null, 1, 0, 300, false, 0, 1, 16);
             let bp2 = new TypesetBotLinebreak(null, 1, 0, 600, false, 0, 2, 16);
             let bp3 = new TypesetBotLinebreak(null, 1, 0, 200, false, 0, 2, 16);
             let bp4 = new TypesetBotLinebreak(null, 1, 0, 400, false, 0, 1, 16);
-
 
             typeset.resetLineBreak();
             expect(typeset.shortestPath).toEqual({});
@@ -76,7 +74,6 @@ describe('typeset.ts:', function () {
         });
 
         it('Token index', function() {
-
             let typeset = new TypesetBotTypeset(new TypesetBot(null, { 'noRun': false }));
 
             let bp1 = new TypesetBotLinebreak(null, 9, 0, 300, false, 0, 3, 16);
@@ -99,7 +96,6 @@ describe('typeset.ts:', function () {
         });
 
         it('Hyphen index', function() {
-
             let typeset = new TypesetBotTypeset(new TypesetBot(null, { 'noRun': false }));
 
             let bp1 = new TypesetBotLinebreak(null, 9, null, 200, false, 0, 3, 16);
