@@ -75,7 +75,7 @@ describe('typeset.ts:', function () {
             expect(typeset.isShortestPath(bp4)).toEqual(false);
         });
 
-        it('Token index lines', function() {
+        it('Token index', function() {
 
             let typeset = new TypesetBotTypeset(new TypesetBot(null, { 'noRun': false }));
 
@@ -98,7 +98,7 @@ describe('typeset.ts:', function () {
             expect(typeset.isShortestPath(bp4)).toEqual(false);
         });
 
-        it('Hyphen index lines', function() {
+        it('Hyphen index', function() {
 
             let typeset = new TypesetBotTypeset(new TypesetBot(null, { 'noRun': false }));
 
