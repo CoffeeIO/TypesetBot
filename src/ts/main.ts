@@ -63,7 +63,10 @@ class TypesetBot {
         this.typesetter = new TypesetBotTypeset(this);
 
         this.isWatching = true;
-        this.typeset();
+
+        if (!this.settings.noRun) {
+            this.typeset();
+        }
     }
 
     /**
@@ -201,3 +204,4 @@ class TypesetBot {
         this.isTypesetting = false;
     }
 }
+

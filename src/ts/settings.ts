@@ -67,9 +67,16 @@ class TypesetBotSettings {
     // How much can the space width shrink
     spaceShrinkability : number = 1 / 9;
 
-    // Debug mode: prints performance stats. -----------------------------------
+    // Debug mode. ------------------------------------------------------------
 
+    // Prints performance stats.
     debug: boolean = false;
+
+    // Don't run Typesetting as soon as program is initialized.
+    noRun: boolean = false;
+
+    // Define levels to log. Options: 'error', 'warn', 'log'
+    logs: string[] = ['error', 'warn'];
 
     /**
      * @param tsb
@@ -92,8 +99,9 @@ class TypesetBotSettings {
         }
 
         for (const [key, value] of Object.entries(settings)) {
-            if (this[key] === undefined) {
-                this._tsb.logger.warn('Unknown settings key "' + key +'"');
+            if (typeof this[key] === 'undefined') {
+                console.warn('Unknown settings key "' + key +'"');
+                continue;
             }
 
             this[key] = value;

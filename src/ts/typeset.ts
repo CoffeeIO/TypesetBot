@@ -150,7 +150,7 @@ class TypesetBotTypeset {
 
         this._tsb.logger.start('---- other');
         // Append tokens to map for quick access.
-        this.appendToTokenMap(element, this.tokens);
+        this._tsb.util.appendToTokenMap(element, this.tokens);
         this._tsb.logger.end('---- other');
 
         this._tsb.logger.start('---- Get render size of words');
@@ -195,6 +195,15 @@ class TypesetBotTypeset {
     }
 
     /**
+     * Reset linebreak variables.
+     */
+    resetLineBreak = function() {
+        this.activeBreakpoints = new Queue();
+        this.shortestPath = {};
+        this.finalBreakpoints = [];
+    }
+
+    /**
      * Get all possible solutions to break the text.
      *
      * @param   element
@@ -204,9 +213,7 @@ class TypesetBotTypeset {
     getFinalLineBreaks = function(element: Element, looseness: number = 0): TypesetBotLinebreak[] {
         this._tsb.logger.start('-- Dynamic programming');
 
-        this.activeBreakpoints = new Queue();
-        this.shortestPath = {};
-        this.finalBreakpoints = [];
+        this.resetLineBreak();
 
         this.activeBreakpoints.enqueue(
             new TypesetBotLinebreak(
@@ -407,6 +414,9 @@ class TypesetBotTypeset {
     isShortestPath = function(breakpoint: TypesetBotLinebreak) : boolean {
         const hyphenIndex = breakpoint.hyphenIndex == null ? -1 : breakpoint.hyphenIndex;
 
+        if (this.shortestPath == null) {
+            this.shortestPath = {};
+        }
         // Safety check.
         if (
             this.shortestPath[breakpoint.lineNumber] != null &&
@@ -438,6 +448,9 @@ class TypesetBotTypeset {
     updateShortestPath = function(breakpoint: TypesetBotLinebreak): boolean {
         const hyphenIndex = breakpoint.hyphenIndex == null ? -1 : breakpoint.hyphenIndex;
 
+        if (this.shortestPath == null) {
+            this.shortestPath = {};
+        }
         if (this.shortestPath[breakpoint.lineNumber] == null) {
             this.shortestPath[breakpoint.lineNumber] = {};
         }
@@ -456,23 +469,7 @@ class TypesetBotTypeset {
         return false;
     }
 
-    /**
-     * Add tokens to map for specific node.
-     *
-     * @param root
-     * @param tokens
-     */
-    appendToTokenMap = function(root: Element, tokens: TypesetBotToken[]) {
-        if (this._tsb.util.getElementIndex(root) == null) {
-            this._tsb.logger.error('Root node is not indexed');
-            this._tsb.logger.error(root);
-            return;
-        }
-
-        const index = this._tsb.util.getElementIndex(root);
-        this._tsb.indexToTokens[index] = tokens;
-    }
-
+    
 
     /**
      * Get properties for a new line object.
