@@ -1,6 +1,15 @@
 'use strict';
 
 describe('typeset.ts:', function () {
+    let loremIpsum =
+        '<div class="test">' +
+            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis volutpat dolor non diam volutpat, laoreet porta risus sollicitudin. Phasellus cursus magna justo, a molestie metus aliquam a. Sed ut tellus non nunc iaculis pulvinar. Etiam suscipit nulla nec dui consectetur varius. Curabitur tortor odio, tincidunt at pharetra ut, varius a mauris. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nulla elementum augue nulla, eget dictum odio auctor sit amet. Nunc commodo in eros at posuere. Aenean blandit auctor justo, porttitor laoreet arcu mattis eget. Nunc malesuada, enim vitae facilisis sagittis, nisl dolor fermentum eros, id euismod est sapien rhoncus velit. Curabitur id nisi id ligula convallis dapibus. Nam congue dolor eget cursus scelerisque. Etiam at sollicitudin nisl. Nullam semper mi dui, et ultrices arcu semper vitae. In quis metus felis.' +
+        '</div>';
+
+    let style =
+        '<style class="style">' +
+            '.test { width: 500px; line-height: 16px; }' +
+        '<style>';
 
     describe('typeset --', function() {
         // @todo
@@ -18,13 +27,52 @@ describe('typeset.ts:', function () {
         // @todo
     });
     describe('lowestDemerit --', function() {
-        // @todo
+        it('Expect lowest demerit', function (done) {
+            document.body.insertAdjacentHTML('beforeend', style);
+            document.body.insertAdjacentHTML('beforeend', loremIpsum);
+
+            let target = document.querySelector('.test');
+            let width = 500;
+
+  
+            let tsb = new TypesetBot('.test');
+
+            setTimeout(function() {
+
+                let bp1 = new TypesetBotLinebreak(null, 1, 0, 300, false, 0, 1, 16);
+                let bp2 = new TypesetBotLinebreak(null, 1, 0, 400, false, 0, 1, 16);
+                let typeset = tsb.util.getTypesetInstance(target);
+
+                typeset.finalBreakpoints.push(bp1); // Best
+                typeset.finalBreakpoints.push(bp2); // Worse
+
+                expect(typeset.lowestDemerit(typeset.finalBreakpoints)).toEqual(bp1);
+
+                done();
+            }, 100);
+        });
     });
     describe('getFinalLineBreaks --', function() {
         // @todo
     });
     describe('pushFinalBreakpoint --', function() {
-        // @todo
+        it('Multiple solutions', function (done) {
+            document.body.insertAdjacentHTML('beforeend', style);
+            document.body.insertAdjacentHTML('beforeend', loremIpsum);
+
+            let target = document.querySelector('.test');
+            let width = 500;
+
+  
+            let tsb = new TypesetBot('.test');
+
+            setTimeout(function() {
+
+                expect(tsb.util.getTypesetInstance(target).finalBreakpoints.length).toBeGreaterThan(10);
+
+                done();
+            }, 100);
+        });
     });
     describe('getBreakpoint --', function() {
         // @todo
@@ -119,9 +167,6 @@ describe('typeset.ts:', function () {
             expect(typeset.isShortestPath(bp4)).toEqual(true);
             expect(typeset.isShortestPath(bp5)).toEqual(true);
         });
-    });
-    describe('appendToTokenMap --', function() {
-        // @todo
     });
     describe('initLineProperties --', function() {
         // @todo

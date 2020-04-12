@@ -869,6 +869,26 @@ function TypesetBotUtils(tsb) {
 
     return this._tsb.indexToTypesetInstance[index];
   };
+  /**
+   * Add tokens to map for specific node.
+   *
+   * @param root
+   * @param tokens
+   */
+
+
+  this.appendToTokenMap = function (root, tokens) {
+    if (this.getElementIndex(root) == null) {
+      this._tsb.logger.error('Root node is not indexed');
+
+      this._tsb.logger.error(root);
+
+      return;
+    }
+
+    var index = this.getElementIndex(root);
+    this._tsb.indexToTokens[index] = tokens;
+  };
 
   this._tsb = tsb;
 };
@@ -1644,7 +1664,7 @@ function TypesetBotTypeset(tsb) {
     this._tsb.logger.start('---- other'); // Append tokens to map for quick access.
 
 
-    this.appendToTokenMap(element, this.tokens);
+    this._tsb.util.appendToTokenMap(element, this.tokens);
 
     this._tsb.logger.end('---- other');
 
@@ -1946,27 +1966,6 @@ function TypesetBotTypeset(tsb) {
     }
 
     return false;
-  };
-  /**
-   * Add tokens to map for specific node.
-   *
-   * @param root
-   * @param tokens
-   */
-
-
-  this.appendToTokenMap = function (root, tokens) {
-    if (this._tsb.util.getElementIndex(root) == null) {
-      this._tsb.logger.error('Root node is not indexed');
-
-      this._tsb.logger.error(root);
-
-      return;
-    }
-
-    var index = this._tsb.util.getElementIndex(root);
-
-    this._tsb.indexToTokens[index] = tokens;
   };
   /**
    * Get properties for a new line object.

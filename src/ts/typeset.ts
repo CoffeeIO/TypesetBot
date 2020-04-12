@@ -150,7 +150,7 @@ class TypesetBotTypeset {
 
         this._tsb.logger.start('---- other');
         // Append tokens to map for quick access.
-        this.appendToTokenMap(element, this.tokens);
+        this._tsb.util.appendToTokenMap(element, this.tokens);
         this._tsb.logger.end('---- other');
 
         this._tsb.logger.start('---- Get render size of words');
@@ -469,23 +469,7 @@ class TypesetBotTypeset {
         return false;
     }
 
-    /**
-     * Add tokens to map for specific node.
-     *
-     * @param root
-     * @param tokens
-     */
-    appendToTokenMap = function(root: Element, tokens: TypesetBotToken[]) {
-        if (this._tsb.util.getElementIndex(root) == null) {
-            this._tsb.logger.error('Root node is not indexed');
-            this._tsb.logger.error(root);
-            return;
-        }
-
-        const index = this._tsb.util.getElementIndex(root);
-        this._tsb.indexToTokens[index] = tokens;
-    }
-
+    
 
     /**
      * Get properties for a new line object.

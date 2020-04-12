@@ -134,4 +134,22 @@ class TypesetBotUtils {
 
         return this._tsb.indexToTypesetInstance[index];
     }
+
+    /**
+     * Add tokens to map for specific node.
+     *
+     * @param root
+     * @param tokens
+     */
+    appendToTokenMap = function(root: Element, tokens: TypesetBotToken[]) {
+        if (this.getElementIndex(root) == null) {
+            this._tsb.logger.error('Root node is not indexed');
+            this._tsb.logger.error(root);
+            return;
+        }
+
+        const index = this.getElementIndex(root);
+        this._tsb.indexToTokens[index] = tokens;
+    }
+
 }
