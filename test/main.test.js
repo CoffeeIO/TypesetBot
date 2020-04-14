@@ -16,6 +16,12 @@ describe('main.ts:', function () {
             '.test { width: 500px; line-height: 16px; }' +
         '<style>';
 
+    describe('rerun --', function() { // constructor
+        // @todo
+    });
+    describe('typesetNodes --', function() { // constructor
+        // @todo
+    });
 
     describe('constructor --', function() {
         it('Basic test', function (done) {
@@ -139,26 +145,6 @@ describe('main.ts:', function () {
                 done();
             }, 100);
         });
-
-
-    });
-    describe('init --', function() { // constructor
-        // @todo
-    });
-    describe('typeset --', function() { // constructor
-        // @todo
-    });
-    describe('rerun --', function() { // constructor
-        // @todo
-    });
-    describe('requery --', function() { // tested in query.test.js
-        // @todo
-    });
-    describe('watch --', function() { // boring?
-        // @todo
-    });
-    describe('unwatch --', function() { // boring?
-        // @todo
     });
     describe('terminate --', function() {
         it('General', function(done) {
@@ -212,8 +198,5 @@ describe('main.ts:', function () {
                 done();
             }, 100);
         });
-    });
-    describe('typesetNodes --', function() { // constructor
-        // @todo
     });
 });

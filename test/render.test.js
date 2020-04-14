@@ -9,6 +9,16 @@ describe('render.ts:', function () {
         noRun: true,
     }
 
+    describe('getWordProperties --', function() {
+        // @todo
+    });
+    describe('getHyphenProperties --', function() {
+        // @todo
+    });
+    describe('applyLineBreaks --', function() {
+        // @todo
+    });
+
     describe('getDefaultFontSize --', function() {
         it('default browser font', function(done) {
             document.body.insertAdjacentHTML('beforeend', fixture);
@@ -405,17 +415,5 @@ describe('render.ts:', function () {
                 done();
             }, 1000);
         });
-    });
-
-    // ---
-
-    describe('getWordProperties --', function() {
-        // @todo
-    });
-    describe('getHyphenProperties --', function() {
-        // @todo
-    });
-    describe('applyLineBreaks --', function() {
-        // @todo
     });
 });

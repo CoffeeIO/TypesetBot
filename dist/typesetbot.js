@@ -777,11 +777,22 @@ function TypesetBotUtils(tsb) {
   _classCallCheck(this, TypesetBotUtils);
 
   /**
+   * Set index on node.
+   *
+   * @param node  The node to set index on
+   * @param index The index to set
+   */
+  this.setElementIndex = function (node, index) {
+    node.setAttribute('data-tsb-indexed', '' + index);
+  };
+  /**
    * Get index of queried node.
    *
    * @param node The node to get index of
    * @returns    The index of the node, otherwise null
    */
+
+
   this.getElementIndex = function (node) {
     if (node.getAttribute('data-tsb-indexed') == null) {
       return null;
@@ -799,17 +810,6 @@ function TypesetBotUtils(tsb) {
     }
 
     return index;
-  };
-  /**
-   * Set index on node.
-   *
-   * @param node  The node to set index on
-   * @param index The index to set
-   */
-
-
-  this.setElementIndex = function (node, index) {
-    node.setAttribute('data-tsb-indexed', '' + index);
   };
   /**
    * Get nodes of element.

@@ -11,12 +11,6 @@ describe('typeset.ts:', function () {
             '.test { width: 500px; line-height: 16px; }' +
         '<style>';
 
-    describe('typeset --', function() {
-        // @todo
-    });
-    describe('reset --', function() { // Tested in main.test.js
-        // @todo
-    });
     describe('getElementProperties --', function() {
         // @todo
     });
@@ -26,15 +20,22 @@ describe('typeset.ts:', function () {
     describe('preprocessElement --', function() {
         // @todo
     });
+    describe('getFinalLineBreaks --', function() {
+        // @todo
+    });
+    describe('getBreakpoint --', function() {
+        // @todo
+    });
+    describe('initLineProperties --', function() {
+        // @todo
+    });
     describe('lowestDemerit --', function() {
         it('Expect lowest demerit', function (done) {
             document.body.insertAdjacentHTML('beforeend', style);
             document.body.insertAdjacentHTML('beforeend', loremIpsum);
 
             let target = document.querySelector('.test');
-            let width = 500;
 
-  
             let tsb = new TypesetBot('.test');
 
             setTimeout(function() {
@@ -52,9 +53,6 @@ describe('typeset.ts:', function () {
             }, 100);
         });
     });
-    describe('getFinalLineBreaks --', function() {
-        // @todo
-    });
     describe('pushFinalBreakpoint --', function() {
         it('Multiple solutions', function (done) {
             document.body.insertAdjacentHTML('beforeend', style);
@@ -63,7 +61,7 @@ describe('typeset.ts:', function () {
             let target = document.querySelector('.test');
             let width = 500;
 
-  
+
             let tsb = new TypesetBot('.test');
 
             setTimeout(function() {
@@ -73,9 +71,6 @@ describe('typeset.ts:', function () {
                 done();
             }, 100);
         });
-    });
-    describe('getBreakpoint --', function() {
-        // @todo
     });
     describe('updateShortestPath & isShortestPath --', function() { // Interesting
         it('Replacing solution based on demerit', function() {
@@ -167,8 +162,5 @@ describe('typeset.ts:', function () {
             expect(typeset.isShortestPath(bp4)).toEqual(true);
             expect(typeset.isShortestPath(bp5)).toEqual(true);
         });
-    });
-    describe('initLineProperties --', function() {
-        // @todo
     });
 });

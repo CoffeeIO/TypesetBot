@@ -11,6 +11,19 @@ describe('html.ts:', function () {
             '<span id="some-id" class="inner" data-hello="world" flag>Hello</span> world' +
         '</div>';
 
+    describe('getHtmlFromTokensRange --', function() {
+        // @todo
+    });
+    describe('getTagTokensOnLine --', function() {
+        // @todo
+    });
+    describe('appendTagTokensOnLine --', function() {
+        // @todo
+    });
+    describe('prependTagTokensOnLine --', function() {
+        // @todo
+    });
+
     describe('createTagHtml --', function() {
         it('General', function(done) {
             document.body.insertAdjacentHTML('beforeend', fixture);
