@@ -945,7 +945,7 @@ TypesetBotUtils.getArrayIndexes = function (arr) {
 
 typesetbotWindowSet('ready', false);
 typesetbotWindowSet('onload', false);
-document.addEventListener("DOMContentLoaded", function (event) {
+document.addEventListener('DOMContentLoaded', function () {
   typesetbotWindowSet('ready', true);
   var event = new Event('typesetbot--interactive'); // Dispatch the event to all TSB instances.
 
@@ -2159,7 +2159,7 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
   this.getLineHeight = function (element) {
     var lineHeight = this.getNodeStyle(element, 'line-height');
 
-    if (lineHeight == 'normal') {
+    if (lineHeight === 'normal') {
       // Make line height relative to font size.
       var fontSize = this.getNodeStyleNumber(element, 'font-size');
       lineHeight = 1.2 * fontSize; // 1.2 em

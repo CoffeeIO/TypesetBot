@@ -100,7 +100,7 @@ class TypesetBotSettings {
 
         for (const [key, value] of Object.entries(settings)) {
             if (typeof this[key] === 'undefined') {
-                console.warn('Unknown settings key "' + key +'"');
+                console.warn('Unknown settings key "' + key + '"');
                 continue;
             }
 

@@ -6,9 +6,9 @@
 typesetbotWindowSet('ready', false);
 typesetbotWindowSet('onload', false);
 
-document.addEventListener("DOMContentLoaded", function(event) {
+document.addEventListener('DOMContentLoaded', function() {
     typesetbotWindowSet('ready', true);
-    var event = new Event('typesetbot--interactive');
+    const event = new Event('typesetbot--interactive');
 
     // Dispatch the event to all TSB instances.
     document.dispatchEvent(event);
@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 (window as any).onload = function() {
     typesetbotWindowSet('onload', true);
-    var event = new Event('typesetbot--complete');
+    const event = new Event('typesetbot--complete');
 
     // Dispatch the event to all TSB instances.
     document.dispatchEvent(event);
