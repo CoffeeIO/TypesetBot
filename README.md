@@ -10,11 +10,10 @@
 <a href="https://travis-ci.org/CoffeeIO/TypesetBot"><img alt="TypesetBot" src="https://travis-ci.org/CoffeeIO/TypesetBot.svg?branch=master"></a>
 <a href="https://www.codacy.com/app/mgapcdev/TypesetBot/dashboard"><img src="https://api.codacy.com/project/badge/Grade/c098136ef81345b78c480ee695314a21"/></a>
 <br>
-<a href="https://www.npmjs.com/package/typesetbot"><img alt="typesetbot" src="https://img.shields.io/npm/v/typesetbot.svg"></a>
-<a href="https://www.npmjs.com/package/typesetbot"><img alt="typesetbot" src="https://img.shields.io/npm/dm/typesetbot.svg"></a>
+<a href="https://badge.fury.io/js/typesetbot"><img src="https://badge.fury.io/js/typesetbot.svg" alt="npm version"></a>
 </p>
 
-See [coffeeio.com](http://coffeeio.com/) for complete docs and demos.
+See [coffeeio.com](https://coffeeio.com/typesetbot) for complete docs and demos.
 </div>
 <div style="clear: both">
 
@@ -35,7 +34,7 @@ Hyphenation Library
 <script src="https://unpkg.com/@coffeeio/hypher@1.0.0/dist/hypher.js" type="text/javascript"></script>
 ```
 
-Hyphenation pattern, replace `{language-code}` with language code like `en-us`. Full list can be found [here](https://github.com/fluid-project/hyphenation-patterns/tree/master/dist/browser).
+Hyphenation pattern, replace `{language-code}` with language code for example `en-us`. Full list can be found [here](https://github.com/fluid-project/hyphenation-patterns/tree/master/dist/browser).
 
 ```
 https://unpkg.com/@fluid-project/hyphenation-patterns@0.2.2-dev.20181115T211247Z.d313a52/dist/browser/{language-code}.js
@@ -58,7 +57,7 @@ Minified:
 
 ### Commercial license
 
-If you want to use TypesetBot to develop commercial sites, themes, projects, and applications, the Commercial license is the appropriate license. With this option, your source code is kept proprietary. Purchase a Flickity Commercial License at [coffeeio.com](http://coffeeio.com/)
+If you want to use TypesetBot to develop commercial sites, themes, projects, and applications, the Commercial license is the appropriate license. With this option, your source code is kept proprietary. Purchase a TypesetBot Commercial License at [coffeeio.com](https://coffeeio.com/typesetbot/license)
 
 ### Open source license
 
@@ -69,19 +68,18 @@ If you are creating an open source application under a license compatible with t
 ## Usage
 
 
-More examples found at [coffeeio.com](http://coffeeio.com/)
+More examples found at [coffeeio.com](https://coffeeio.com/typesetbot/examples)
 
 ```html
 <head>
 <link rel="stylesheet" href="https://unpkg.com/typesetbot/dist/typesetbot.min.css">
-<script type="text/javascript" src="https://unpkg.com/typesetbot/dist/typesetbot.min.js"></script>    
-    
+<script type="text/javascript" src="https://unpkg.com/typesetbot/dist/typesetbot.min.js"></script>
+
 <!-- (optional) -->
 <!-- hyphenation library -->
 <script type="text/javascript" src="https://unpkg.com/@coffeeio/hypher@1.0.0/dist/hypher.js"></script>
 <!-- hyphenation pattern for US english -->
 <script type="text/javascript" src="https://unpkg.com/@fluid-project/hyphenation-patterns@0.2.2-dev.20181115T211247Z.d313a52/dist/browser/en-us.js"></script>
-
 
 <!-- Initialize TypesetBot -->
 <script type="text/javascript">
@@ -100,25 +98,6 @@ More examples found at [coffeeio.com](http://coffeeio.com/)
     <p class="container">Lorem ipsum...</p>
 </body>
 ```
-
-## Features
-
-
-### Line breaking
-The line breaking algorithm implemented, is inspired by TeX's implementation of the total-fit algorithm.
-The implementation is modified specifically for the web domain. This required some rethinking some fundamentatal elements of the algorithm we get: use of query selectors,  html inline-tag support, handle viewport changes.
-
-### Query selectors
-TypesetBot can be either initialized with a query selector, a Node or NodeList.
-
-### Hyphenation
-TypesetBot does not require the use of hyphenation libraries, but hyphenation of words can be used to greatly improve the line breaking quality. Hyphenation is done with [hypher](https://github.com/bramstein/hypher) and uses the open source TeX hyphenation patterns and can hyphenate text in various languages. Languages supported can be found in [hyphenation-patterns by bramstein](https://github.com/bramstein/hyphenation-patterns/tree/master/dist/browser)
-
-### Viewport changes
-With responsive design being a important thing on the web, I think it only made sense to consider that the user might change the viewport size by dragging the browser or going from portrait to landscape on mobile. When using the _TypesetBot.attach()_ we recalculate the line breaking every time the viewport changes and with some clever CSS the transition is hard to notice.
-
-### Tag support
-On of the biggest changes that had to be made from the total-fit algorithm, is the support for inline tags in paragraphs. The support allows the user to wrap text in style changing tags like `<span>` or `<b class="someClass">` these can be used as you would expect, even in the middle of a word and with styles that change the font-size.
 
 ## Settings
 
@@ -184,12 +163,20 @@ Most common settings to adjust is `hyphenLanguage` and `alignment`.
     // How much can the space width shrink
     spaceShrinkability : number = 1 / 9;
 
-    // Debug mode: prints performance stats. -----------------------------------
+    // Debug mode. ------------------------------------------------------------
 
+    // Prints performance stats.
     debug: boolean = false;
 
+    // Don't run Typesetting as soon as program is initialized.
+    noRun: boolean = false;
+
+    // Define levels to log. Options: 'error', 'warn', 'log'
+    logs: string[] = ['error', 'warn'];
 }
 ```
+
+See [coffeeio.com](https://coffeeio.com/typesetbot) for complete docs and demos.
 
 ---
 

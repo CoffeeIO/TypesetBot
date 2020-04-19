@@ -37,6 +37,33 @@ class TypesetBotUtils {
     }
 
     /**
+     * Take a string array and return array of string length and ignore last element.
+     * Fx: ["hyp", "hen", "ation"] --> [3, 3].
+     *
+     * @param   arr Array of word parts
+     * @returns     Array of word parts length
+     */
+    static getArrayIndexes = function(arr: string[]): number[] {
+        const indexes = [];
+
+        for (let i = 0; i < arr.length - 1; i++) {
+            indexes.push(arr[i].length);
+        }
+
+        return indexes;
+    };
+
+    /**
+     * Set index on node.
+     *
+     * @param node  The node to set index on
+     * @param index The index to set
+     */
+    setElementIndex = function(node: Element, index: number) {
+        node.setAttribute('data-tsb-indexed', '' + index);
+    }
+
+    /**
      * Get index of queried node.
      *
      * @param node The node to get index of
@@ -57,16 +84,6 @@ class TypesetBotUtils {
         }
 
         return index;
-    }
-
-    /**
-     * Set index on node.
-     *
-     * @param node  The node to set index on
-     * @param index The index to set
-     */
-    setElementIndex = function(node: Element, index: number) {
-        node.setAttribute('data-tsb-indexed', '' + index);
     }
 
     /**
@@ -97,23 +114,6 @@ class TypesetBotUtils {
         }
         return this._tsb.indexToTokens[index];
     }
-
-    /**
-     * Take a string array and return array of string length and ignore last element.
-     * Fx: ["hyp", "hen", "ation"] --> [3, 3].
-     *
-     * @param   arr Array of word parts
-     * @returns     Array of word parts length
-     */
-    static getArrayIndexes = function(arr: string[]): number[] {
-        const indexes = [];
-
-        for (let i = 0; i < arr.length - 1; i++) {
-            indexes.push(arr[i].length);
-        }
-
-        return indexes;
-    };
 
     /**
      * Get existing instance of typesetting for particular element.

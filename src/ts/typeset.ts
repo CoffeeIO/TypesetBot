@@ -469,8 +469,6 @@ class TypesetBotTypeset {
         return false;
     }
 
-    
-
     /**
      * Get properties for a new line object.
      *

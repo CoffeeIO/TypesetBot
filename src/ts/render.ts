@@ -119,9 +119,9 @@ class TypesetBotRender {
      */
     getLineHeight = function(element: HTMLElement) {
         let lineHeight = this.getNodeStyle(element, 'line-height');
-        if (lineHeight == 'normal') {
+        if (lineHeight === 'normal') {
             // Make line height relative to font size.
-            let fontSize = this.getNodeStyleNumber(element, 'font-size');
+            const fontSize = this.getNodeStyleNumber(element, 'font-size');
             lineHeight = 1.2 * fontSize; // 1.2 em
         } else {
             // Format number.

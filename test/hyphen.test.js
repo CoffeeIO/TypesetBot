@@ -15,6 +15,10 @@ describe('hyphen.ts:', function() {
             'Hello world' +
         '</div>';
 
+    describe('nextWord --', function() {
+        // @todo
+    });
+
     describe('hyphenate --', function() {
         it('Hyphenate english word', function(done) {
             let tsb1 = new TypesetBot(null, defaultSettings);
@@ -190,8 +194,5 @@ describe('hyphen.ts:', function() {
                 done();
             }, 100);
         })
-    });
-    describe('nextWord --', function() {
-        // @todo
     });
 });
