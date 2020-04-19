@@ -13,7 +13,7 @@
 <a href="https://badge.fury.io/js/typesetbot"><img src="https://badge.fury.io/js/typesetbot.svg" alt="npm version"></a>
 </p>
 
-See [coffeeio.com](http://coffeeio.com/typesetbot) for complete docs and demos.
+See [coffeeio.com](https://coffeeio.com/typesetbot) for complete docs and demos.
 </div>
 <div style="clear: both">
 
@@ -57,7 +57,7 @@ Minified:
 
 ### Commercial license
 
-If you want to use TypesetBot to develop commercial sites, themes, projects, and applications, the Commercial license is the appropriate license. With this option, your source code is kept proprietary. Purchase a Flickity Commercial License at [coffeeio.com](http://coffeeio.com/)
+If you want to use TypesetBot to develop commercial sites, themes, projects, and applications, the Commercial license is the appropriate license. With this option, your source code is kept proprietary. Purchase a TypesetBot Commercial License at [coffeeio.com](https://coffeeio.com/typesetbot/license)
 
 ### Open source license
 
@@ -68,7 +68,7 @@ If you are creating an open source application under a license compatible with t
 ## Usage
 
 
-More examples found at [coffeeio.com](http://coffeeio.com/typesetbot/examples)
+More examples found at [coffeeio.com](https://coffeeio.com/typesetbot/examples)
 
 ```html
 <head>
@@ -176,7 +176,7 @@ Most common settings to adjust is `hyphenLanguage` and `alignment`.
 }
 ```
 
-See [coffeeio.com](http://coffeeio.com/typesetbot) for complete docs and demos.
+See [coffeeio.com](https://coffeeio.com/typesetbot) for complete docs and demos.
 
 ---
 
