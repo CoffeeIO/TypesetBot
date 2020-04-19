@@ -225,6 +225,7 @@ class TypesetBotTypeset {
                 null,
                 0,
                 0,
+                0,
             ),
         );
 
@@ -359,6 +360,7 @@ class TypesetBotTypeset {
                 null,
                 originBreakpoint.lineNumber + 1,
                 lineProperties.lineHeight,
+                0,
             ),
         );
     }
@@ -399,6 +401,7 @@ class TypesetBotTypeset {
             fitnessClass,
             origin.lineNumber + 1,
             lineProperties.lineHeight,
+            ratio,
         );
     }
 
@@ -511,6 +514,7 @@ class TypesetBotLinebreak {
         public fitnessClass:  number,
         public lineNumber:    number,
         public maxLineHeight: number,
+        public ratio:         number,
     ) { }
 }
 

@@ -386,8 +386,14 @@ class TypesetBotRender {
                 lineHeight = defaultLineHeight;
             }
 
+            var attr = '';
+            if (this._tsb.settings.debug) {
+                attr += 'typeset-bot-line="' + line.lineNumber + '" ';
+                attr += 'typeset-bot-ratio="' + line.ratio + '" ';
+            }
+
             html +=
-                '<tsb-line line="' + line.lineNumber + '" style="height:' + lineHeight + 'px">' +
+                '<tsb-line ' + attr + ' style="height:' + lineHeight + 'px">' +
                     lineHtml +
                 '</tsb-line>';
         }

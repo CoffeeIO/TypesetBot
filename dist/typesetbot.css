@@ -3,12 +3,14 @@ tsb-line {
 
 .typesetbot-justify {
   text-align: justify; }
-  .typesetbot-justify tsb-line:after {
-    content: "";
-    display: inline-block;
-    width: 100%; }
-  .typesetbot-justify tsb-line:last-of-type:after {
-    display: none; }
+  .typesetbot-justify tsb-line {
+    word-spacing: normal; }
+    .typesetbot-justify tsb-line:after {
+      content: "";
+      display: inline-block;
+      width: 100%; }
+    .typesetbot-justify tsb-line:last-of-type:after {
+      display: none; }
 
 .typesetbot-right tsb-line {
   text-align: right; }

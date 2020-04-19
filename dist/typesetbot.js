@@ -1764,7 +1764,7 @@ function TypesetBotTypeset(tsb) {
     this._tsb.logger.start('-- Dynamic programming');
 
     this.resetLineBreak();
-    this.activeBreakpoints.enqueue(new TypesetBotLinebreak(null, 0, null, 0, false, null, 0, 0));
+    this.activeBreakpoints.enqueue(new TypesetBotLinebreak(null, 0, null, 0, false, null, 0, 0, 0));
     var isFinished = false;
 
     while (!isFinished) {
@@ -1880,7 +1880,7 @@ function TypesetBotTypeset(tsb) {
 
 
   this.pushFinalBreakpoint = function (originBreakpoint, lineProperties) {
-    this.finalBreakpoints.push(new TypesetBotLinebreak(originBreakpoint, null, null, originBreakpoint.demerit, false, null, originBreakpoint.lineNumber + 1, lineProperties.lineHeight));
+    this.finalBreakpoints.push(new TypesetBotLinebreak(originBreakpoint, null, null, originBreakpoint.demerit, false, null, originBreakpoint.lineNumber + 1, lineProperties.lineHeight, 0));
   };
   /**
    * Calculate demerit and return new linebreak object.
@@ -1905,7 +1905,7 @@ function TypesetBotTypeset(tsb) {
     var skippingFitnessClass = origin.fitnessClass != null && Math.abs(origin.fitnessClass - fitnessClass) > 1;
     var demerit = this.math.getDemerit(ratio, consecutiveFlag, hasHyphen, skippingFitnessClass);
     return new TypesetBotLinebreak(origin, tokenIndex, hyphenIndex, origin.demerit + demerit, // Append demerit from previous line
-    flag, fitnessClass, origin.lineNumber + 1, lineProperties.lineHeight);
+    flag, fitnessClass, origin.lineNumber + 1, lineProperties.lineHeight, ratio);
   };
   /**
    * Check if a certain breakpoint is the current shortest path to the break.
@@ -2002,7 +2002,7 @@ var TypesetBotLinebreak =
  * @param lineNumber    Line number of current line
  * @param maxLineHeight Max line height of current solution
  */
-function TypesetBotLinebreak(origin, tokenIndex, hyphenIndex, demerit, flag, fitnessClass, lineNumber, maxLineHeight) {
+function TypesetBotLinebreak(origin, tokenIndex, hyphenIndex, demerit, flag, fitnessClass, lineNumber, maxLineHeight, ratio) {
   _classCallCheck(this, TypesetBotLinebreak);
 
   this.origin = origin;
@@ -2013,6 +2013,7 @@ function TypesetBotLinebreak(origin, tokenIndex, hyphenIndex, demerit, flag, fit
   this.fitnessClass = fitnessClass;
   this.lineNumber = lineNumber;
   this.maxLineHeight = maxLineHeight;
+  this.ratio = ratio;
 };
 /**
  * Class representing properties for each line in the dynamic programming algorithm.
@@ -2545,7 +2546,14 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
         lineHeight = defaultLineHeight;
       }
 
-      html += '<tsb-line line="' + line.lineNumber + '" style="height:' + lineHeight + 'px">' + lineHtml + '</tsb-line>';
+      var attr = '';
+
+      if (this._tsb.settings.debug) {
+        attr += 'typeset-bot-line="' + line.lineNumber + '" ';
+        attr += 'typeset-bot-ratio="' + line.ratio + '" ';
+      }
+
+      html += '<tsb-line ' + attr + ' style="height:' + lineHeight + 'px">' + lineHtml + '</tsb-line>';
     }
 
     element.innerHTML = html;
