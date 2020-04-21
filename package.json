@@ -1,7 +1,7 @@
 {
   "name": "typesetbot",
   "version": "1.0.0-beta1",
-  "description": "Small project to dynamically typeset text on the web",
+  "description": "Dynamically typeset text on the web",
   "author": "Mathias Grundtvig Andreasen (MGApcDev)",
   "license": "GPL-3.0",
   "devDependencies": {
@@ -35,5 +35,17 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/CoffeeIO/TypesetBot"
-  }
+  },
+  "keywords": [
+    "typesetting",
+    "DOM",
+    "dynamic",
+    "hyphen",
+    "hyphenation",
+    "typeset",
+    "browser",
+    "typescript",
+    "responsive"
+  ],
+  "homepage": "https://coffeeio.com/typesetbot"
 }
