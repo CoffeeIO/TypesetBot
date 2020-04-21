@@ -1,6 +1,4 @@
 // Karma configuration
-// Generated on Mon Jul 18 2016 14:06:44 GMT-0500 (Central Daylight Time (Mexico))
-
 module.exports = function(config) {
 
     var configuration = {
@@ -17,35 +15,41 @@ module.exports = function(config) {
         files: [
             // Source files.
             {pattern: 'dist/typesetbot.js', watched: true, included: true, served: true},
+            {pattern: 'dist/typesetbot.css', watched: true, included: true, served: true},
 
-            {pattern: 'node_modules/jquery/dist/jquery.min.js', watched: true, included: true, served: true},
-            {pattern: 'node_modules/hypher/dist/jquery.hypher.js', watched: true, included: true, served: true},
-            {pattern: 'node_modules/hyphenation.en-us/lib/en-us.js', watched: true, included: true, served: true},
-
-            {pattern: 'fixtures/**/*.html'},
+            {pattern: 'https://unpkg.com/@coffeeio/hypher@1.0.0/dist/hypher.js', watched: false, included: true, served: true},
+            {pattern: 'https://unpkg.com/@fluid-project/hyphenation-patterns@0.2.2-dev.20181115T211247Z.d313a52/dist/browser/en-us.js', watched: false, included: true, served: true},
+            {pattern: 'https://unpkg.com/@fluid-project/hyphenation-patterns@0.2.2-dev.20181115T211247Z.d313a52/dist/browser/en-gb.js', watched: false, included: true, served: true},
+            {pattern: 'https://fonts.googleapis.com/css2?family=Open+Sans+Condensed&display=swap', watched: false, included: true, served: true},
+            {pattern: 'https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap', watched: false, included: true, served: true},
 
             // Test files.
-            {pattern: 'test/paraUtils.test.js', watched: true, included: true, served: true},
-            {pattern: 'test/lineUtils.test.js', watched: true, included: true, served: true},
-            {pattern: 'test/nodeUtils.test.js', watched: true, included: true, served: true},
-            {pattern: 'test/typesetUtils.test.js', watched: true, included: true, served: true},
-            {pattern: 'test/utils.test.js', watched: true, included: true, served: true},
-            {pattern: 'test/math.test.js', watched: true, included: true, served: true},
-            {pattern: 'test/hyphen.test.js', watched: true, included: true, served: true},
-            {pattern: 'test/settings.test.js', watched: true, included: true, served: true},
+            {pattern: 'test/*.test.js', watched: true, included: true, served: true},
         ],
+
+        // plugins: [
+        //     // "karma-browserify",
+        //     // "karma-chrome-launcher",
+        //     // "karma-firefox-launcher",
+        //     // "karma-ie-launcher",
+        //     // "karma-opera-launcher",
+        //     // "karma-phantomjs-launcher"
+        // ],
+        browsers: [
+            "Chrome",
+            // "Firefox",
+            // "IE",
+            //"Opera",
+            // "PhantomJS"
+        ],
+
+        client: {
+            captureConsole: false,
+        },
 
         // list of files to exclude
         exclude: [
         ],
-
-
-        // preprocess matching files before serving them to the browser
-        // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-        preprocessors: {
-            '**/*.html': ['html2js']
-        },
-
 
         // test results reporter to use
         // possible values: 'dots', 'progress'
@@ -63,16 +67,11 @@ module.exports = function(config) {
 
         // level of logging
         // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-        logLevel: config.LOG_INFO,
+        logLevel: config.LOG_DISABLE,
 
 
         // enable / disable watching file and executing tests whenever any file changes
         autoWatch: true,
-
-
-        // start these browsers
-        // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-        browsers: ['Chrome'],
 
         customLaunchers: {
             Chrome_travis_ci: {
@@ -87,27 +86,24 @@ module.exports = function(config) {
 
         // Concurrency level
         // how many browser should be started simultaneous
-        concurrency: Infinity,
-
-        html2JsPreprocessor: {
-            // strip this from the file path
-            stripPrefix: 'public/',
-
-            // prepend this to the file path
-            prependPrefix: 'served/',
-
-            // or define a custom transform function
-            processPath: function(filePath) {
-                // Drop the file extension
-                return filePath.replace(/\.html$/, '');
-            }
-        }
+        concurrency: Infinity
     };
 
-    // Change some config (Chrome to Chrome Canary) if Running on TravisCI.
-    // See: http://stackoverflow.com/questions/19255976/how-to-make-travis-execute-angular-tests-on-chrome-please-set-env-variable-chr
-    if(process.env.TRAVIS){
-        configuration.browsers = ['Chrome_travis_ci'];
+    // Travis configuration.
+    if (process.env.TRAVIS) {
+        configuration.customLaunchers = {
+            Chrome_travis_ci: {
+                base: 'Chrome',
+                flags: ['--no-sandbox']
+            }
+        };
+        configuration.browsers = [
+            "Chrome_travis_ci",
+            // "Firefox",
+            //"IE",
+            //"Opera",
+            // "PhantomJS"
+        ];
         configuration.singleRun = true;
     }
 

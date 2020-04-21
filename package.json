@@ -1,33 +1,51 @@
 {
   "name": "typesetbot",
-  "version": "0.2.1",
-  "description": "Small project to dynamically typeset text on the web",
+  "version": "1.0.0-beta1",
+  "description": "Dynamically typeset text on the web",
   "author": "Mathias Grundtvig Andreasen (MGApcDev)",
   "license": "GPL-3.0",
   "devDependencies": {
-    "jquery": "~3.1.1",
-    "gulp": "~3.9.1",
-    "gulp-watch": "~4.3.11",
-    "gulp-uglify": "~2.0.1",
-    "gulp-rename": "~1.2.2",
-    "gulp-concat": "~2.6.1",
-    "pump": "~1.0.2",
-    "jasmine-core": "~2.5.2",
-    "karma": "~1.4.1",
-    "karma-chrome-launcher": "~2.0.0",
-    "karma-jasmine": "~1.1.0",
-    "karma-html2js-preprocessor": "~1.1.0",
-    "gulp-sass": "~3.1.0",
-    "hyphenation.en-us": "~0.2.1",
-    "hypher": "~0.2.5"
+    "@babel/core": "^7.6.2",
+    "@babel/plugin-proposal-class-properties": "^7.0.0",
+    "@babel/preset-env": "^7.6.2",
+    "browserify": "^16.5.0",
+    "gulp": "^4.0.2",
+    "gulp-babel": "^8.0.0-beta.2",
+    "gulp-concat": "^2.6.1",
+    "gulp-minify": "^3.1.0",
+    "gulp-sass": "^4.0.2",
+    "gulp-typescript": "^5.0.1",
+    "gulp-watch": "^5.0.1",
+    "jasmine-core": "^3.5.0",
+    "karma": "^4.4.1",
+    "karma-browserify": "^7.0.0",
+    "karma-chrome-launcher": "^3.1.0",
+    "karma-firefox-launcher": "^1.3.0",
+    "karma-ie-launcher": "^1.0.0",
+    "karma-jasmine": "^3.1.1",
+    "karma-opera-launcher": "^1.0.0",
+    "karma-phantomjs-launcher": "^1.0.4",
+    "tslint": "^5.20.1",
+    "typescript": "^3.6.4"
   },
+  "dependencies": {},
   "scripts": {
-    "start": "python -m SimpleHTTPServer",
-    "pretest": "gulp",
     "test": "karma start karma.conf.js"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/CoffeeIO/TypesetBot"
-  }
+  },
+  "keywords": [
+    "typesetting",
+    "DOM",
+    "dynamic",
+    "hyphen",
+    "hyphenation",
+    "typeset",
+    "browser",
+    "typescript",
+    "responsive"
+  ],
+  "homepage": "https://coffeeio.com/typesetbot"
 }

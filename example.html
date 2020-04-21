@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="dist/typesetbot.min.css">
+    <script type="text/javascript" src="dist/typesetbot.js"></script>
+
+    <!-- (optional) -->
+    <!-- hyphenation library -->
+    <script type="text/javascript" src="https://unpkg.com/@coffeeio/hypher@1.0.0/dist/hypher.js"></script>
+    <!-- hyphenation pattern for US english -->
+    <script type="text/javascript" src="https://unpkg.com/@fluid-project/hyphenation-patterns@0.2.2-dev.20181115T211247Z.d313a52/dist/browser/en-us.js"></script>
+
+
+    <!-- Initialize TypesetBot -->
+    <script type="text/javascript">
+        let tsb = new TypesetBot(
+            '.container', // Query selector.
+            {
+                'hyphenLanguage': 'en-us',
+                'alignment': 'justify',
+            }
+        );
+    </script>
+</head>
+<body>
+    <p class="container">
+            Lorem ipsum dolor sit amet, consectetur adipiscing
+            elit. Aliquam ut lectus nec tellus venenatis feugiat
+            sed a sem. Nullam rutrum lacus sed enim vehicula,
+            vel suscipit ex gravida. Duis interdum est non augue
+            bibendum ornare. Nunc accumsan egestas quam.
+            Sed mollis quis urna ac laoreet. Mauris consequat
+            congue nibh ut varius. Quisque ultrices felis et diam
+            mollis convallis. Vivamus convallis felis vitae augue
+            faucibus, vel porttitor diam viverra. Vivamus dictum
+            vulputate aliquet. Ut neque arcu, venenatis eget ul-
+            lamcorper id, pulvinar sit amet nunc. Morbi cursus
+            euismod lorem rutrum lacinia.
+    </p>
+</body>
+
+</html>

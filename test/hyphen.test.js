@@ -1,46 +1,198 @@
 'use strict';
 
-describe('Hyphenation:', function () {
+describe('hyphen.ts:', function() {
 
-    describe('Hyphenate word:', function () {
-        it('Normal words', function () {
-            var settings = TypesetBot.settings.get();
-            expect(TypesetBot.hyphen.word('hyphenation', settings)).toEqual(['hy', 'phen', 'ation']);
-            expect(TypesetBot.hyphen.word('test', settings)).toEqual(['test']);
-        });
-        it('Adjusting hyphen settings', function () {
-            var settings = TypesetBot.settings.get({hyphenLanguage: 'en-us'});
-            expect(TypesetBot.hyphen.word('hyphenate', settings)).toEqual(['hy', 'phen', 'ate']);
+    let defaultSettings = {
+        'noRun': true,
+        'hyphenLanguage': 'en-us',
+        'hyphenLeftMin': 2,
+        'hyphenRightMin': 2,
+        'logs': ['error', 'warn', 'log'],
+    };
 
-            settings = TypesetBot.settings.get({hyphenLanguage: 'en-us', hyphenRightMin: 3, hyphenLeftMin: 4});
-            expect(TypesetBot.hyphen.word('hyphenate', settings)).toEqual(['hyphen', 'ate']);
-        });
-        it('Language not found', function () {
-            var settings = TypesetBot.settings.get({hyphenLanguage: 'gg'});
-            expect(TypesetBot.hyphen.word('hyphenate', settings)).toEqual(['hyphenate']);
-        });
+    let fixture =
+        '<div class="test">' +
+            'Hello world' +
+        '</div>';
+
+    describe('nextWord --', function() {
+        // @todo
     });
 
-    describe('Hyphenation offset:', function () {
-        it('Normal word', function () {
-            var offset = TypesetBot.hyphen.getWordOffset('hyphen');
-            expect(offset.right).toEqual(0);
-            expect(offset.left).toEqual(0);
+    describe('hyphenate --', function() {
+        it('Hyphenate english word', function(done) {
+            let tsb1 = new TypesetBot(null, defaultSettings);
+
+            setTimeout(function() {
+
+                let hyphen = new TypesetBotHyphen(tsb1);
+                let wordparts = hyphen.hyphenate('hyphenation');
+
+                expect(wordparts.length).toEqual(3);
+                expect(wordparts).toEqual(['hy', 'phen', 'ation']);
+
+                done();
+            }, 100);
         });
-        it('Special character word', function () {
-            var offset = TypesetBot.hyphen.getWordOffset(',|Hello.$.');
-            expect(offset.right).toEqual(3);
-            expect(offset.left).toEqual(2);
+        it('Hyphenate english GB word', function(done) {
+            const settings = Object.assign({}, defaultSettings);
+            settings.hyphenLanguage = 'en-gb';
+            let tsb1 = new TypesetBot(null, settings);
+
+            setTimeout(function() {
+
+                let hyphen = new TypesetBotHyphen(tsb1);
+                let wordparts = hyphen.hyphenate('hyphenation');
+
+                expect(wordparts.length).toEqual(4);
+                expect(wordparts).toEqual(['hy', 'phen', 'a', 'tion']);
+
+                done();
+            }, 100);
+        });
+        it('Hyphenate word left min', function(done) {
+            const settings = Object.assign({}, defaultSettings);
+            settings.hyphenLanguage = 'en-gb';
+            settings.hyphenLeftMin = 3;
+            let tsb1 = new TypesetBot(null, settings);
+
+            setTimeout(function() {
+
+                let hyphen = new TypesetBotHyphen(tsb1);
+                let wordparts = hyphen.hyphenate('hyphenation');
+
+                expect(wordparts.length).toEqual(3);
+                expect(wordparts).toEqual(['hyphen', 'a', 'tion']);
+
+                done();
+            }, 100);
+        });
+        it('Hyphenate word right min', function(done) {
+            const settings = Object.assign({}, defaultSettings);
+            settings.hyphenLanguage = 'en-gb';
+            settings.hyphenRightMin = 5;
+            let tsb1 = new TypesetBot(null, settings);
+
+            setTimeout(function() {
+
+                let hyphen = new TypesetBotHyphen(tsb1);
+                let wordparts = hyphen.hyphenate('hyphenation');
+
+                expect(wordparts.length).toEqual(3);
+                expect(wordparts).toEqual(['hy', 'phen', 'ation']);
+
+                done();
+            }, 100);
+        });
+
+        it('Hyphenate danish word, no library', function(done) {
+            const settings = Object.assign({}, defaultSettings);
+            settings.hyphenLanguage = 'da';
+
+            let tsb1 = new TypesetBot(null, settings);
+
+            setTimeout(function() {
+
+                let hyphen = new TypesetBotHyphen(tsb1);
+                let wordparts = hyphen.hyphenate('hyphenate');
+
+                expect(wordparts).toEqual(['hyphenate']);
+
+                done();
+            }, 100);
+        });
+        it('Hyphenate word - null library', function(done) {
+            const settings = Object.assign({}, defaultSettings);
+            settings.hyphenLanguage = null;
+
+            let tsb1 = new TypesetBot(null, settings);
+
+            setTimeout(function() {
+
+                let hyphen = new TypesetBotHyphen(tsb1);
+                let wordparts = hyphen.hyphenate('hyphenate');
+
+                expect(wordparts).toEqual(['hyphenate']);
+
+                done();
+            }, 100);
+        });
+        it('Hyphenate word - empty library', function(done) {
+            const settings = Object.assign({}, defaultSettings);
+            settings.hyphenLanguage = '';
+
+            let tsb1 = new TypesetBot(null, settings);
+
+            setTimeout(function() {
+
+                let hyphen = new TypesetBotHyphen(tsb1);
+                let wordparts = hyphen.hyphenate('hyphenate');
+
+                expect(wordparts).toEqual(['hyphenate']);
+
+                done();
+            }, 100);
+        });
+        it('Hyphenate word - unknown library', function(done) {
+            const settings = Object.assign({}, defaultSettings);
+            settings.hyphenLanguage = 'wasd';
+
+            let tsb1 = new TypesetBot(null, settings);
+
+            setTimeout(function() {
+
+                let hyphen = new TypesetBotHyphen(tsb1);
+                let wordparts = hyphen.hyphenate('hyphenate');
+
+                expect(wordparts).toEqual(['hyphenate']);
+
+                done();
+            }, 100);
         });
     });
+    describe('getWordOffset --', function() {
+        it('Normal word, no offset', function(done) {
+            let tsb1 = new TypesetBot(null, defaultSettings);
 
-    describe('Hyphenation end width:', function () {
-        it('Normal word', function () {
-            expect(TypesetBot.hyphen.getEndWidth([3, 4], 0, 7)).toEqual(11);
-            expect(TypesetBot.hyphen.getEndWidth([3, 4], 1, 7)).toEqual(7);
-            expect(TypesetBot.hyphen.getEndWidth([3, 4], 1, 0)).toEqual(0);
+            setTimeout(function() {
+
+                let hyphen = new TypesetBotHyphen(tsb1);
+                let offset = hyphen.getWordOffset('hyphenate');
+
+                expect(offset.left).toEqual(0);
+                expect(offset.right).toEqual(0);
+
+                done();
+            }, 100);
+        });
+        it('Special characters', function(done) {
+            let tsb1 = new TypesetBot(null, defaultSettings);
+
+            setTimeout(function() {
+
+                let hyphen = new TypesetBotHyphen(tsb1);
+                let offset = hyphen.getWordOffset(',|Hello.$.');
+
+                expect(offset.left).toEqual(2);
+                expect(offset.right).toEqual(3);
+
+                done();
+            }, 100);
         });
     });
+    describe('getEndWidth --', function() {
+        it('General', function(done) {
+            let tsb1 = new TypesetBot(null, defaultSettings);
 
+            setTimeout(function() {
 
+                let hyphen = new TypesetBotHyphen(tsb1);
+                let width = hyphen.getEndWidth([3,4], 0, 7);
+
+                expect(width).toEqual(11);
+
+                done();
+            }, 100);
+        })
+    });
 });
