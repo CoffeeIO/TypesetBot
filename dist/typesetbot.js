@@ -1579,6 +1579,11 @@ function TypesetBotTypeset(tsb) {
 
 
     this.render.applyLineBreaks(element, solution, this.lineHeight);
+
+    if (this._tsb.settings.debug) {
+      console.log('Hyphen store:');
+      console.log(this._tsb.hyphenStore);
+    }
   };
   /**
    * Reset typesetting by removing attributes and resetting to original html.
@@ -1653,7 +1658,9 @@ function TypesetBotTypeset(tsb) {
     this._tsb.logger.start('-- Preprocess'); // Analyse working element.
 
 
-    this.getElementProperties(element); // Tokenize element for words, space and tags.
+    this.getElementProperties(element); // Replace invalid characters.
+
+    this.render.replaceInvalidCharacters(element); // Tokenize element for words, space and tags.
 
     this._tsb.logger.start('---- Tokenize text');
 
@@ -1688,6 +1695,11 @@ function TypesetBotTypeset(tsb) {
     this.render.getHyphenProperties(element, this.tokens);
 
     this._tsb.logger.end('---- Hyphen render');
+
+    if (this._tsb.settings.debug) {
+      console.log('Tokens:');
+      console.log(this.tokens);
+    }
 
     this._tsb.logger.end('-- Preprocess');
   };
@@ -2560,6 +2572,17 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
     this.setJustificationClass(element);
 
     this._tsb.logger.end('-- Apply breakpoints');
+  };
+  /**
+   * Replace invalid chracters with valid ones.
+   *
+   * @param element The element
+   */
+
+
+  this.replaceInvalidCharacters = function (element) {
+    // Replace dashes with non-breaking dash.
+    element.innerHTML = element.innerHTML.replace(/-/g, '&#8209;');
   };
 
   this._tsb = tsb;

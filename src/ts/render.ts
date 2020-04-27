@@ -404,4 +404,14 @@ class TypesetBotRender {
 
         this._tsb.logger.end('-- Apply breakpoints');
     }
+
+    /**
+     * Replace invalid chracters with valid ones.
+     *
+     * @param element The element
+     */
+    replaceInvalidCharacters = function(element: Element) {
+        // Replace dashes with non-breaking dash.
+        element.innerHTML = element.innerHTML.replace(/-/g, '&#8209;');
+    }
 }
