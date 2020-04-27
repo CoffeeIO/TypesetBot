@@ -68,6 +68,11 @@ class TypesetBotTypeset {
 
         // Render solution to DOM.
         this.render.applyLineBreaks(element, solution, this.lineHeight);
+
+        if (this._tsb.settings.debug) {
+            console.log('Hyphen store:');
+            console.log(this._tsb.hyphenStore);
+        }
     }
 
     /**
@@ -167,6 +172,11 @@ class TypesetBotTypeset {
         // Calculate hyphens on tokens.
         this.render.getHyphenProperties(element, this.tokens);
         this._tsb.logger.end('---- Hyphen render');
+
+        if (this._tsb.settings.debug) {
+            console.log('Tokens:');
+            console.log(this.tokens);
+        }
 
         this._tsb.logger.end('-- Preprocess');
     }

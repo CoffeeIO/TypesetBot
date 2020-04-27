@@ -1430,7 +1430,9 @@ function TypesetBotTokenizer(tsb, typesetter) {
 
 
   this.replaceInvalidCharacters = function (text) {
-    return text.replace(/(?:\r\n|\r|\n)/g, ' ');
+    text = text.replace(/(?:\r\n|\r|\n)/g, ' ');
+    text = text.replace(/-/g, '&#8209;');
+    return text;
   };
 
   this._tsb = tsb;
@@ -1579,6 +1581,11 @@ function TypesetBotTypeset(tsb) {
 
 
     this.render.applyLineBreaks(element, solution, this.lineHeight);
+
+    if (this._tsb.settings.debug) {
+      console.log('Hyphen store:');
+      console.log(this._tsb.hyphenStore);
+    }
   };
   /**
    * Reset typesetting by removing attributes and resetting to original html.
@@ -1688,6 +1695,11 @@ function TypesetBotTypeset(tsb) {
     this.render.getHyphenProperties(element, this.tokens);
 
     this._tsb.logger.end('---- Hyphen render');
+
+    if (this._tsb.settings.debug) {
+      console.log('Tokens:');
+      console.log(this.tokens);
+    }
 
     this._tsb.logger.end('-- Preprocess');
   };
