@@ -1430,7 +1430,9 @@ function TypesetBotTokenizer(tsb, typesetter) {
 
 
   this.replaceInvalidCharacters = function (text) {
-    return text.replace(/(?:\r\n|\r|\n)/g, ' ');
+    text = text.replace(/(?:\r\n|\r|\n)/g, ' ');
+    text = text.replace(/-/g, '&#8209;');
+    return text;
   };
 
   this._tsb = tsb;
@@ -1658,9 +1660,7 @@ function TypesetBotTypeset(tsb) {
     this._tsb.logger.start('-- Preprocess'); // Analyse working element.
 
 
-    this.getElementProperties(element); // Replace invalid characters.
-
-    this.render.replaceInvalidCharacters(element); // Tokenize element for words, space and tags.
+    this.getElementProperties(element); // Tokenize element for words, space and tags.
 
     this._tsb.logger.start('---- Tokenize text');
 
@@ -2572,17 +2572,6 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
     this.setJustificationClass(element);
 
     this._tsb.logger.end('-- Apply breakpoints');
-  };
-  /**
-   * Replace invalid chracters with valid ones.
-   *
-   * @param element The element
-   */
-
-
-  this.replaceInvalidCharacters = function (element) {
-    // Replace dashes with non-breaking dash.
-    element.innerHTML = element.innerHTML.replace(/-/g, '&#8209;');
   };
 
   this._tsb = tsb;

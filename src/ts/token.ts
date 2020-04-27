@@ -166,7 +166,9 @@ class TypesetBotTokenizer {
      * @returns    The new string with no newlines
      */
     replaceInvalidCharacters = function(text: string): string {
-        return text.replace(/(?:\r\n|\r|\n)/g, ' ');
+        text = text.replace(/(?:\r\n|\r|\n)/g, ' ');
+        text = text.replace(/-/g, '&#8209;');
+        return text;
     }
 }
 

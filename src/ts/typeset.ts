@@ -148,9 +148,6 @@ class TypesetBotTypeset {
         // Analyse working element.
         this.getElementProperties(element);
 
-        // Replace invalid characters.
-        this.render.replaceInvalidCharacters(element);
-
         // Tokenize element for words, space and tags.
         this._tsb.logger.start('---- Tokenize text');
         this.tokens = this.tokenizer.tokenize(element);
