@@ -6,15 +6,25 @@ describe('main.ts:', function () {
             'Hello world' +
         '</div>';
 
+    let loremIpsumText = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis volutpat dolor non diam volutpat, laoreet porta risus sollicitudin. Phasellus cursus magna justo, a molestie metus aliquam a. Sed ut tellus non nunc iaculis pulvinar. Etiam suscipit nulla nec dui consectetur varius. Curabitur tortor odio, tincidunt at pharetra ut, varius a mauris. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nulla elementum augue nulla, eget dictum odio auctor sit amet. Nunc commodo in eros at posuere. Aenean blandit auctor justo, porttitor laoreet arcu mattis eget. Nunc malesuada, enim vitae facilisis sagittis, nisl dolor fermentum eros, id euismod est sapien rhoncus velit. Curabitur id nisi id ligula convallis dapibus. Nam congue dolor eget cursus scelerisque. Etiam at sollicitudin nisl. Nullam semper mi dui, et ultrices arcu semper vitae. In quis metus felis.';
     let loremIpsum =
         '<div class="test">' +
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis volutpat dolor non diam volutpat, laoreet porta risus sollicitudin. Phasellus cursus magna justo, a molestie metus aliquam a. Sed ut tellus non nunc iaculis pulvinar. Etiam suscipit nulla nec dui consectetur varius. Curabitur tortor odio, tincidunt at pharetra ut, varius a mauris. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nulla elementum augue nulla, eget dictum odio auctor sit amet. Nunc commodo in eros at posuere. Aenean blandit auctor justo, porttitor laoreet arcu mattis eget. Nunc malesuada, enim vitae facilisis sagittis, nisl dolor fermentum eros, id euismod est sapien rhoncus velit. Curabitur id nisi id ligula convallis dapibus. Nam congue dolor eget cursus scelerisque. Etiam at sollicitudin nisl. Nullam semper mi dui, et ultrices arcu semper vitae. In quis metus felis.' +
+            loremIpsumText +
         '</div>';
 
     let style =
         '<style class="style">' +
             '.test { width: 500px; line-height: 16px; }' +
         '<style>';
+
+    /**
+     * Generalize text by replacing double spaces with single spaces and trim spaces at the end.
+     *
+     * @param {string} text
+     */
+    function generalizeText(text) {
+        return text.replace(/\s{2,}/g, ' ').trim();
+    }
 
     describe('rerun --', function() { // constructor
         // @todo
@@ -54,8 +64,10 @@ describe('main.ts:', function () {
                 expect(target.getBoundingClientRect().height).toBeLessThanOrEqual(beforeHeight);
 
                 // Check use of hyphen character.
-                var count = (target.textContent.match(/-/g) || []).length;
+                var count = target.querySelectorAll('tsb-hyphen').length;
                 expect(count).toBeGreaterThanOrEqual(0);
+
+                expect(generalizeText(target.textContent)).toEqual(loremIpsumText);
 
                 done();
             }, 100);
@@ -96,8 +108,10 @@ describe('main.ts:', function () {
                 expect(target.getBoundingClientRect().height).toBeLessThan(beforeHeight);
 
                 // Check use of hyphen character.
-                var count = (target.textContent.match(/-/g) || []).length;
+                var count = target.querySelectorAll('tsb-hyphen').length;
                 expect(count).toBeGreaterThan(0);
+
+                expect(generalizeText(target.textContent)).toEqual(loremIpsumText);
 
                 done();
             }, 100);
@@ -139,8 +153,10 @@ describe('main.ts:', function () {
                 expect(target.getBoundingClientRect().height).toEqual(beforeHeight);
 
                 // Check use of hyphen character.
-                var count = (target.textContent.match(/-/g) || []).length;
+                var count = target.querySelectorAll('tsb-hyphen').length;
                 expect(count).toEqual(0);
+
+                expect(generalizeText(target.textContent)).toEqual(loremIpsumText);
 
                 done();
             }, 100);

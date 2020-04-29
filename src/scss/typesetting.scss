@@ -1,5 +1,10 @@
 tsb-line {
-    display: block;
+    // display: block;
+    display: inline-block;
+    width: 100%;
+    &:last-of-type {
+        word-spacing: normal;
+    }
 }
 tsb-hyphen {
     &:after {
@@ -9,18 +14,12 @@ tsb-hyphen {
 
 .typesetbot-justify {
     text-align: justify;
-
     tsb-line {
-        &:after {
-            content: "";
-            display: inline-block;
-            width: 100%;
-        }
+        text-align: justify;
+        @include text-align-last(justify);
+
         &:last-of-type {
-            &:after {
-                display: none;
-            }
-            word-spacing: normal;
+            @include text-align-last(auto);
         }
     }
 }

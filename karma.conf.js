@@ -44,7 +44,7 @@ module.exports = function(config) {
         ],
 
         client: {
-            captureConsole: false,
+            captureConsole: false, // Set to true to see console logs in failed tests.
         },
 
         // list of files to exclude
