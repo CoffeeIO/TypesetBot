@@ -67,6 +67,7 @@ describe('main.ts:', function () {
                 var count = target.querySelectorAll('tsb-hyphen').length;
                 expect(count).toBeGreaterThanOrEqual(0);
 
+                // Check text content is not modified.
                 expect(generalizeText(target.textContent)).toEqual(loremIpsumText);
 
                 done();
@@ -111,6 +112,7 @@ describe('main.ts:', function () {
                 var count = target.querySelectorAll('tsb-hyphen').length;
                 expect(count).toBeGreaterThan(0);
 
+                // Check text content is not modified.
                 expect(generalizeText(target.textContent)).toEqual(loremIpsumText);
 
                 done();
@@ -156,6 +158,7 @@ describe('main.ts:', function () {
                 var count = target.querySelectorAll('tsb-hyphen').length;
                 expect(count).toEqual(0);
 
+                // Check text content is not modified.
                 expect(generalizeText(target.textContent)).toEqual(loremIpsumText);
 
                 done();
