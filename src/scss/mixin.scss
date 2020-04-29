@@ -1,0 +1,6 @@
+
+@mixin text-align-last($value) {
+    text-align-last: $value;
+    -moz-text-align-last: $value;
+    -ms-text-align-last: $value;
+}

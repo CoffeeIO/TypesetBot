@@ -392,10 +392,17 @@ class TypesetBotRender {
                 attr += 'typeset-bot-ratio="' + line.ratio + '" ';
             }
 
+            // If word is not hyphenated, add space to separate words between lines.
+            // This space should not be visible.
+            let gap = ' ';
+            if (line.hyphenIndex != null) {
+                gap = '';
+            }
+
             html +=
                 '<tsb-line ' + attr + ' style="height:' + lineHeight + 'px">' +
                     lineHtml +
-                '</tsb-line>';
+                '</tsb-line>' + gap;
         }
 
         element.innerHTML = html;

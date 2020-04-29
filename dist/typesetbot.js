@@ -2563,9 +2563,17 @@ var TypesetBotRender = function TypesetBotRender(tsb) {
       if (this._tsb.settings.debug) {
         attr += 'typeset-bot-line="' + line.lineNumber + '" ';
         attr += 'typeset-bot-ratio="' + line.ratio + '" ';
+      } // If word is not hyphenated, add space to separate words between lines.
+      // This space should not be visible.
+
+
+      var gap = ' ';
+
+      if (line.hyphenIndex != null) {
+        gap = '';
       }
 
-      html += '<tsb-line ' + attr + ' style="height:' + lineHeight + 'px">' + lineHtml + '</tsb-line>';
+      html += '<tsb-line ' + attr + ' style="height:' + lineHeight + 'px">' + lineHtml + '</tsb-line>' + gap;
     }
 
     element.innerHTML = html;
@@ -2769,7 +2777,7 @@ var TypesetBotHtml = function TypesetBotHtml(tsb) {
 
       var _cut2 = _word.text.substr(0, _cutIndex + 1);
 
-      html += _cut2 + '-'; // Add dash to html
+      html += _cut2 + '<tsb-hyphen></tsb-hyphen>'; // Add dash to html
     }
 
     return html;

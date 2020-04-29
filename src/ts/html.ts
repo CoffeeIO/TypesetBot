@@ -144,7 +144,7 @@ class TypesetBotHtml {
             const cutIndex = word.hyphenIndexPositions[endHyphenIndex];
             const cut = word.text.substr(0, cutIndex + 1);
 
-            html += cut + '-'; // Add dash to html
+            html += cut + '<tsb-hyphen></tsb-hyphen>'; // Add dash to html
         }
 
         return html;
