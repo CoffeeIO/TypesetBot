@@ -1,6 +1,12 @@
 tsb-line {
     display: block;
 }
+tsb-hyphen {
+    &:after {
+        content: '-';
+    }
+}
+
 .typesetbot-justify {
     text-align: justify;
 
@@ -27,3 +33,4 @@ tsb-line {
 .typesetbot-center tsb-line {
     text-align: center;
 }
+

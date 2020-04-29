@@ -1,6 +1,9 @@
 tsb-line {
   display: block; }
 
+tsb-hyphen:after {
+  content: '-'; }
+
 .typesetbot-justify {
   text-align: justify; }
   .typesetbot-justify tsb-line:after {

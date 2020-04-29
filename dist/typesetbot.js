@@ -2769,7 +2769,7 @@ var TypesetBotHtml = function TypesetBotHtml(tsb) {
 
       var _cut2 = _word.text.substr(0, _cutIndex + 1);
 
-      html += _cut2 + '-'; // Add dash to html
+      html += _cut2 + '<tsb-hyphen></tsb-hyphen>'; // Add dash to html
     }
 
     return html;
