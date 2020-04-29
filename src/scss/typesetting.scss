@@ -1,7 +1,13 @@
 tsb-line {
-    // display: block;
-    display: inline-block;
-    width: 100%;
+
+    @supports (text-align-last: justify) {
+        display: inline-block;
+        width: 100%;
+    }
+    @supports not (text-align-last: justify) {
+        display: block;
+    }
+
     &:last-of-type {
         word-spacing: normal;
     }
@@ -15,12 +21,27 @@ tsb-hyphen {
 .typesetbot-justify {
     text-align: justify;
     tsb-line {
-        text-align: justify;
-        @include text-align-last(justify);
+        @supports (text-align-last: justify) {
+            text-align: justify;
+            @include text-align-last(justify);
 
-        &:last-of-type {
-            @include text-align-last(auto);
+            &:last-of-type {
+                @include text-align-last(auto);
+            }
         }
+        @supports not (text-align-last: justify) {
+            &:after {
+                content: "";
+                display: inline-block;
+                width: 100%;
+            }
+            &:last-of-type {
+                &:after {
+                    display: none;
+                }
+            }
+        }
+
     }
 }
 .typesetbot-right tsb-line {
