@@ -1569,7 +1569,7 @@ function TypesetBotTypeset(tsb) {
 
     this.preprocessElement(element); // Calculate all feasible linebreak solutions.
 
-    var finalBreakpoints = this.getFinalLineBreaks(element); // Get best solution.
+    var finalBreakpoints = this.getFinalLineBreaksBasic(element); // Get best solution.
 
     var solution = this.lowestDemerit(finalBreakpoints);
 
@@ -1879,6 +1879,64 @@ function TypesetBotTypeset(tsb) {
 
     if (this.finalBreakpoints.length === 0 && looseness <= 4) {
       return this.getFinalLineBreaks(element, looseness + 1);
+    }
+
+    return this.finalBreakpoints;
+  };
+  /**
+   *
+   */
+
+
+  this.getFinalLineBreaksBasic = function (element) {
+    this.resetLineBreak();
+    element.style.wordSpacing = '';
+    this._tsb.settings.minRatio = 0;
+    this._tsb.settings.alignment = 'left';
+    this._tsb.settings.debug = true;
+    var looseness = 0;
+    this.spaceWidth = this.render.getSpaceWidth(element);
+    var originBreakpoint = new TypesetBotLinebreak(null, 0, null, 0, false, null, 0, 0, 0);
+    var breakpoint = null;
+    var isFinished = false;
+
+    while (!isFinished) {
+      // isFinished = true;
+      var lineProperties = this.initLineProperties(originBreakpoint);
+      var lineIsFinished = false;
+
+      while (!lineIsFinished) {
+        var oldLineWidth = lineProperties.curWidth;
+        var wordData = this.hyphen.nextWord(element, lineProperties.tokenIndex, lineProperties.firstWordHyphenIndex);
+        lineProperties.firstWordHyphenIndex = null; // Unset hyphenindex for next words.
+
+        if (wordData == null) {
+          // No more words are available in element, possible solution.
+          this.pushFinalBreakpoint(originBreakpoint, lineProperties);
+          isFinished = true;
+          lineIsFinished = true;
+          continue;
+        } // Update token index.
+
+
+        lineProperties.tokenIndex = wordData.tokenIndex;
+        lineProperties.curWidth += wordData.width;
+        lineProperties.lineHeight = wordData.height;
+        lineProperties.wordCount++;
+        var ratio = this.math.getRatio(this.elemWidth, lineProperties.curWidth, lineProperties.wordCount, this.spaceShrink, this.spaceStretch); // When line has a ratio lower than 0 the solution is no longer valid, use the breakpoint from previous word.
+
+        if (!this.math.ratioIsHigherThanMin(ratio)) {
+          // Set previous breakpoint as the best option.
+          originBreakpoint = breakpoint; // Finish line.
+
+          lineIsFinished = true;
+          continue; // Don't add the last node.
+        } // Generate breakpoint, but don't use it.
+
+
+        breakpoint = this.getBreakpoint(originBreakpoint, lineProperties, ratio, lineProperties.tokenIndex);
+        lineProperties.curWidth += this.spaceWidth;
+      }
     }
 
     return this.finalBreakpoints;
