@@ -1561,17 +1561,36 @@ function TypesetBotTypeset(tsb) {
    * @param element
    */
   this.typeset = function (element) {
+    var algorithm = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'tsb';
+
     // Reset HTML of node if the typesetting has run before.
     if (this.backupInnerHtml != null) {
       element.innerHTML = this.backupInnerHtml;
     } // Preprocess hyphenations and rendering dimensions.
 
 
-    this.preprocessElement(element); // Calculate all feasible linebreak solutions.
+    this.preprocessElement(element);
+    var finalBreakpoints = [];
+    var solution = null;
 
-    var finalBreakpoints = this.getFinalLineBreaksBasic(element); // Get best solution.
+    switch (algorithm) {
+      case 'tsb':
+        // Calculate all feasible linebreak solutions.
+        finalBreakpoints = this.getFinalLineBreaks(element);
+        solution = this.lowestDemerit(finalBreakpoints);
+        break;
 
-    var solution = this.lowestDemerit(finalBreakpoints);
+      case 'basic':
+        // Calculate tightest positive one-line solution.
+        finalBreakpoints = this.getFinalLineBreaksBasic(element);
+        solution = this.lowestDemerit(finalBreakpoints);
+        break;
+
+      default:
+        this._tsb.logger.warn('Typesetting algorithm "' + algorithm + '" is unknown. Element is skipped.');
+
+        break;
+    }
 
     if (solution == null) {
       this._tsb.logger.warn('No viable solution found during typesetting. Element is skipped.');
@@ -1894,7 +1913,6 @@ function TypesetBotTypeset(tsb) {
     this._tsb.settings.minRatio = 0;
     this._tsb.settings.alignment = 'left';
     this._tsb.settings.debug = true;
-    var looseness = 0;
     this.spaceWidth = this.render.getSpaceWidth(element);
     var originBreakpoint = new TypesetBotLinebreak(null, 0, null, 0, false, null, 0, 0, 0);
     var breakpoint = null;

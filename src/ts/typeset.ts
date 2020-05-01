@@ -47,7 +47,7 @@ class TypesetBotTypeset {
      *
      * @param element
      */
-    typeset = function(element: Element) {
+    typeset = function(element: Element, algorithm: string = 'tsb') {
         // Reset HTML of node if the typesetting has run before.
         if (this.backupInnerHtml != null) {
             element.innerHTML = this.backupInnerHtml;
@@ -56,11 +56,25 @@ class TypesetBotTypeset {
         // Preprocess hyphenations and rendering dimensions.
         this.preprocessElement(element);
 
-        // Calculate all feasible linebreak solutions.
-        const finalBreakpoints = this.getFinalLineBreaksBasic(element);
+        let finalBreakpoints = [];
+        let solution = null;
 
-        // Get best solution.
-        const solution = this.lowestDemerit(finalBreakpoints);
+        switch (algorithm) {
+            case 'tsb':
+                // Calculate all feasible linebreak solutions.
+                finalBreakpoints = this.getFinalLineBreaks(element);
+                solution = this.lowestDemerit(finalBreakpoints);
+                break;
+            case 'basic':
+                // Calculate tightest positive one-line solution.
+                finalBreakpoints = this.getFinalLineBreaksBasic(element);
+                solution = this.lowestDemerit(finalBreakpoints);
+                break;
+            default:
+                this._tsb.logger.warn('Typesetting algorithm "' + algorithm + '" is unknown. Element is skipped.');
+                break;
+        }
+
         if (solution == null) {
             this._tsb.logger.warn('No viable solution found during typesetting. Element is skipped.');
             return;
@@ -363,7 +377,6 @@ class TypesetBotTypeset {
         this._tsb.settings.minRatio = 0;
         this._tsb.settings.alignment = 'left';
         this._tsb.settings.debug = true;
-        let looseness = 0;
 
         this.spaceWidth = this.render.getSpaceWidth(element);
 
