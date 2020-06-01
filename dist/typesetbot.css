@@ -1,23 +1,37 @@
-tsb-line {
-  display: inline-block;
-  width: 100%; }
-  tsb-line:last-of-type {
-    word-spacing: normal; }
+@supports (text-align-last: justify) {
+  tsb-line {
+    display: inline-block;
+    width: 100%; } }
+
+@supports not (text-align-last: justify) {
+  tsb-line {
+    display: block; } }
+
+tsb-line:last-of-type {
+  word-spacing: normal; }
 
 tsb-hyphen:after {
   content: '-'; }
 
 .typesetbot-justify {
   text-align: justify; }
-  .typesetbot-justify tsb-line {
-    text-align: justify;
-    text-align-last: justify;
-    -moz-text-align-last: justify;
-    -ms-text-align-last: justify; }
-    .typesetbot-justify tsb-line:last-of-type {
-      text-align-last: auto;
-      -moz-text-align-last: auto;
-      -ms-text-align-last: auto; }
+  @supports (text-align-last: justify) {
+    .typesetbot-justify tsb-line {
+      text-align: justify;
+      text-align-last: justify;
+      -moz-text-align-last: justify;
+      -ms-text-align-last: justify; }
+      .typesetbot-justify tsb-line:last-of-type {
+        text-align-last: auto;
+        -moz-text-align-last: auto;
+        -ms-text-align-last: auto; } }
+  @supports not (text-align-last: justify) {
+    .typesetbot-justify tsb-line:after {
+      content: "";
+      display: inline-block;
+      width: 100%; }
+    .typesetbot-justify tsb-line:last-of-type:after {
+      display: none; } }
 
 .typesetbot-right tsb-line {
   text-align: right; }
