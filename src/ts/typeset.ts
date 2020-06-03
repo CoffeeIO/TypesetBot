@@ -47,7 +47,7 @@ class TypesetBotTypeset {
      *
      * @param element
      */
-    typeset = function(element: Element) {
+    typeset = function(element: Element, algorithm: string = 'tsb') {
         // Reset HTML of node if the typesetting has run before.
         if (this.backupInnerHtml != null) {
             element.innerHTML = this.backupInnerHtml;
@@ -56,11 +56,25 @@ class TypesetBotTypeset {
         // Preprocess hyphenations and rendering dimensions.
         this.preprocessElement(element);
 
-        // Calculate all feasible linebreak solutions.
-        const finalBreakpoints = this.getFinalLineBreaks(element);
+        let finalBreakpoints = [];
+        let solution = null;
 
-        // Get best solution.
-        const solution = this.lowestDemerit(finalBreakpoints);
+        switch (algorithm) {
+            case 'tsb':
+                // Calculate all feasible linebreak solutions.
+                finalBreakpoints = this.getFinalLineBreaks(element);
+                solution = this.lowestDemerit(finalBreakpoints);
+                break;
+            case 'basic':
+                // Calculate tightest positive one-line solution.
+                finalBreakpoints = this.getFinalLineBreaksBasic(element);
+                solution = this.lowestDemerit(finalBreakpoints);
+                break;
+            default:
+                this._tsb.logger.warn('Typesetting algorithm "' + algorithm + '" is unknown. Element is skipped.');
+                break;
+        }
+
         if (solution == null) {
             this._tsb.logger.warn('No viable solution found during typesetting. Element is skipped.');
             return;
@@ -349,6 +363,98 @@ class TypesetBotTypeset {
         if (this.finalBreakpoints.length === 0 && looseness <= 4) {
             return this.getFinalLineBreaks(element, looseness + 1);
         }
+
+        return this.finalBreakpoints;
+    }
+
+    /**
+     *
+     */
+    getFinalLineBreaksBasic = function(element: HTMLElement): TypesetBotLinebreak[] {
+        this.resetLineBreak();
+        element.style.wordSpacing = '';
+
+        this._tsb.settings.minRatio = 0;
+        this._tsb.settings.alignment = 'left';
+        this._tsb.settings.debug = true;
+
+        this.spaceWidth = this.render.getSpaceWidth(element);
+
+        let originBreakpoint = new TypesetBotLinebreak(
+            null,
+            0,
+            null,
+            0,
+            false,
+            null,
+            0,
+            0,
+            0,
+        );
+        let breakpoint = null;
+
+        let isFinished = false;
+
+
+        while (!isFinished) {
+            // isFinished = true;
+            const lineProperties = this.initLineProperties(originBreakpoint);
+
+            let lineIsFinished = false;
+            while (!lineIsFinished) {
+                let oldLineWidth: number = lineProperties.curWidth;
+                const wordData = this.hyphen.nextWord(
+                    element,
+                    lineProperties.tokenIndex,
+                    lineProperties.firstWordHyphenIndex,
+                ) as TypesetBotWordData;
+
+
+
+                lineProperties.firstWordHyphenIndex = null; // Unset hyphenindex for next words.
+                if (wordData == null) {
+                    // No more words are available in element, possible solution.
+                    this.pushFinalBreakpoint(originBreakpoint, lineProperties);
+                    isFinished = true;
+                    lineIsFinished = true;
+                    continue;
+                }
+
+                // Update token index.
+                lineProperties.tokenIndex = wordData.tokenIndex;
+                lineProperties.curWidth += wordData.width;
+                lineProperties.lineHeight = wordData.height;
+                lineProperties.wordCount++;
+
+                const ratio = this.math.getRatio(
+                    this.elemWidth,
+                    lineProperties.curWidth,
+                    lineProperties.wordCount,
+                    this.spaceShrink,
+                    this.spaceStretch,
+                );
+
+                // When line has a ratio lower than 0 the solution is no longer valid, use the breakpoint from previous word.
+                if (!this.math.ratioIsHigherThanMin(ratio)) {
+                    // Set previous breakpoint as the best option.
+                    originBreakpoint = breakpoint;
+
+                    // Finish line.
+                    lineIsFinished = true;
+                    continue; // Don't add the last node.
+                }
+                // Generate breakpoint, but don't use it.
+                breakpoint = this.getBreakpoint(
+                    originBreakpoint,
+                    lineProperties,
+                    ratio,
+                    lineProperties.tokenIndex,
+                );
+
+                lineProperties.curWidth += this.spaceWidth;
+            }
+        }
+
 
         return this.finalBreakpoints;
     }
